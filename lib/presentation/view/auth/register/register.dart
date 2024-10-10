@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:zuuro/app/base/base_screen.dart';
 import 'package:zuuro/presentation/view/auth/register/provider/reg_provider.dart';
+import 'package:zuuro/presentation/view/vtu/model/country_model.dart';
 
 import '../../../../app/animation/navigator.dart';
 import '../../../../app/cache/orage_cred.dart';
@@ -13,297 +14,6 @@ import '../../../../app/locator.dart';
 import '../../../../app/validator.dart';
 import '../../../resources/resources.dart';
 import '../../onboarding/onboarding.dart';
-
-// class Register extends StatefulWidget {
-//   const Register({super.key, required this.from});
-
-//   final String from;
-
-//   @override
-//   State<Register> createState() => _RegisterState();
-// }
-
-// class _RegisterState extends State<Register> {
-//   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-//   final _mekStorage = getIt<MekStorage>();
-
-//   bool tc = false;
-
-//   late PageController _pageController;
-//   int pageIndex = 0;
-
-//   updatePageIndex() {
-//     if (widget.from == "info") {
-//       setState(() {
-//         pageIndex = 1;
-//       });
-//     } else if (widget.from == "password") {
-//       setState(() {
-//         pageIndex = 2;
-//       });
-//     } else if (widget.from == "pin") {
-//       setState(() {
-//         pageIndex = 3;
-//       });
-//     }
-//   }
-
-//   List<Widget> registrationForms = const [
-//     PhoneNumberReg(),
-//     UserInfoReg(),
-//     PasswordReg(),
-//     CreatePin(),
-//   ];
-
-//   @override
-//   void initState() {
-//     _pageController = PageController(
-//         initialPage: widget.from == "info"
-//             ? 1
-//             : widget.from == "password"
-//                 ? 2
-//                 : widget.from == "pin"
-//                     ? 3
-//                     : 0);
-//     updatePageIndex();
-//     super.initState();
-//   }
-
-//   @override
-//   void dispose() {
-//     _pageController.dispose();
-//     super.dispose();
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       resizeToAvoidBottomInset: false,
-//       body: SafeArea(
-//         child: Form(
-//           key: _formKey,
-//           child: Column(
-//             children: [
-//               Expanded(
-//                 flex: 1,
-//                 child: Padding(
-//                   padding: const EdgeInsets.symmetric(horizontal: 20.0),
-//                   child: Column(
-//                     crossAxisAlignment: CrossAxisAlignment.start,
-//                     mainAxisAlignment: MainAxisAlignment.center,
-//                     children: [
-//                       Row(
-//                         mainAxisAlignment: MainAxisAlignment.center,
-//                         children: [
-//                           ...List.generate(
-//                             registrationForms.length,
-//                             (index) => Padding(
-//                               padding: const EdgeInsets.only(
-//                                 right: 4.0,
-//                               ),
-//                               child: DotIndicatorWidget(
-//                                 isActive: index == pageIndex,
-//                                 isReg: true,
-//                               ),
-//                             ),
-//                           ),
-//                         ],
-//                       ),
-//                       UIHelper.verticalSpaceSmall,
-//                       GradientText(
-//                         gradient: LinearGradient(
-//                           colors: [
-//                             ColorManager.blackColor,
-//                             ColorManager.primaryColor,
-//                             ColorManager.primaryColor,
-//                             ColorManager.primaryColor,
-//                             ColorManager.primaryColor,
-//                           ],
-//                           begin: Alignment.topLeft,
-//                           end: Alignment.bottomRight,
-//                         ),
-//                         "Sign Up",
-//                         style: getBoldStyle(color: ColorManager.whiteColor)
-//                             .copyWith(fontSize: 22),
-//                       ),
-//                     ],
-//                   ),
-//                 ),
-//               ),
-//               Expanded(
-//                 flex: 7,
-//                 child: Padding(
-//                   padding: const EdgeInsets.symmetric(
-//                       horizontal: 20.0, vertical: 10),
-//                   child: PageView.builder(
-//                     controller: _pageController,
-//                     physics: const NeverScrollableScrollPhysics(),
-//                     itemCount: registrationForms.length,
-//                     onPageChanged: (index) {
-//                       setState(
-//                         () {
-//                           pageIndex = index;
-//                         },
-//                       );
-//                     },
-//                     itemBuilder: (context, index) {
-//                       return registrationForms[index];
-//                     },
-//                   ),
-//                 ),
-//               ),
-//               Expanded(
-//                 flex: 2,
-//                 child: Column(
-//                   mainAxisAlignment: MainAxisAlignment.center,
-//                   children: [
-//                     AppButton(
-//                       onPressed: () {
-//                         if (!_formKey.currentState!.validate()) {
-//                           if (pageIndex != registrationForms.length - 1) {
-//                             if (pageIndex == 0) {
-//                               _mekStorage.putString(
-//                                 StorageKeys.onBoardingStorageKey,
-//                                 "number",
-//                               );
-//                               _pageController.nextPage(
-//                                 duration: const Duration(milliseconds: 300),
-//                                 curve: Curves.easeIn,
-//                               );
-//                             } else if (pageIndex == 1) {
-//                               _mekStorage.putString(
-//                                 StorageKeys.onBoardingStorageKey,
-//                                 "info",
-//                               );
-//                               _pageController.nextPage(
-//                                 duration: const Duration(milliseconds: 300),
-//                                 curve: Curves.easeIn,
-//                               );
-//                             } else {
-//                               _mekStorage.putString(
-//                                 StorageKeys.onBoardingStorageKey,
-//                                 "password",
-//                               );
-//                               _pageController.nextPage(
-//                                 duration: const Duration(milliseconds: 300),
-//                                 curve: Curves.easeIn,
-//                               );
-//                             }
-//                           } else {
-//                             _mekStorage.putString(
-//                               StorageKeys.onBoardingStorageKey,
-//                               "reg",
-//                             );
-//                             _modalBottomSheetMenu();
-//                           }
-//                         }
-//                       },
-//                       buttonText: pageIndex == registrationForms.length - 1
-//                           ? "Submit"
-//                           : "Next",
-//                     ),
-//                     UIHelper.verticalSpaceSmall,
-//                     Center(
-//                       child: RichText(
-//                         text: TextSpan(
-//                           text: "Already have an account?  ",
-//                           style: TextStyle(
-//                               fontSize: 12, color: ColorManager.blackColor),
-//                           children: [
-//                             WidgetSpan(
-//                               child: InkWell(
-//                                 onTap: () {
-//                                   NavigateClass().pushNamed(
-//                                     context: context,
-//                                     routName: Routes.loginRoute,
-//                                   );
-//                                 },
-//                                 child: GradientText(
-//                                   gradient: LinearGradient(
-//                                     colors: [
-//                                       ColorManager.primaryColor,
-//                                       ColorManager.primaryColor,
-//                                       ColorManager.secondaryColor,
-//                                     ],
-//                                     begin: Alignment.topLeft,
-//                                     end: Alignment.bottomRight,
-//                                   ),
-//                                   "Sign In",
-//                                   style: getBoldStyle(
-//                                           color: ColorManager.whiteColor)
-//                                       .copyWith(fontSize: 12),
-//                                 ),
-//                               ),
-//                             ),
-//                           ],
-//                         ),
-//                       ),
-//                     ),
-//                   ],
-//                 ),
-//               ),
-//             ],
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-
-//   void _modalBottomSheetMenu() {
-//     showModalBottomSheet(
-//       context: context,
-//       backgroundColor: ColorManager.whiteColor,
-//       builder: (builder) {
-//         return Container(
-//           height: deviceHeight(context) * .7,
-//           color: Colors.transparent,
-//           padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
-//           child: Container(
-//             decoration: const BoxDecoration(
-//               borderRadius: BorderRadius.only(
-//                 topLeft: Radius.circular(20.0),
-//                 topRight: Radius.circular(20.0),
-//               ),
-//             ),
-//             child: Column(
-//               mainAxisAlignment: MainAxisAlignment.center,
-//               children: [
-//                 SvgPicture.asset(ImageAssets.success),
-//                 UIHelper.verticalSpaceMedium,
-//                 Text(
-//                   "Successful",
-//                   style: getBoldStyle(
-//                       color: ColorManager.blackColor, fontSize: 16),
-//                 ),
-//                 UIHelper.verticalSpaceSmall,
-//                 Text(
-//                   " Your account have been successfully\ncreated",
-//                   textAlign: TextAlign.center,
-//                   style: getRegularStyle(
-//                     color: ColorManager.blackColor,
-//                     fontSize: 13,
-//                   ),
-//                 ),
-//                 UIHelper.verticalSpaceMediumPlus,
-//                 AppButton(
-//                   onPressed: () {
-//                     NavigateClass().pushNamed(
-//                       context: context,
-//                       routName: Routes.loginRoute,
-//                     );
-//                   },
-//                   buttonText: pageIndex == registrationForms.length - 1
-//                       ? "Submit"
-//                       : "Next",
-//                 ),
-//               ],
-//             ),
-//           ),
-//         );
-//       },
-//     );
-//   }
-// }
 
 class Register extends StatelessWidget {
   Register({super.key, required this.from});
@@ -330,6 +40,7 @@ class Register extends StatelessWidget {
       PhoneNumberReg(
         countryController: regProvider.countryController,
         numberController: regProvider.telController,
+        registerProvider: regProvider,
       ),
       UserInfoReg(
         nameController: regProvider.nameController,
@@ -593,21 +304,234 @@ class PhoneNumberReg extends StatelessWidget {
     super.key,
     required this.countryController,
     required this.numberController,
+    required this.registerProvider,
   });
 
   TextEditingController countryController = TextEditingController();
   TextEditingController numberController = TextEditingController();
+  RegisterProvider registerProvider;
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        AppFormField(
-          hintText: "Country",
-          keyboardType: TextInputType.name,
-          fieldController: countryController,
-          validator: (String? val) => FieldValidator().validate(val!),
+        // AppFormField(
+        //   hintText: "Country",
+        //   keyboardType: TextInputType.name,
+        //   fieldController: countryController,
+        //   validator: (String? val) => FieldValidator().validate(val!),
+        // ),
+        Text(
+          "Country",
+          style: getBoldStyle(
+            color: ColorManager.deepGreyColor,
+            fontSize: 14,
+          ),
         ),
+        UIHelper.verticalSpaceSmall,
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+          decoration: BoxDecoration(
+            color: ColorManager.greyColor.withOpacity(.4),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                registerProvider.selectedCountry != null
+                    ? registerProvider.selectedCountry!.countryName
+                    : "Select Country",
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1.5,
+                  fontFamily: "NT",
+                  color: ColorManager.blackColor,
+                ),
+              ),
+              InkWell(
+                onTap: () {
+                  appBottomSheet(
+                    context,
+                    isNotTabScreen: true,
+                    Container(
+                      decoration: BoxDecoration(
+                        color: ColorManager.whiteColor,
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(16),
+                          topRight: Radius.circular(16),
+                        ),
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Row(
+                            children: [
+                              IconButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                icon: const Icon(
+                                  Icons.keyboard_backspace_rounded,
+                                ),
+                              ),
+                              const Label(
+                                label: "Select Country",
+                              ),
+                            ],
+                          ),
+                          const Divider(),
+                          Container(
+                            height: 280,
+                            child: Expanded(
+                              child: SingleChildScrollView(
+                                child: Padding(
+                                    padding: const EdgeInsets.all(12.0),
+                                    child: FutureBuilder<List<CountryModel>?>(
+                                      future: registerProvider.getCountryList(
+                                          ctx: context),
+                                      builder: (context, snapshot) {
+                                        if (snapshot.connectionState ==
+                                            ConnectionState.waiting) {
+                                          return Center(
+                                              child:
+                                                  CircularProgressIndicator()); // Show loading indicator while waiting
+                                        } else if (snapshot.hasError) {
+                                          return Text(
+                                              'Error: ${snapshot.error}');
+                                        } else if (snapshot.hasData &&
+                                            snapshot.data != null) {
+                                          List<CountryModel> countries =
+                                              snapshot.data!;
+                                          return Column(
+                                            children: [
+                                              ...List.generate(
+                                                 countries.length,
+                                                  (index) {
+                                                return InkWell(
+                                                  onTap: () {
+                                                    registerProvider.setCountry(
+                                                        countries[index]);
+                                                    Navigator.pop(context);
+                                                  },
+                                                  child: Padding(
+                                                    padding: const EdgeInsets
+                                                        .symmetric(
+                                                      horizontal: 10.0,
+                                                      vertical: 8,
+                                                    ),
+                                                    child: Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Text(
+                                                          countries[index].countryName
+                                                              .toString(),
+                                                          style: TextStyle(
+                                                            color: Colors.black,
+                                                            fontSize:
+                                                                screenAwareSize(
+                                                                    19,
+                                                                    context),
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                            letterSpacing: 1.5,
+                                                          ),
+                                                        ),
+                                                        UIHelper
+                                                            .verticalSpaceSmall,
+                                                        const Divider(),
+                                                        UIHelper
+                                                            .verticalSpaceSmall,
+                                                      ],
+                                                    ),
+                                                  ),
+                                                );
+                                              })
+                                            ],
+                                          );
+                                          // Text(
+                                          //   'Country Name: ${snapshot.data!.customerName}',
+                                          //   style: getBoldStyle(
+                                          //       color: ColorManager.activeColor,
+                                          //       fontSize: 16),
+                                          // );
+                                        } else {
+                                          return Text(
+                                            'Unable to fecth country...',
+                                            style: getBoldStyle(
+                                                color:
+                                                    ColorManager.primaryColor,
+                                                fontSize: 16),
+                                          );
+                                        }
+                                      },
+                                    )
+
+                                    // Column(
+                                    //   children: [
+                                    //     ...List.generate(
+                                    //         vtuProvider.meterType.length,
+                                    //         (index) {
+                                    //       return InkWell(
+                                    //         onTap: () {
+                                    //           vtuProvider.setMeter(vtuProvider
+                                    //               .meterType[index]['name']);
+                                    //           Navigator.pop(context);
+                                    //         },
+                                    //         child: Padding(
+                                    //           padding: const EdgeInsets.symmetric(
+                                    //             horizontal: 10.0,
+                                    //             vertical: 8,
+                                    //           ),
+                                    //           child: Column(
+                                    //             crossAxisAlignment:
+                                    //                 CrossAxisAlignment.start,
+                                    //             children: [
+                                    //               Text(
+                                    //                 vtuProvider.meterType[index]
+                                    //                         ['name']
+                                    //                     .toString(),
+                                    //                 style: TextStyle(
+                                    //                   color: Colors.black,
+                                    //                   fontSize: screenAwareSize(
+                                    //                       19, context),
+                                    //                   fontWeight: FontWeight.w500,
+                                    //                   letterSpacing: 1.5,
+                                    //                 ),
+                                    //               ),
+                                    //               UIHelper.verticalSpaceSmall,
+                                    //               const Divider(),
+                                    //               UIHelper.verticalSpaceSmall,
+                                    //             ],
+                                    //           ),
+                                    //         ),
+                                    //       );
+                                    //     })
+                                    //   ],
+                                    // ),
+
+                                    ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+                child: Icon(
+                  Icons.arrow_drop_down,
+                  color: ColorManager.deepGreyColor,
+                  size: 30,
+                ),
+              ),
+            ],
+          ),
+        ),
+
         UIHelper.verticalSpaceSmall,
         AppFormField(
           hintText: "8056789800",

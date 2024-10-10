@@ -5,6 +5,7 @@ import 'package:zuuro/presentation/resources/resources.dart';
 import 'package:zuuro/presentation/resources/ui_helper.dart';
 
 import '../../../app/animation/navigator.dart';
+import '../../../app/app_constants.dart';
 import '../../../app/locator.dart';
 
 class Profile extends StatelessWidget {
@@ -18,44 +19,55 @@ class Profile extends StatelessWidget {
           height: deviceHeight(context),
           width: deviceWidth(context),
           decoration: BoxDecoration(
-            gradient: ColorManager.buttonGradient,
+            gradient: ColorManager.buttonFadeGradient,
           ),
           child: Stack(
             children: [
               Positioned(
-                top: 15,
+                top: 5,
                 left: 15,
-                child: Row(
+                child: 
+                    Row(
                   children: [
                     Container(
                       height: screenAwareSize(100, context),
                       width: screenAwareSize(100, context),
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: ColorManager.activeColor,
+                        gradient: ColorManager.buttonGradient
+                        //color: ColorManager.primaryColor,
                       ),
+                      child: Center(
+                          child: Text(
+                        AppConstants.homeModel != null
+                            ? AppConstants.homeModel!.data.user.username
+                                .substring(0, 2)
+                                .toUpperCase()
+                            : "",
+                        style: getBoldStyle(
+                          color: ColorManager.whiteColor,
+                          fontSize: 25,
+                        ),
+                      ),),
                     ),
                     UIHelper.horizontalSpaceSmall,
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "Hello, Berry",
-                          style: getRegularStyle(
-                            color: ColorManager.whiteColor,
-                            fontSize: 14,
-                          ),
+                          AppConstants.homeModel != null
+                              ? "Hello ${AppConstants.homeModel!.data.user.username}!"
+                              : "Hello !",
+                          style: getBoldStyle(color: ColorManager.blackColor)
+                              .copyWith(fontSize: 18),
                         ),
-                        UIHelper.verticalSpaceSmall,
                         Text(
-                          "Level 2 Account",
-                          style: getRegularStyle(
-                            color: ColorManager.whiteColor,
-                            fontSize: 10,
-                          ),
+                          "Active Account",
+                          style: getBoldStyle(color: ColorManager.activeColor)
+                              .copyWith(fontSize: 14),
                         ),
                       ],
-                    )
+                    ),
                   ],
                 ),
               ),
@@ -97,10 +109,10 @@ class Profile extends StatelessWidget {
                                 subTitle: "1 linked card/account",
                                 icon: Icons.group,
                                 onPressed: () {
-                                  // NavigateClass().pushNamed(
-                                  //   context: context,
-                                  //   routName: Routes.withdraw,
-                                  // );
+                                  NavigateClass().pushNamed(
+                                    context: context,
+                                    routName: Routes.bank,
+                                  );
                                 },
                                 isLast: true,
                               ),
@@ -262,7 +274,7 @@ class ProfileCategoryWidget extends StatelessWidget {
       children: [
         Text(
           title,
-          style: getRegularStyle(color: ColorManager.greyColor),
+          style: getRegularStyle(color: ColorManager.deepGreyColor),
         ),
         UIHelper.verticalSpaceSmall,
         Container(
@@ -343,7 +355,7 @@ class ProfileTile extends StatelessWidget {
                   width: screenAwareSize(50, context),
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: ColorManager.primaryColor.withOpacity(.4),
+                    color: ColorManager.primaryColor.withOpacity(.2),
                   ),
                   child: Icon(
                     icon,
@@ -363,8 +375,8 @@ class ProfileTile extends StatelessWidget {
                     Text(
                       subTitle,
                       //overflow: TextOverflow.ellipsis,
-                      style: getRegularStyle(color: ColorManager.greyColor)
-                          .copyWith(fontSize: 10),
+                      style: getRegularStyle(color: ColorManager.deepGreyColor)
+                          .copyWith(fontSize: 12),
                     ),
                   ],
                 ),

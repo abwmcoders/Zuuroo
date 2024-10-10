@@ -1,9 +1,11 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
+import '../cache/orage_cred.dart';
 import '../cache/storage.dart';
 import '../locator.dart';
 
@@ -12,9 +14,10 @@ class BaseServices {
   final _mekStorage = getIt<MekStorage>();
 
   //getUserToken from store
-  Future getUserRecords() async {
-    final token = await _mekStorage.getString("mekUserToken");
-    return token;
+  Future getUserToken() async {
+    String? token =
+        await MekSecureStorage().getSecuredKeyStoreData(StorageKeys.token);
+    return token ?? "";
   }
 
   //get request
@@ -44,6 +47,35 @@ class BaseServices {
     }
   }
 
+  //untokenized get  request
+  Future getRequest({required String url, bool decodeJson = false}) async {
+    final String _url = baseUrl + url;
+    try {
+      final _response = await http.get(Uri.parse(_url));
+
+      final _result =
+          decodeJson == true ? _response : jsonDecode(_response.body);
+
+      return _result;
+    } catch (e) {
+      debugPrint("error cateched $e");
+      return null;
+    }
+  }
+
+  Future getListRequest({required String url}) async {
+    final String _url = baseUrl + url;
+    try {
+      final _response = await http.get(Uri.parse(_url));
+      Map<String, dynamic>? map = json.decode(_response.body);
+
+      return map;
+    } catch (e) {
+      debugPrint("error cateched $e");
+      return null;
+    }
+  }
+
   //make post request
   Future tokenizedPostRequest(
       {String? token, dynamic data, required String url}) async {
@@ -59,7 +91,7 @@ class BaseServices {
           .post(Uri.parse(baseUrl + url0),
               headers: headers, body: jsonEncode(data))
           .timeout(const Duration(seconds: 30));
-
+      
       final result = jsonDecode(response.body);
 
       if (response.statusCode == 200) {
@@ -68,7 +100,38 @@ class BaseServices {
       if (response.statusCode == 422) {
         return result;
       } else {
-        return null;
+        return result;
+      }
+    } on SocketException {
+      return null;
+    } catch (e) {
+      return null;
+    }
+  }
+  Future tokenizedPutRequest(
+      {String? token, dynamic data, required String url}) async {
+    final String url0 = url;
+    var headers = {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      'Authorization': 'Bearer $token',
+    };
+
+    try {
+      final response = await http
+          .put(Uri.parse(baseUrl + url0),
+              headers: headers, body: jsonEncode(data))
+          .timeout(const Duration(seconds: 30));
+      
+      final result = jsonDecode(response.body);
+
+      if (response.statusCode == 200) {
+        return result;
+      }
+      if (response.statusCode == 422) {
+        return result;
+      } else {
+        return result;
       }
     } on SocketException {
       return null;
@@ -134,4 +197,6 @@ class BaseServices {
       return null;
     }
   }
+
+
 }

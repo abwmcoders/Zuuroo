@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:zuuro/app/app_constants.dart';
 
+import '../../../app/animation/navigator.dart';
 import '../../resources/resources.dart';
+import '../home/home.dart';
 
 class Wallet extends StatelessWidget {
   const Wallet({super.key});
@@ -28,6 +31,7 @@ class Wallet extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
                               "Available Balance",
@@ -39,8 +43,8 @@ class Wallet extends StatelessWidget {
                             Text(
                               "Money added through deposit",
                               style: getRegularStyle(
-                                color: ColorManager.greyColor,
-                                fontSize: 10,
+                                color: ColorManager.deepGreyColor,
+                                fontSize: 12,
                               ),
                             ),
                            
@@ -48,7 +52,10 @@ class Wallet extends StatelessWidget {
                         ),
                        UIHelper.verticalSpaceMedium,
                         Text(
-                          "₦ 12,000",
+                          AppConstants.homeModel != null ? formatCurrency(
+                                  double.parse(AppConstants
+                                      .homeModel!.data.wallet.balance),
+                                ) : "₦ 0,000",
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.normal,
@@ -63,29 +70,37 @@ class Wallet extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         UIHelper.verticalSpaceLarge,
-                        Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 2),
-                            decoration: BoxDecoration(
-                                gradient: ColorManager.buttonGradient,
-                                borderRadius: BorderRadius.circular(30)),
-                            child: Row(
-                              children: [
-                                Icon(
-                                  Icons.add,
-                                  color: ColorManager.whiteColor,
-                                  size: 20,
-                                ),
-                                UIHelper.horizontalSpaceSmall,
-                                Text(
-                                  "Add Money",
-                                  style: getBoldStyle(
+                        InkWell(
+                          onTap: (){
+                             NavigateClass().pushNamed(
+                              context: context,
+                              routName: Routes.addMoney,
+                            );
+                          },
+                          child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 2),
+                              decoration: BoxDecoration(
+                                  gradient: ColorManager.buttonGradient,
+                                  borderRadius: BorderRadius.circular(30)),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.add,
                                     color: ColorManager.whiteColor,
-                                    fontSize: 12,
+                                    size: 20,
                                   ),
-                                )
-                              ],
-                            ),),
+                                  UIHelper.horizontalSpaceSmall,
+                                  Text(
+                                    "Add Money",
+                                    style: getBoldStyle(
+                                      color: ColorManager.whiteColor,
+                                      fontSize: 12,
+                                    ),
+                                  )
+                                ],
+                              ),),
+                        ),
                       ],
                     ),
                   ],
@@ -106,6 +121,7 @@ class Wallet extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
                               "Loan Balance",
@@ -117,16 +133,20 @@ class Wallet extends StatelessWidget {
                             Text(
                               "Money lend to you",
                               style: getRegularStyle(
-                                color: ColorManager.greyColor,
-                                fontSize: 10,
+                                color: ColorManager.deepGreyColor,
+                                fontSize: 12,
                               ),
                             ),
-                           
                           ],
                         ),
                         UIHelper.verticalSpaceMedium,
                         Text(
-                          "₦ 12,000",
+                          AppConstants.homeModel != null
+                              ? formatCurrency(
+                                  double.parse(AppConstants
+                                      .homeModel!.data.wallet.loanBalance),
+                                )
+                              : "₦ 0,000",
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.normal,
@@ -156,7 +176,7 @@ class Wallet extends StatelessWidget {
                                 ),
                                 UIHelper.horizontalSpaceSmall,
                                 Text(
-                                  "Add Money",
+                                  "Pay Up",
                                   style: getBoldStyle(
                                     color: ColorManager.whiteColor,
                                     fontSize: 12,

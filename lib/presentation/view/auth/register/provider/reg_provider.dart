@@ -6,12 +6,14 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:zuuro/presentation/view/auth/register/model/reg_model.dart';
 import 'package:zuuro/presentation/view/auth/register/repository/reg_repo.dart';
+import 'package:zuuro/presentation/view/vtu/model/country_model.dart';
 
 import '../../../../../app/animation/navigator.dart';
 import '../../../../../app/base/base_view_model/base_vm.dart';
 import '../../../../../app/cache/orage_cred.dart';
 import '../../../../../app/cache/storage.dart';
 import '../../../../../app/functions.dart';
+import '../../../../../app/services/api_rep/user_services.dart';
 import '../../../../resources/resources.dart';
 
 class RegisterProvider extends BaseViewModel {
@@ -23,9 +25,15 @@ class RegisterProvider extends BaseViewModel {
   PageController? pageController;
   int pageIndex = 0;
   String? pin;
+  CountryModel? selectedCountry;
 
   setPin(String text) {
     pin = text;
+    notifyListeners();
+  }
+
+  setCountry(CountryModel country) {
+    selectedCountry = country;
     notifyListeners();
   }
 
@@ -125,6 +133,50 @@ class RegisterProvider extends BaseViewModel {
       }
     }
   }
+
+  
+  Future<List<CountryModel>?> getCountryList({
+    required BuildContext ctx,
+  }) async {
+    try {
+      var request = await UserApiServices().getCountry();
+      if (request != null) {
+        if (request["success"] == true) {
+          List<CountryModel> _countryResult = [];
+          for (dynamic country in request['data']) {
+            final countryModel = CountryModel.fromJson(country);
+            bool exists = _countryResult.any((existingCountry) =>
+                existingCountry.countryCode == countryModel.countryCode);
+
+            if (!exists) {
+              _countryResult.add(countryModel);
+              notifyListeners();
+            }
+          }
+          return _countryResult;
+        } else {
+          MekNotification().showMessage(
+            ctx,
+            message: request['message'].toString(),
+          );
+          return null;
+        }
+      } else {
+        MekNotification().showMessage(
+          ctx,
+          message: request['message'].toString(),
+        );
+        return null;
+      }
+    } catch (e) {
+      MekNotification().showMessage(
+        ctx,
+        message: e.toString(),
+      );
+      return null;
+    }
+  }
+
 
   @override
   FutureOr<void> disposeState() {

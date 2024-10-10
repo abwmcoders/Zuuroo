@@ -82,7 +82,7 @@ class AppFormField extends StatelessWidget {
             borderRadius: BorderRadius.circular(50),
           ),
            suffixIcon: suffixWidget ?? const Text(""),
-          prefixIcon: prefix ?? const Text(""),
+          //prefixIcon: prefix ?? const Text(""),
          // suffix: suffix ?? const Text(""),
           hintText: hintText,
           errorStyle: Styles.kSmallTextStyle.copyWith(

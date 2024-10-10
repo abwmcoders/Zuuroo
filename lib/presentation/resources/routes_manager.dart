@@ -19,6 +19,7 @@ import '../view/money/transfer/transfer.dart';
 import '../view/onboarding/onboarding.dart';
 import '../view/settings/personal_info/personal_info.dart';
 import '../view/settings/t_and_c/t_and_c.dart';
+import '../view/vtu/cable/cable.dart';
 import '../view/vtu/success/success.dart';
 import 'resources.dart';
 
@@ -34,6 +35,7 @@ class Routes {
   static const String dataRoute = "/Data";
   static const String betRoute = "/Betting";
   static const String electRoute = "/Electricity";
+  static const String cableRoute = "/Cable";
   static const String success = "/Success";
   static const String addMoney = "/add-money";
   static const String bank = "/bank-transfer";
@@ -78,6 +80,8 @@ class RouteGenerator {
         return MaterialPageRoute(builder: (_) => const Bet());
       case Routes.electRoute:
         return MaterialPageRoute(builder: (_) => const Bill());
+      case Routes.cableRoute:
+        return MaterialPageRoute(builder: (_) => const Cable());
       case Routes.success:
         return MaterialPageRoute(builder: (_) => const SuccessScreen());
       case Routes.addMoney:
@@ -89,7 +93,7 @@ class RouteGenerator {
       case Routes.changePin:
         return MaterialPageRoute(builder: (_) => const ChangePin());
       case Routes.personalInfo:
-        return MaterialPageRoute(builder: (_) => const PersonalInfo());
+        return MaterialPageRoute(builder: (_) => PersonalInfo());
       case Routes.bankTransfer:
         return MaterialPageRoute(builder: (_) => const BankTransfer());
       case Routes.cardFunding:

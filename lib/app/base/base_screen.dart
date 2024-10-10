@@ -6,7 +6,6 @@ import 'base_view_model/base_vm.dart';
 
 
 
-
 class BaseView<T extends BaseViewModel> extends StatelessWidget {
   const BaseView({super.key, required this.vmBuilder, required this.builder});
 

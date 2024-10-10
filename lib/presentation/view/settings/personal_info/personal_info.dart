@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:zuuro/app/app_constants.dart';
+import 'package:zuuro/presentation/view/home/model/home_model.dart';
 
 import '../../../resources/resources.dart';
 import '../../history/transaction_details.dart';
 import '../../vtu/airtime/airtime.dart';
 
 class PersonalInfo extends StatelessWidget {
-  const PersonalInfo({super.key});
+  PersonalInfo({super.key});
 
   @override
   Widget build(BuildContext context) {
+    User user = AppConstants.homeModel!.data.user;
     return Scaffold(
       appBar: const SimpleAppBar(title: "Personal Information"),
       body: ContainerWidget(
@@ -20,39 +23,52 @@ class PersonalInfo extends StatelessWidget {
               width: screenAwareSize(120, context),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: ColorManager.activeColor,
+                gradient: ColorManager.buttonGradient
+                //color: ColorManager.activeColor,
               ),
+              child: Center(
+                          child: Text(
+                        AppConstants.homeModel != null
+                            ? AppConstants.homeModel!.data.user.name
+                                .substring(0, 2)
+                                .toUpperCase()
+                            : "",
+                        style: getBoldStyle(
+                          color: ColorManager.whiteColor,
+                          fontSize: 25,
+                        ),
+                      ),),
             ),
             UIHelper.verticalSpaceLarge,
-            const RowTile(
+            RowTile(
               title: "Full name",
-              value: "John Doe",
+              value: user.name,
             ),
             RowTile(
               title: "Phone number",
-              value: "+234679054435",
+              value: user.phoneNumber,
               valueTextColor: ColorManager.selectColor,
             ),
-            const RowTile(
+             RowTile(
               title: "Nickname",
-              value: "Johnny",
+              value: user.username,
             ),
-            const RowTile(
+             RowTile(
               title: "Gender",
-              value: "Male",
+              value: user.gender.toUpperCase(),
             ),
-            const RowTile(
+             RowTile(
               title: "Date of birth",
-              value: "09/8/2000",
+              value: user.dateOfBirth,
             ),
             RowTile(
               title: "Email",
-              value: "Johndoe@gmail.com",
+              value: user.email,
               valueTextColor: ColorManager.selectColor,
             ),
-            const RowTile(
+             RowTile(
               title: "Address",
-              value: "No 3,Aliafia street crescent, Lagos road",
+              value: user.address,
             ),
             UIHelper.verticalSpaceSmall,
             Align(
@@ -79,7 +95,10 @@ class PersonalInfo extends StatelessWidget {
 
 class RowTile extends StatelessWidget {
   const RowTile({
-    super.key, required this.title, required this.value, this.valueTextColor,
+    super.key,
+    required this.title,
+    required this.value,
+    this.valueTextColor,
   });
 
   final String title, value;
@@ -96,18 +115,20 @@ class RowTile extends StatelessWidget {
             flex: 4,
             child: Text(
               title,
-              style:
-                  getRegularStyle(color: ColorManager.deepGreyColor, fontSize: 13),
+              style: getRegularStyle(
+                  color: ColorManager.deepGreyColor, fontSize: 13),
             ),
           ),
           Expanded(
-          flex: 6,
+            flex: 6,
             child: Align(
               alignment: Alignment.bottomRight,
               child: Text(
                 value,
                 textAlign: TextAlign.start,
-                style: getBoldStyle(color: valueTextColor ?? ColorManager.blackColor, fontSize: 14),
+                style: getBoldStyle(
+                    color: valueTextColor ?? ColorManager.blackColor,
+                    fontSize: 14),
               ),
             ),
           ),

@@ -1,0 +1,418 @@
+// ignore_for_file: use_build_context_synchronously
+
+import 'dart:async';
+import 'dart:developer';
+
+import 'package:flutter/material.dart';
+import 'package:zuuro/app/app_constants.dart';
+import 'package:zuuro/app/base/base_view_model/base_vm.dart';
+import 'package:zuuro/presentation/resources/resources.dart';
+import 'package:zuuro/presentation/resources/style_manager.dart';
+import 'package:zuuro/presentation/view/vtu/model/biller_model.dart';
+
+import '../../../../app/animation/navigator.dart';
+import '../../../../app/functions.dart';
+import '../../../../app/services/api_rep/user_services.dart';
+import '../model/country_model.dart';
+import '../model/meter_number_model.dart';
+import '../model/operator_model.dart';
+
+class VtuProvider extends BaseViewModel {
+  BuildContext? context;
+  List<CountryModel>? countries;
+  dynamic operators;
+  CountryModel? selectedCountry;
+  BillerData? selectedBiller;
+  bool shouldCallInit = false;
+  bool callBiller = false;
+
+  VtuProvider({
+    this.context,
+    this.countries,
+    this.operators,
+    this.selectedCountry,
+    this.shouldCallInit = true,
+    this.callBiller = false,
+  });
+
+  // TextEditingController amountController = TextEditingController();
+  // TextEditingController numberController = TextEditingController();
+
+  String? countryCode;
+  String? billerCode;
+  String? customerName;
+  String? customerNumber;
+  String? billerName;
+  String? phoneCode;
+  String? operatorCode;
+  bool operatorSet = false;
+  String? otp;
+  String? metr;
+
+  final List<Map> meterType = [
+    {
+      'id': 1,
+      'name': 'Prepaid',
+    },
+    {
+      'id': 2,
+      'name': 'Postpaid',
+    }
+  ];
+
+  setCountryCode(String newCode, String newPhoneCode) {
+    countryCode = newCode;
+    phoneCode = newPhoneCode;
+    notifyListeners();
+  }
+
+  setBillerCode(String newCode, String newName) {
+    billerCode = newCode;
+    billerName = newName;
+    notifyListeners();
+    
+  }
+
+  setCustomerName(String name, String number) {
+    customerName = name;
+    customerNumber = number;
+    notifyListeners();
+  }
+
+  setOtp(String newOtp) {
+    otp = newOtp;
+    notifyListeners();
+  }
+
+  setMeter(String newMeter) {
+    metr = newMeter;
+    notifyListeners();
+  }
+
+  setOperatorCode(code) {
+    operatorCode = code;
+    notifyListeners();
+  }
+
+  isOpSet() {
+    operatorSet = true;
+    notifyListeners();
+  }
+
+  List<DropdownMenuItem<CountryModel>> countryList(List<CountryModel> ct) {
+    return ct
+        .map(
+          (value) => DropdownMenuItem<CountryModel>(
+            value: value,
+            child: RichText(
+              text: TextSpan(
+                children: [
+                  TextSpan(
+                    text: value.countryName,
+                    style: getBoldStyle(
+                      color: ColorManager.blackColor,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        )
+        .toList();
+  }
+
+  List<DropdownMenuItem<BillerData>> billersCode(List<BillerData> ct) {
+    return ct
+        .map(
+          (value) => DropdownMenuItem<BillerData>(
+            value: value,
+            child: Text(
+              overflow: TextOverflow.ellipsis,
+              value.billerName,
+              softWrap: true,
+              style: getBoldStyle(
+                color: ColorManager.blackColor,
+                fontSize: 14,
+              ),
+            ),
+          ),
+        )
+        .toList();
+  }
+
+  List<DropdownMenuItem<Map<dynamic, dynamic>>> meterTypeList() {
+    return meterType
+        .map(
+          (value) => DropdownMenuItem<Map<dynamic, dynamic>>(
+            value: value,
+            child: Text(
+              value["name"],
+              softWrap: true,
+              style: getBoldStyle(
+                color: ColorManager.blackColor,
+                fontSize: 14,
+              ),
+            ),
+          ),
+        )
+        .toList();
+  }
+
+  getData() async {
+    final response = await UserApiServices().getCountryList();
+    if (response != null && response['data'] != null) {
+      List<CountryModel> _countryResult = AppConstants.countryModel ?? [];
+      for (dynamic country in response['data']) {
+        final countryModel = CountryModel.fromJson(country);
+        bool exists = _countryResult.any((existingCountry) =>
+            existingCountry.countryCode == countryModel.countryCode);
+
+        if (!exists) {
+          _countryResult.add(countryModel);
+        }
+
+        AppConstants.countryModel = _countryResult;
+        notifyListeners();
+      }
+    }
+  }
+
+  getBiller() async {
+    final response = await UserApiServices().getBillerList();
+    if (response != null && response['data'] != null) {
+      List<BillerData> _billerResult = AppConstants.billerModel ?? [];
+      for (dynamic biller in response['data']) {
+        final billerModel = BillerData.fromJson(biller);
+        bool exists = _billerResult.any((existingBiller) =>
+            existingBiller.billerCode == billerModel.billerCode);
+        if (!exists) {
+          _billerResult.add(billerModel);
+        }
+        AppConstants.billerModel = _billerResult;
+        notifyListeners();
+      }
+    }
+  }
+
+  getOperator(String code) async {
+    final response = await UserApiServices().getOperatorList(code);
+    if (response != null) {
+      List<OperatorModel> _operatorsResults = AppConstants.operatorModel ?? [];
+      for (dynamic operator in response['data']) {
+        final operators = OperatorModel.fromJson(operator);
+        bool exists = _operatorsResults.any((existingOperator) =>
+            existingOperator.operatorCode == operators.operatorCode);
+        if (!exists) {
+          _operatorsResults.add(
+            OperatorModel.fromJson(operator),
+          );
+        }
+
+        AppConstants.operatorModel = _operatorsResults;
+        notifyListeners();
+      }
+    }
+  }
+
+  void purchaseAirtime(
+      {required BuildContext ctx,
+      int topUp = 1,
+      required String number,
+      required String amount}) async {
+    dismissKeyboard(context);
+    changeLoaderStatus(true);
+    var body = {
+      "pin": otp,
+      "top_up": topUp,
+      "country": countryCode,
+      "phoneNumber": number,
+      "network_operator":
+          operatorCode ?? AppConstants.operatorModel![0].operatorCode,
+      "amount": amount,
+    };
+
+    print("object for airtime purchase ---> $body");
+    try {
+      var request = await UserApiServices().purchaseAirtime(body);
+      changeLoaderStatus(false);
+      if (request != null) {
+        if (request["status"] == true) {
+          NavigateClass().pushNamed(
+            context: ctx,
+            routName: Routes.success,
+          );
+        } else {
+          MekNotification().showMessage(
+            ctx,
+            message: request['message'].toString(),
+          );
+        }
+      } else {
+        MekNotification().showMessage(
+          ctx,
+          message: request['message'].toString(),
+        );
+      }
+    } catch (e) {
+      MekNotification().showMessage(
+        ctx,
+        message: e.toString(),
+      );
+    }
+  }
+
+  void purchaseBill(
+      {required BuildContext ctx,
+      required String meterNumber,
+      String meterType = "prepaid",
+      required String amount}) async {
+    dismissKeyboard(context);
+    changeLoaderStatus(true);
+    var body =     {
+    "billerName": billerCode,
+    "meterType": meterType,
+    "meterNumber": meterNumber,
+    "amount": amount,
+    "customerName": customerName,
+    "customerPhoneNumber": customerNumber,
+    "pin": otp,
+};
+
+    print("object for airtime purchase ---> $body");
+    try {
+      var request = await UserApiServices().purchaseBill(body);
+      changeLoaderStatus(false);
+      if (request != null) {
+        if (request["status"] == true) {
+          NavigateClass().pushNamed(
+            context: ctx,
+            routName: Routes.success,
+          );
+        } else {
+          MekNotification().showMessage(
+            ctx,
+            message: request['message'].toString(),
+          );
+        }
+      } else {
+        MekNotification().showMessage(
+          ctx,
+          message: request['message'].toString(),
+        );
+      }
+    } catch (e) {
+      MekNotification().showMessage(
+        ctx,
+        message: e.toString(),
+      );
+    }
+  }
+
+  void verifyPin(
+      {required BuildContext ctx, required Function onSuccess}) async {
+    dismissKeyboard(context);
+    changeLoaderStatus(true);
+    var body = {
+      "pin": otp,
+    };
+
+    try {
+      var request = await UserApiServices().verifyPin(body);
+      changeLoaderStatus(false);
+      if (request != null) {
+        if (request["status"] == true) {
+          onSuccess();
+        } else {
+          MekNotification().showMessage(
+            ctx,
+            message: request['message'].toString(),
+          );
+        }
+      } else {
+        MekNotification().showMessage(
+          ctx,
+          message: request['message'].toString(),
+        );
+      }
+    } catch (e) {
+      MekNotification().showMessage(
+        ctx,
+        message: e.toString(),
+      );
+    }
+  }
+
+  Future<VerifyMeterNumberData?> verifyMeterNumber(
+      {required BuildContext ctx,
+      required String ctr,
+      required String billerCode,
+      String meterType = "prepaid",
+      }) async {
+    dismissKeyboard(context);
+    var body = {
+      "serviceID": ctr,
+      "billersCode": billerCode,
+      "meterType": meterType,
+    };
+
+    try {
+      var request = await UserApiServices().verifyMeterNumber(body);
+      if (request != null) {
+        if (request["success"] == true) {
+          var verifyMeterResponse =
+              VerifyMeterNumberData.fromJson(request['data']);
+          return verifyMeterResponse;
+        } else {
+          MekNotification().showMessage(
+            ctx,
+            message: request['message'].toString(),
+          );
+          return null;
+        }
+      } else {
+        MekNotification().showMessage(
+          ctx,
+          message: request['message'].toString(),
+        );
+        return null;
+      }
+    } catch (e) {
+      MekNotification().showMessage(
+        ctx,
+        message: e.toString(),
+      );
+      return null;
+    }
+  }
+
+  void setSelectedCountry(CountryModel country) {
+    selectedCountry = country;
+    notifyListeners();
+  }
+
+  void setSelectedBiller(BillerData biller) {
+    selectedBiller = biller;
+    notifyListeners();
+  }
+
+  @override
+  FutureOr<void> disposeState() {}
+
+  @override
+  FutureOr<void> initState() async {
+    if (callBiller) {
+      await getBiller();
+    }
+    if (countries == null || AppConstants.countryModel == null) {
+      if (shouldCallInit) {
+        changeCallInitState(false);
+        await getData();
+      }
+    }
+  }
+
+  changeCallInitState(bool state) {
+    shouldCallInit = state;
+    notifyListeners();
+  }
+}

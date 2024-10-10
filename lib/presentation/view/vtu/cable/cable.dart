@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:zuuro/app/base/base_screen.dart';
+import 'package:zuuro/presentation/view/vtu/model/cable_model.dart';
+import 'package:zuuro/presentation/view/vtu/provider/cable_provider.dart';
 
 import '../../../../app/animation/navigator.dart';
+import '../../../../app/app_constants.dart';
+import '../../../../app/functions.dart';
+import '../../../../app/validator.dart';
 import '../../../resources/resources.dart';
 import '../../history/transaction_details.dart';
 import '../airtime/airtime.dart';
 import '../elect/elect.dart';
+import '../model/verify_iuc.dart';
 
 class Cable extends StatefulWidget {
   const Cable({super.key});
@@ -14,32 +21,56 @@ class Cable extends StatefulWidget {
   State<Cable> createState() => _CableState();
 }
 
-class _CableState extends State<Cable> with SingleTickerProviderStateMixin{
-
+class _CableState extends State<Cable> with SingleTickerProviderStateMixin {
   TabController? _tabController;
+  bool checkNumber = false;
+  FocusNode? pin2FocusNode;
+  FocusNode? pin3FocusNode;
+  FocusNode? pin4FocusNode;
+
+  TextEditingController pin1 = TextEditingController(text: "");
+  TextEditingController pin2 = TextEditingController(text: "");
+  TextEditingController pin3 = TextEditingController(text: "");
+  TextEditingController pin4 = TextEditingController(text: "");
+  TextEditingController amountController = TextEditingController(text: "");
+  TextEditingController numberController = TextEditingController(text: "");
+  bool isOtpComplete = false;
+
+   String? newOtp;
 
   @override
   void initState() {
     _tabController = TabController(length: 2, vsync: this);
+    pin2FocusNode = FocusNode();
+    pin3FocusNode = FocusNode();
+    pin4FocusNode = FocusNode();
     super.initState();
   }
 
+
+  void nextField(String value, FocusNode? focusNode) {
+    if (value.length == 1) {
+      focusNode!.requestFocus();
+    }
+  }
+
+
   @override
   void dispose() {
+    pin2FocusNode!.dispose();
+    pin3FocusNode!.dispose();
+    pin4FocusNode!.dispose();
     _tabController!.dispose();
     super.dispose();
   }
 
-
-  TextEditingController email = TextEditingController();
-  TextEditingController cardNumber = TextEditingController();
-  TextEditingController phoneNumber = TextEditingController();
+  TextEditingController iucNumber = TextEditingController();
 
   String? _mySelection;
   String? _selectedPlan;
   int? _selectedIndex;
   String selectedLoan = '';
-  
+
   final List<Map> _myJson = [
     {
       'id': 'dstv',
@@ -97,7 +128,7 @@ class _CableState extends State<Cable> with SingleTickerProviderStateMixin{
             padding: const EdgeInsets.all(10.0),
             child: DropdownButton<String>(
               borderRadius: BorderRadius.circular(15),
-              hint: Text('Select Cable Provider'),
+              hint: const Text('Select Cable Provider'),
               underline: Container(
                 height: 1,
                 color: ColorManager.primaryColor,
@@ -162,7 +193,7 @@ class _CableState extends State<Cable> with SingleTickerProviderStateMixin{
             padding: const EdgeInsets.all(10.0),
             child: DropdownButton<String>(
               borderRadius: BorderRadius.circular(15),
-              hint: Text('Select Buoquet'),
+              hint: const Text('Select Buoquet'),
               underline: Container(
                 height: 1,
                 color: ColorManager.primaryColor,
@@ -224,7 +255,6 @@ class _CableState extends State<Cable> with SingleTickerProviderStateMixin{
             padding: const EdgeInsets.all(10.0),
             child: TextField(
               keyboardType: TextInputType.number,
-              controller: cardNumber,
               style: const TextStyle(color: Colors.black87),
               decoration: InputDecoration(
                   border: UnderlineInputBorder(
@@ -237,7 +267,7 @@ class _CableState extends State<Cable> with SingleTickerProviderStateMixin{
                   ),
                   //contentPadding: EdgeInsets.only(top: 0.0, left: 20),
                   hintText: 'Enter smart card number',
-                  hintStyle: TextStyle(color: Colors.black38)),
+                  hintStyle: const TextStyle(color: Colors.black38)),
             ),
           ),
         )
@@ -263,7 +293,6 @@ class _CableState extends State<Cable> with SingleTickerProviderStateMixin{
             padding: const EdgeInsets.all(10.0),
             child: TextField(
               keyboardType: TextInputType.emailAddress,
-              controller: phoneNumber,
               style: const TextStyle(color: Colors.black87),
               decoration: InputDecoration(
                   border: UnderlineInputBorder(
@@ -276,7 +305,7 @@ class _CableState extends State<Cable> with SingleTickerProviderStateMixin{
                   ),
                   //contentPadding: EdgeInsets.only(top: 0.0, left: 20),
                   hintText: 'Enter email address',
-                  hintStyle: TextStyle(color: Colors.black38)),
+                  hintStyle: const TextStyle(color: Colors.black38)),
             ),
           ),
         )
@@ -302,7 +331,6 @@ class _CableState extends State<Cable> with SingleTickerProviderStateMixin{
             padding: const EdgeInsets.all(10.0),
             child: TextField(
               keyboardType: TextInputType.number,
-              controller: phoneNumber,
               style: const TextStyle(color: Colors.black87),
               decoration: InputDecoration(
                   border: UnderlineInputBorder(
@@ -315,7 +343,7 @@ class _CableState extends State<Cable> with SingleTickerProviderStateMixin{
                   ),
                   //contentPadding: EdgeInsets.only(top: 0.0, left: 20),
                   hintText: 'Enter phone number',
-                  hintStyle: TextStyle(color: Colors.black38)),
+                  hintStyle: const TextStyle(color: Colors.black38)),
             ),
           ),
         )
@@ -323,133 +351,14 @@ class _CableState extends State<Cable> with SingleTickerProviderStateMixin{
     );
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-       
-      appBar: const SimpleAppBar(title: "Data"),
-      body: ContainerWidget(
-        content: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            AppTabView(
-              tabController: _tabController,
-            ),
-            UIHelper.verticalSpaceSmall,
-            AppTabField(
-              tabController: _tabController,
-              contentOne: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: ListView(
-                  children: [
-                    const VtuCountrySelector(),
-                    UIHelper.verticalSpaceMedium,
-                    const AppNumberField(),
-                    UIHelper.verticalSpaceMedium,
-                    
-                    UIHelper.verticalSpaceMedium,
-                    Text(
-                      "Loan",
-                      style: getBoldStyle(
-                        color: ColorManager.deepGreyColor,
-                        fontSize: 14,
-                      ),
-                    ),
-                    UIHelper.verticalSpaceSmall,
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: List.generate(
-                        loanPeriod.length,
-                        (index) => Expanded(
-                          child: SelectLoanPeriod(
-                            accountType: loanPeriod[index]['name'],
-                            active: _selectedIndex == index ? true : false,
-                            onPressed: () {
-                              setState(() {
-                                if (_selectedIndex == index) {
-                                  _selectedIndex = null;
-                                } else {
-                                  _selectedIndex = index;
-                                }
-                                selectedLoan =
-                                    "${loanPeriod[_selectedIndex!]["name"]}";
-                              });
-                            },
-                          ),
-                        ),
-                      ),
-                    ),
-                    UIHelper.verticalSpaceMedium,
-                    const AppAmountField(
-                      title: "Loan Repayment",
-                    ),
-                    UIHelper.verticalSpaceLarge,
-                    Row(
-                      children: [
-                        Expanded(
-                          child: AppButton(
-                            buttonText: "Submit",
-                            onPressed: () {},
-                            height: 30,
-                          ),
-                        ),
-                        UIHelper.horizontalSpaceSmall,
-                        Expanded(
-                          child: AppButton(
-                            buttonText: "clear",
-                            onPressed: () {},
-                            height: 30,
-                            borderColor: ColorManager.primaryColor,
-                            buttonColor: ColorManager.whiteColor,
-                            buttonTextColor: ColorManager.primaryColor,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              contentTwo: Column(
-                children: [
-                  const VtuCountrySelector(),
-                  UIHelper.verticalSpaceMedium,
-                  const AppNumberField(),
-                  UIHelper.verticalSpaceMedium,
-                  
-                  UIHelper.verticalSpaceMedium,
-                  Row(
-                    children: [
-                      Expanded(
-                        child: AppButton(
-                          buttonText: "Submit",
-                          onPressed: () {
-                            _confirmationBottomSheetMenu();
-                          },
-                          height: 30,
-                        ),
-                      ),
-                      UIHelper.horizontalSpaceSmall,
-                      Expanded(
-                        child: AppButton(
-                          buttonText: "clear",
-                          onPressed: () {},
-                          height: 30,
-                          borderColor: ColorManager.primaryColor,
-                          buttonColor: ColorManager.whiteColor,
-                          buttonTextColor: ColorManager.primaryColor,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
+      appBar: const SimpleAppBar(title: "Cable"),
+      body: BaseView(
+        vmBuilder: (context) => CableProvider(context: context),
+        builder: _buildScreen,
       ),
-   
-   
       // appBar: AppBar(
       //   leading: IconButton(
       //       onPressed: () {
@@ -529,12 +438,821 @@ class _CableState extends State<Cable> with SingleTickerProviderStateMixin{
       //     ),
       //   ),
       // ),
-    
+    );
+  }
+
+  Widget _buildScreen(BuildContext context, CableProvider cableProvider) {
+    return ContainerWidget(
+      content: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          AppTabView(
+            tabController: _tabController,
+          ),
+          UIHelper.verticalSpaceSmall,
+          AppTabField(
+            tabController: _tabController,
+            contentOne: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: ListView(
+                children: [
+                  //!const VtuCountrySelector(),
+                  Text(
+                    "Cable Tv",
+                    style: getBoldStyle(
+                      color: ColorManager.deepGreyColor,
+                      fontSize: 14,
+                    ),
+                  ),
+                  UIHelper.verticalSpaceSmall,
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 8),
+                        child: Center(
+                          child: Text(
+                            cableProvider.cableCode != null
+                                ? cableProvider.cableCode!
+                                    .toUpperCase()
+                                    .substring(0, 2)
+                                : "..",
+                            style: getBoldStyle(
+                              color: ColorManager.blackColor,
+                              fontSize: 18,
+                            ),
+                          ),
+                        ),
+                      ),
+                      UIHelper.horizontalSpaceSmall,
+                      AppConstants.cableModel != null &&
+                              AppConstants.cableModel!.isNotEmpty
+                          ? Expanded(
+                              child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 10, vertical: 0),
+                                  decoration: BoxDecoration(
+                                    color:
+                                        ColorManager.greyColor.withOpacity(.4),
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: DropdownButtonFormField<CableData>(
+                                    decoration: const InputDecoration(
+                                      border: InputBorder.none,
+                                      enabledBorder: InputBorder.none,
+                                    ),
+                                    value: cableProvider.selectedCable,
+                                    onChanged: (CableData? newValue) async {
+                                      cableProvider.setSelectedCable(newValue!);
+                                      cableProvider.setString(
+                                        newValue.providerCode!,
+                                        newValue.providerName!,
+                                      );
+
+                                      await cableProvider.getCableplan(
+                                        newValue.providerCode!,
+                                      );
+
+                                      cableProvider.setPlan();
+                                    },
+                                    items: cableProvider
+                                        .cableList(AppConstants.cableModel!),
+                                  )),
+                            )
+                          : Container(),
+                    ],
+                  ),
+
+                  UIHelper.verticalSpaceMedium,
+                  Text(
+                    "Cable Plan",
+                    style: getBoldStyle(
+                      color: ColorManager.deepGreyColor,
+                      fontSize: 14,
+                    ),
+                  ),
+                  UIHelper.verticalSpaceSmall,
+                  Container(
+                    height: 40,
+                    padding: EdgeInsets.symmetric(horizontal: 15, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: ColorManager.greyColor.withOpacity(.4),
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          cableProvider.cablePlan != null
+                              ? cableProvider.cablePlan!.plan
+                              : "Select Cable Plan",
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 1.5,
+                            fontFamily: "NT",
+                            color: ColorManager.blackColor,
+                          ),
+                        ),
+                        InkWell(
+                          onTap: () {
+                            appBottomSheet(
+                              context,
+                              isNotTabScreen: true,
+                              Container(
+                                decoration: BoxDecoration(
+                                  color: ColorManager.whiteColor,
+                                  borderRadius: const BorderRadius.only(
+                                    topLeft: Radius.circular(16),
+                                    topRight: Radius.circular(16),
+                                  ),
+                                ),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        IconButton(
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                          },
+                                          icon: const Icon(
+                                            Icons.keyboard_backspace_rounded,
+                                          ),
+                                        ),
+                                        const Label(
+                                          label: "Select Cable Plan",
+                                        ),
+                                      ],
+                                    ),
+                                    const Divider(),
+                                    Container(
+                                      height: 280,
+                                      child: Expanded(
+                                        child: SingleChildScrollView(
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(12.0),
+                                            child: Column(
+                                              children: [
+                                                ...List.generate(
+                                                    AppConstants.cablePlanModel!
+                                                        .length, (index) {
+                                                  return InkWell(
+                                                    onTap: () {
+                                                      cableProvider.setSelectedPlan(
+                                                          AppConstants
+                                                                  .cablePlanModel![
+                                                              index]);
+                                                      Navigator.pop(context);
+                                                    },
+                                                    child: Padding(
+                                                      padding: const EdgeInsets
+                                                          .symmetric(
+                                                        horizontal: 10.0,
+                                                        vertical: 8,
+                                                      ),
+                                                      child: Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Text(
+                                                            AppConstants
+                                                                    .cablePlanModel![
+                                                                        index]
+                                                                    .plan
+                                                                    .toString() +
+                                                                "------>${AppConstants.currencySymbol} ${AppConstants.cablePlanModel![index].price}",
+                                                            style: TextStyle(
+                                                              color:
+                                                                  Colors.black,
+                                                              fontSize:
+                                                                  screenAwareSize(
+                                                                      19,
+                                                                      context),
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w500,
+                                                              letterSpacing:
+                                                                  1.5,
+                                                            ),
+                                                          ),
+                                                          UIHelper
+                                                              .verticalSpaceSmall,
+                                                          const Divider(),
+                                                          UIHelper
+                                                              .verticalSpaceSmall,
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  );
+                                                })
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                          child: Icon(
+                            Icons.arrow_drop_down,
+                            color: ColorManager.deepGreyColor,
+                            size: 30,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  UIHelper.verticalSpaceMedium,
+                  //! ------------ amount---------
+                  cableProvider.cableCode != null
+                      ? Text(
+                          "Amount",
+                          style: getBoldStyle(
+                            color: ColorManager.deepGreyColor,
+                            fontSize: 14,
+                          ),
+                        )
+                      : Container(),
+                  UIHelper.verticalSpaceSmall,
+                  cableProvider.cableCode != null
+                      ? Container(
+                          height: 40,
+                          padding:
+                              EdgeInsets.symmetric(horizontal: 15, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: ColorManager.greyColor.withOpacity(.4),
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment
+                                .spaceBetween, //"${AppConstants.currencySymbol}"
+                            children: [
+                              Text(
+                                cableProvider.cablePlan != null
+                                    ? cableProvider.cablePlan!.price
+                                    : "Loading...",
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                  letterSpacing: 1.5,
+                                  fontFamily: "NT",
+                                  color: ColorManager.blackColor,
+                                ),
+                              ),
+                              InkWell(
+                                onTap: () {
+                                  appBottomSheet(
+                                    context,
+                                    isNotTabScreen: true,
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        color: ColorManager.whiteColor,
+                                        borderRadius: const BorderRadius.only(
+                                          topLeft: Radius.circular(16),
+                                          topRight: Radius.circular(16),
+                                        ),
+                                      ),
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Row(
+                                            children: [
+                                              IconButton(
+                                                onPressed: () {
+                                                  Navigator.pop(context);
+                                                },
+                                                icon: const Icon(
+                                                  Icons
+                                                      .keyboard_backspace_rounded,
+                                                ),
+                                              ),
+                                              const Label(
+                                                label: "List of channels",
+                                              ),
+                                            ],
+                                          ),
+                                          const Divider(),
+                                          Container(
+                                            height: 280,
+                                            child: Expanded(
+                                              child: SingleChildScrollView(
+                                                child: Padding(
+                                                  padding: const EdgeInsets.all(
+                                                      12.0),
+                                                  child: Column(
+                                                    children: [
+                                                      ...List.generate(
+                                                          cableProvider
+                                                              .cablePlan!
+                                                              .channels
+                                                              .length, (index) {
+                                                        return InkWell(
+                                                          onTap: () {
+                                                            Navigator.pop(
+                                                                context);
+                                                          },
+                                                          child: Padding(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .symmetric(
+                                                              horizontal: 10.0,
+                                                              vertical: 8,
+                                                            ),
+                                                            child: Column(
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .start,
+                                                              children: [
+                                                                Text(
+                                                                  cableProvider
+                                                                      .cablePlan!
+                                                                      .channels[index],
+                                                                  style:
+                                                                      TextStyle(
+                                                                    color: Colors
+                                                                        .black,
+                                                                    fontSize:
+                                                                        screenAwareSize(
+                                                                            19,
+                                                                            context),
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w500,
+                                                                    letterSpacing:
+                                                                        1.5,
+                                                                  ),
+                                                                ),
+                                                                UIHelper
+                                                                    .verticalSpaceSmall,
+                                                                const Divider(),
+                                                                UIHelper
+                                                                    .verticalSpaceSmall,
+                                                              ],
+                                                            ),
+                                                          ),
+                                                        );
+                                                      })
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                },
+                                child: Icon(
+                                  Icons.arrow_drop_down,
+                                  color: ColorManager.deepGreyColor,
+                                  size: 30,
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+                      : Container(),
+                  UIHelper.verticalSpaceMedium,
+                  //! IUC number
+                  Text(
+                    "IUC number",
+                    style: getBoldStyle(
+                      color: ColorManager.deepGreyColor,
+                      fontSize: 14,
+                    ),
+                  ),
+                  UIHelper.verticalSpaceSmall,
+                  Container(
+                    alignment: Alignment.centerLeft,
+                    decoration: BoxDecoration(
+                      color: ColorManager.greyColor.withOpacity(.4),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    height: 40,
+                    child: Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: TextFormField(
+                        keyboardType: TextInputType.number,
+                        controller: iucNumber,
+                        style: const TextStyle(color: Colors.black87),
+                        decoration: const InputDecoration(
+                          border: InputBorder.none,
+                          enabledBorder: InputBorder.none,
+                          focusedBorder: InputBorder.none,
+                          hintText: 'Enter Iuc number',
+                          hintStyle: TextStyle(
+                            color: Colors.black38,
+                          ),
+                        ),
+                        onEditingComplete: () {
+                          setState(() {
+                            checkNumber = true;
+                          });
+                        },
+                      ),
+                    ),
+                  ),
+                  UIHelper.verticalSpaceMedium,
+                  checkNumber
+                      ? FutureBuilder<VerifyIucData?>(
+                          future: cableProvider.verifyIucNumber(
+                            ctx: context,
+                            iuc: iucNumber.text.trim(),
+                          ),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return CircularProgressIndicator(); // Show loading indicator while waiting
+                            } else if (snapshot.hasError) {
+                              return Text('Error: ${snapshot.error}');
+                            } else if (snapshot.hasData &&
+                                snapshot.data != null) {
+                              cableProvider.setCustomerName(
+                                  snapshot.data!.customerName,
+                                  snapshot.data!.customerNumber);
+                              return Text(
+                                'Customer Name: ${snapshot.data!.customerName}',
+                                style: getBoldStyle(
+                                    color: ColorManager.activeColor,
+                                    fontSize: 16),
+                              );
+                            } else {
+                              return Text(
+                                'Invalid iuc number',
+                                style: getBoldStyle(
+                                    color: ColorManager.primaryColor,
+                                    fontSize: 16),
+                              );
+                            }
+                          },
+                        )
+                      
+                      : Container(),
+                  UIHelper.verticalSpaceMedium,
+                  //! LOAN ---------
+                  Text(
+                    "Loan",
+                    style: getBoldStyle(
+                      color: ColorManager.deepGreyColor,
+                      fontSize: 14,
+                    ),
+                  ),
+                  UIHelper.verticalSpaceSmall,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: List.generate(
+                      loanPeriod.length,
+                      (index) => Expanded(
+                        child: SelectLoanPeriod(
+                          accountType: loanPeriod[index]['name'],
+                          active: _selectedIndex == index ? true : false,
+                          onPressed: () {
+                            setState(() {
+                              if (_selectedIndex == index) {
+                                _selectedIndex = null;
+                              } else {
+                                _selectedIndex = index;
+                              }
+                              selectedLoan =
+                                  "${loanPeriod[_selectedIndex!]["name"]}";
+                            });
+                          },
+                        ),
+                      ),
+                    ),
+                  ),
+                  UIHelper.verticalSpaceMedium,
+                  const AppAmountField(
+                    title: "Loan Repayment",
+                  ),
+                  UIHelper.verticalSpaceLarge,
+                  Row(
+                    children: [
+                      Expanded(
+                        child: AppButton(
+                          buttonText: "Submit",
+                          onPressed: () {
+                            if (cableProvider.customerName != null) {
+                              if (cableProvider.cableName != null ||
+                                  cableProvider.cableCode != null) {
+                                _confirmationBottomSheetMenu(
+                                  amount: cableProvider.cablePlan!.price,
+                                  number: cableProvider.customerNumber!,
+                                  provider: cableProvider,
+                                );
+                              } else {
+                                MekNotification().showMessage(
+                                  context,
+                                  message: "Please a cable tv and plan !!!",
+                                );
+                              }
+                            } else {
+                              MekNotification().showMessage(
+                                context,
+                                message: "Unverified iuc number !!!",
+                              );
+                            }
+                          },
+                          height: 30,
+                        ),
+                      ),
+                      UIHelper.horizontalSpaceSmall,
+                      Expanded(
+                        child: AppButton(
+                          buttonText: "Back",
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          height: 30,
+                          borderColor: ColorManager.primaryColor,
+                          buttonColor: ColorManager.whiteColor,
+                          buttonTextColor: ColorManager.primaryColor,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            contentTwo: Column(
+              children: [
+                const VtuCountrySelector(),
+                UIHelper.verticalSpaceMedium,
+                const AppNumberField(),
+                UIHelper.verticalSpaceMedium,
+                UIHelper.verticalSpaceMedium,
+                Row(
+                  children: [
+                    Expanded(
+                      child: AppButton(
+                        buttonText: "Submit",
+                        onPressed: () {
+                          //_confirmationBottomSheetMenu(amount: "", );
+                        },
+                        height: 30,
+                      ),
+                    ),
+                    UIHelper.horizontalSpaceSmall,
+                    Expanded(
+                      child: AppButton(
+                        buttonText: "clear",
+                        onPressed: () {},
+                        height: 30,
+                        borderColor: ColorManager.primaryColor,
+                        buttonColor: ColorManager.whiteColor,
+                        buttonTextColor: ColorManager.primaryColor,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 
 
-  void _confirmationBottomSheetMenu() {
+  _otpInput(CableProvider provider, {required int topUp}) {
+    appBottomSheet(
+      context,
+      Container(
+        decoration: BoxDecoration(
+          color: ColorManager.whiteColor,
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(16),
+            topRight: Radius.circular(16),
+          ),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              children: [
+                IconButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  icon: const Icon(
+                    Icons.keyboard_backspace_rounded,
+                  ),
+                ),
+                const Label(
+                  label: "Enter Your 4 Digits OTP",
+                ),
+              ],
+            ),
+            const Divider(),
+            Column(
+              children: [
+                UIHelper.verticalSpaceMedium,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      width: deviceWidth(context) * 0.15,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: ColorManager.whiteColor,
+                        boxShadow: [
+                          BoxShadow(
+                            color: ColorManager.greyColor.withOpacity(.14),
+                            spreadRadius: 8,
+                            blurRadius: 9,
+                            offset: const Offset(
+                                8, 5), // changes position of shadow
+                          ),
+                        ],
+                      ),
+                      child: TextFormField(
+                        autofocus: true,
+                        obscureText: false,
+                        controller: pin1,
+                        cursorColor: ColorManager.primaryColor,
+                        validator: (String? val) =>
+                            FieldValidator().validate(val!),
+                        style: const TextStyle(
+                            fontSize: 24, fontWeight: FontWeight.bold),
+                        keyboardType: TextInputType.number,
+                        textAlign: TextAlign.center,
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                        ),
+                        // decoration: //otpInputDecoration,
+                        onChanged: (value) {
+                          nextField(value, pin2FocusNode);
+                        },
+                      ),
+                    ),
+                    UIHelper.horizontalSpaceSmall,
+                    Container(
+                      width: deviceWidth(context) * 0.15,
+                      decoration: BoxDecoration(
+                        color: ColorManager.whiteColor,
+                        borderRadius: BorderRadius.circular(10),
+                        boxShadow: [
+                          BoxShadow(
+                            color: ColorManager.greyColor.withOpacity(.14),
+                            spreadRadius: 8,
+                            blurRadius: 9,
+                            offset: const Offset(
+                                8, 5), // changes position of shadow
+                          ),
+                        ],
+                      ),
+                      child: TextFormField(
+                          focusNode: pin2FocusNode,
+                          autofocus: true,
+                          obscureText: false,
+                          controller: pin2,
+                          cursorColor: ColorManager.primaryColor,
+                          validator: (String? val) =>
+                              FieldValidator().validate(val!),
+                          style: const TextStyle(
+                              fontSize: 24, fontWeight: FontWeight.bold),
+                          keyboardType: TextInputType.number,
+                          textAlign: TextAlign.center,
+                          decoration: InputDecoration(
+                            border: InputBorder.none,
+                          ),
+                          onChanged: (value) {
+                            nextField(value, pin3FocusNode);
+                          }),
+                    ),
+                    UIHelper.horizontalSpaceSmall,
+                    Container(
+                      width: deviceWidth(context) * 0.15,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: ColorManager.whiteColor,
+                        boxShadow: [
+                          BoxShadow(
+                            color: ColorManager.greyColor.withOpacity(.14),
+                            spreadRadius: 8,
+                            blurRadius: 9,
+                            offset: const Offset(
+                                8, 5), // changes position of shadow
+                          ),
+                        ],
+                      ),
+                      child: TextFormField(
+                          focusNode: pin3FocusNode,
+                          autofocus: true,
+                          obscureText: false,
+                          controller: pin3,
+                          cursorColor: ColorManager.primaryColor,
+                          validator: (String? val) =>
+                              FieldValidator().validate(val!),
+                          style: const TextStyle(
+                              fontSize: 24, fontWeight: FontWeight.bold),
+                          keyboardType: TextInputType.number,
+                          textAlign: TextAlign.center,
+                          decoration: InputDecoration(
+                            border: InputBorder.none,
+                          ),
+                          onChanged: (value) {
+                            nextField(value, pin4FocusNode);
+                          }),
+                    ),
+                    UIHelper.horizontalSpaceSmall,
+                    Container(
+                      width: deviceWidth(context) * 0.15,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: ColorManager.whiteColor,
+                        boxShadow: [
+                          BoxShadow(
+                            color: ColorManager.greyColor.withOpacity(.14),
+                            spreadRadius: 8,
+                            blurRadius: 9,
+                            offset: const Offset(
+                                8, 5), // changes position of shadow
+                          ),
+                        ],
+                      ),
+                      child: TextFormField(
+                          focusNode: pin4FocusNode,
+                          autofocus: true,
+                          obscureText: false,
+                          controller: pin4,
+                          cursorColor: ColorManager.primaryColor,
+                          validator: (String? val) =>
+                              FieldValidator().validate(val!),
+                          style: const TextStyle(
+                              fontSize: 24, fontWeight: FontWeight.bold),
+                          keyboardType: TextInputType.number,
+                          textAlign: TextAlign.center,
+                          decoration: InputDecoration(
+                            border: InputBorder.none,
+                          ),
+                          onChanged: (value) {
+                            if (value.length == 1) {
+                              newOtp =
+                                  "${pin1.text.trim() + pin2.text.trim() + pin3.text.trim() + pin4.text.trim()}";
+                              setState(() {
+                                isOtpComplete = true;
+                              });
+                              provider.setOtp(newOtp!);
+                              pin4FocusNode!.unfocus();
+                            }
+                          }),
+                    ),
+                  ],
+                ),
+                UIHelper.verticalSpaceMedium,
+                AppButton(
+                  onPressed: () {
+                    if (isOtpComplete) {
+                      Navigator.pop(context);
+                      print("popped the screen first");
+                      provider.verifyPin(
+                          ctx: context,
+                          onSuccess: () {
+                            provider.purchaseCable(
+                              ctx: context,
+                              iuc: iucNumber.text.trim(),
+                            );
+                            
+                          });
+                    } else {
+                      Navigator.pop(context);
+                      MekNotification().showMessage(
+                        context,
+                        message: "Please enter your pin",
+                      );
+                    }
+                  },
+                  buttonText: "Continue",
+                ),
+                UIHelper.verticalSpaceMedium,
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+
+    // return OtpInputField(
+    //   onTap: () {
+    //     provider.purchaseAirtime(ctx: context);
+    //   },
+    //   vtuProvider: provider,
+    // );
+  }
+
+  void _confirmationBottomSheetMenu(
+      {required String amount,
+      String? type = "Cable",
+      required String number,
+      int topUp = 1,
+      required CableProvider provider}) {
     showModalBottomSheet(
       context: context,
       backgroundColor: ColorManager.whiteColor,
@@ -554,7 +1272,7 @@ class _CableState extends State<Cable> with SingleTickerProviderStateMixin{
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  "₦ 2000.00",
+                  "${AppConstants.currencySymbol} ${amount}.00",
                   style: getBoldStyle(
                       color: ColorManager.blackColor, fontSize: 16),
                 ),
@@ -580,7 +1298,7 @@ class _CableState extends State<Cable> with SingleTickerProviderStateMixin{
                             ImageAssets.mtn,
                           ),
                           Text(
-                            "Electricity",
+                            type!,
                             style: getBoldStyle(
                               color: ColorManager.blackColor,
                               fontSize: 12,
@@ -607,7 +1325,7 @@ class _CableState extends State<Cable> with SingleTickerProviderStateMixin{
                         ),
                       ),
                       Text(
-                        "0806789435",
+                        number,
                         style: getBoldStyle(
                           color: ColorManager.blackColor,
                           fontSize: 12,
@@ -629,14 +1347,14 @@ class _CableState extends State<Cable> with SingleTickerProviderStateMixin{
                       Row(
                         children: [
                           Text(
-                            "Loan Balance",
+                            "Wallet Balance",
                             style: getBoldStyle(
                               color: ColorManager.blackColor,
                               fontSize: 12,
                             ),
                           ),
                           Text(
-                            "( ₦ 100,000)",
+                            "( ₦ ${AppConstants.homeModel!.data.wallet.balance})",
                             style: getRegularStyle(
                               color: ColorManager.deepGreyColor,
                               fontSize: 12,
@@ -644,20 +1362,34 @@ class _CableState extends State<Cable> with SingleTickerProviderStateMixin{
                           ),
                         ],
                       ),
-                      Icon(
-                        Icons.check,
-                        color: ColorManager.primaryColor,
-                      )
+                      int.parse(AppConstants.homeModel!.data.wallet.balance) >=
+                              int.parse(amount)
+                          ? Icon(
+                              Icons.check,
+                              color: ColorManager.activeColor,
+                            )
+                          : Icon(
+                              Icons.close,
+                              color: ColorManager.primaryColor,
+                            )
                     ],
                   ),
                 ),
                 UIHelper.verticalSpaceMediumPlus,
                 AppButton(
                   onPressed: () {
-                    NavigateClass().pushNamed(
-                      context: context,
-                      routName: Routes.success,
-                    );
+                    if (int.parse(
+                            AppConstants.homeModel!.data.wallet.balance) >=
+                        int.parse(amount)) {
+                      Navigator.pop(context);
+                      //!
+                      _otpInput(provider, topUp: topUp);
+                    } else {
+                      MekNotification().showMessage(
+                        context,
+                        message: "Insufficient fund !!!",
+                      );
+                    }
                   },
                   buttonText: "Pay",
                 ),

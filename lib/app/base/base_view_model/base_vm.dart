@@ -25,7 +25,7 @@ abstract class BaseViewModel extends ChangeNotifier {
     });
   }
 
-   //! obscure text
+  //! obscure text
   bool _obscureText = true;
   bool get obscureTextGetter => _obscureText;
   void obscure() {
@@ -42,6 +42,7 @@ abstract class BaseViewModel extends ChangeNotifier {
   }
 
   changeLoaderStatus(bool status) {
+    print("Changing loading state ---> $status");
     isLoading = status;
     notifyListeners();
   }
@@ -49,7 +50,6 @@ abstract class BaseViewModel extends ChangeNotifier {
   void dismissKeyboardFocus() {
     FocusManager.instance.primaryFocus!.unfocus();
   }
-
 
   @override
   void dispose() {
