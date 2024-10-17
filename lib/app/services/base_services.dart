@@ -51,8 +51,11 @@ class BaseServices {
   Future getRequest({required String url, bool decodeJson = false}) async {
     final String _url = baseUrl + url;
     try {
-      final _response = await http.get(Uri.parse(_url));
-
+      final _response = await http.get(Uri.parse(_url), headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json"
+      });
+      print("request body ----> ${_response.body}");
       final _result =
           decodeJson == true ? _response : jsonDecode(_response.body);
 
@@ -91,7 +94,7 @@ class BaseServices {
           .post(Uri.parse(baseUrl + url0),
               headers: headers, body: jsonEncode(data))
           .timeout(const Duration(seconds: 30));
-      
+
       final result = jsonDecode(response.body);
 
       if (response.statusCode == 200) {
@@ -108,6 +111,7 @@ class BaseServices {
       return null;
     }
   }
+
   Future tokenizedPutRequest(
       {String? token, dynamic data, required String url}) async {
     final String url0 = url;
@@ -122,7 +126,7 @@ class BaseServices {
           .put(Uri.parse(baseUrl + url0),
               headers: headers, body: jsonEncode(data))
           .timeout(const Duration(seconds: 30));
-      
+
       final result = jsonDecode(response.body);
 
       if (response.statusCode == 200) {
@@ -151,6 +155,7 @@ class BaseServices {
           .post(Uri.parse(url0 + url), headers: headers, body: jsonEncode(data))
           .timeout(const Duration(seconds: 20));
       final result = jsonDecode(response.body);
+      print("request body ----> ${response.body}");
       if (response.statusCode == 201 || response.statusCode == 200) {
         return result;
       } else if (response.statusCode == 422) {
@@ -159,8 +164,10 @@ class BaseServices {
         return result;
       }
     } on SocketException {
+      print("Socket issues");
       return null;
     } catch (e) {
+       print("catcht issues -----> ${e.toString()}");
       return null;
     }
   }
@@ -197,6 +204,4 @@ class BaseServices {
       return null;
     }
   }
-
-
 }

@@ -269,400 +269,16 @@ class _BillState extends State<Bill> with SingleTickerProviderStateMixin {
               child: ListView(
                 children: [
                   //! Select Biller
-                  Text(
-                    "Biller",
-                    style: getBoldStyle(
-                      color: ColorManager.deepGreyColor,
-                      fontSize: 14,
-                    ),
-                  ),
-                  UIHelper.verticalSpaceSmall,
-                  Row(
-                    children: [
-                      AppConstants.billerModel != null
-                          ? Container(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 10, vertical: 8),
-                              child: Center(
-                                child: Text(
-                                  vtuProvider.selectedBiller != null
-                                      ? vtuProvider.selectedBiller!.billerName
-                                          .substring(0, 2)
-                                          .toUpperCase()
-                                      : "..",
-                                  style: getBoldStyle(
-                                    color: ColorManager.blackColor,
-                                    fontSize: 18,
-                                  ),
-                                ),
-                              ),
-                            )
-                          : Text(".."),
-                      UIHelper.horizontalSpaceSmall,
-                      AppConstants.billerModel != null &&
-                              AppConstants.billerModel!.isNotEmpty
-                          ? Expanded(
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 10, vertical: 8),
-                                decoration: BoxDecoration(
-                                  color: ColorManager.greyColor.withOpacity(.4),
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Expanded(
-                                      child: Text(
-                                        vtuProvider.selectedBiller != null
-                                            ? vtuProvider
-                                                .selectedBiller!.billerName
-                                            : "Select Biller",
-                                        overflow: TextOverflow.ellipsis,
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.bold,
-                                          letterSpacing: 1.5,
-                                          fontFamily: "NT",
-                                          color: ColorManager.blackColor,
-                                        ),
-                                      ),
-                                    ),
-                                    InkWell(
-                                      onTap: () {
-                                        appBottomSheet(
-                                          context,
-                                          isNotTabScreen: true,
-                                          Container(
-                                            decoration: BoxDecoration(
-                                              color: ColorManager.whiteColor,
-                                              borderRadius:
-                                                  const BorderRadius.only(
-                                                topLeft: Radius.circular(16),
-                                                topRight: Radius.circular(16),
-                                              ),
-                                            ),
-                                            child: Column(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: [
-                                                Row(
-                                                  children: [
-                                                    IconButton(
-                                                      onPressed: () {
-                                                        Navigator.pop(context);
-                                                      },
-                                                      icon: const Icon(
-                                                        Icons
-                                                            .keyboard_backspace_rounded,
-                                                      ),
-                                                    ),
-                                                    const Label(
-                                                      label: "Select Biller",
-                                                    ),
-                                                  ],
-                                                ),
-                                                const Divider(),
-                                                Container(
-                                                  height: 280,
-                                                  child: Expanded(
-                                                    child:
-                                                        SingleChildScrollView(
-                                                      child: Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .all(12.0),
-                                                        child: Column(
-                                                          children: [
-                                                            ...List.generate(
-                                                                AppConstants
-                                                                    .billerModel!
-                                                                    .length,
-                                                                (index) {
-                                                              return InkWell(
-                                                                onTap: () {
-                                                                  vtuProvider
-                                                                      .setSelectedBiller(
-                                                                    AppConstants
-                                                                            .billerModel![
-                                                                        index],
-                                                                  );
-                                                                  vtuProvider.setBillerCode(
-                                                                      AppConstants
-                                                                          .billerModel![
-                                                                              index]
-                                                                          .billerCode,
-                                                                      AppConstants
-                                                                          .billerModel![
-                                                                              index]
-                                                                          .billerName);
-
-                                                                  Navigator.pop(
-                                                                      context);
-                                                                },
-                                                                child: Padding(
-                                                                  padding:
-                                                                      const EdgeInsets
-                                                                          .symmetric(
-                                                                    horizontal:
-                                                                        10.0,
-                                                                    vertical: 8,
-                                                                  ),
-                                                                  child: Column(
-                                                                    crossAxisAlignment:
-                                                                        CrossAxisAlignment
-                                                                            .start,
-                                                                    children: [
-                                                                      Text(
-                                                                        AppConstants
-                                                                            .billerModel![index]
-                                                                            .billerName,
-                                                                        style:
-                                                                            TextStyle(
-                                                                          color:
-                                                                              Colors.black,
-                                                                          fontSize: screenAwareSize(
-                                                                              19,
-                                                                              context),
-                                                                          fontWeight:
-                                                                              FontWeight.w500,
-                                                                          letterSpacing:
-                                                                              1.5,
-                                                                        ),
-                                                                      ),
-                                                                      UIHelper
-                                                                          .verticalSpaceSmall,
-                                                                      const Divider(),
-                                                                      UIHelper
-                                                                          .verticalSpaceSmall,
-                                                                    ],
-                                                                  ),
-                                                                ),
-                                                              );
-                                                            })
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                      child: Icon(
-                                        Icons.arrow_drop_down,
-                                        color: ColorManager.deepGreyColor,
-                                        size: 30,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            )
-                          : Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 10, vertical: 0),
-                              decoration: BoxDecoration(
-                                color: ColorManager.greyColor.withOpacity(.4),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: Text(
-                                "Loading .....",
-                                style: getBoldStyle(
-                                    color: ColorManager.deepGreyColor),
-                              ),
-                            ),
-                    ],
-                  ),
-
+                  SelectBiller( vtuProvider: vtuProvider,),
                   UIHelper.verticalSpaceMedium,
-
                   //! Select meter type
-                  Text(
-                    "Meter type",
-                    style: getBoldStyle(
-                      color: ColorManager.deepGreyColor,
-                      fontSize: 14,
-                    ),
-                  ),
-                  UIHelper.verticalSpaceSmall,
-                  Container(
-                    height: 40,
-                    padding: EdgeInsets.symmetric(horizontal: 15, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: ColorManager.greyColor.withOpacity(.4),
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          vtuProvider.metr ?? "Select Meter type",
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 1.5,
-                            fontFamily: "NT",
-                            color: ColorManager.blackColor,
-                          ),
-                        ),
-                        InkWell(
-                          onTap: () {
-                            appBottomSheet(
-                              context,
-                              isNotTabScreen: true,
-                              Container(
-                                decoration: BoxDecoration(
-                                  color: ColorManager.whiteColor,
-                                  borderRadius: const BorderRadius.only(
-                                    topLeft: Radius.circular(16),
-                                    topRight: Radius.circular(16),
-                                  ),
-                                ),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        IconButton(
-                                          onPressed: () {
-                                            Navigator.pop(context);
-                                          },
-                                          icon: const Icon(
-                                            Icons.keyboard_backspace_rounded,
-                                          ),
-                                        ),
-                                        const Label(
-                                          label: "Select Meter Type",
-                                        ),
-                                      ],
-                                    ),
-                                    const Divider(),
-                                    Container(
-                                      height: 280,
-                                      child: Expanded(
-                                        child: SingleChildScrollView(
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(12.0),
-                                            child: Column(
-                                              children: [
-                                                ...List.generate(
-                                                    vtuProvider.meterType
-                                                        .length, (index) {
-                                                  return InkWell(
-                                                    onTap: () {
-                                                      vtuProvider.setMeter(
-                                                          vtuProvider.meterType[
-                                                              index]['name']);
-                                                      Navigator.pop(context);
-                                                    },
-                                                    child: Padding(
-                                                      padding: const EdgeInsets
-                                                          .symmetric(
-                                                        horizontal: 10.0,
-                                                        vertical: 8,
-                                                      ),
-                                                      child: Column(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
-                                                        children: [
-                                                          Text(
-                                                            vtuProvider
-                                                                .meterType[
-                                                                    index]
-                                                                    ['name']
-                                                                .toString(),
-                                                            style: TextStyle(
-                                                              color:
-                                                                  Colors.black,
-                                                              fontSize:
-                                                                  screenAwareSize(
-                                                                      19,
-                                                                      context),
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w500,
-                                                              letterSpacing:
-                                                                  1.5,
-                                                            ),
-                                                          ),
-                                                          UIHelper
-                                                              .verticalSpaceSmall,
-                                                          const Divider(),
-                                                          UIHelper
-                                                              .verticalSpaceSmall,
-                                                        ],
-                                                      ),
-                                                    ),
-                                                  );
-                                                })
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            );
-                          },
-                          child: Icon(
-                            Icons.arrow_drop_down,
-                            color: ColorManager.deepGreyColor,
-                            size: 30,
-                          ),
-                        ),
-                      
-                      ],
-                    ),
-                  ),
+                  selectMeterType(vtuProvider, context),
                   UIHelper.verticalSpaceMedium,
                   //! amount
                   buildAmount(),
                   UIHelper.verticalSpaceMedium,
                   //! Meter number
-                  Text(
-                    "Meter number",
-                    style: getBoldStyle(
-                      color: ColorManager.deepGreyColor,
-                      fontSize: 14,
-                    ),
-                  ),
-                  UIHelper.verticalSpaceSmall,
-                  Container(
-                    alignment: Alignment.centerLeft,
-                    decoration: BoxDecoration(
-                      color: ColorManager.greyColor.withOpacity(.4),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    height: 40,
-                    child: Padding(
-                      padding: const EdgeInsets.all(10.0),
-                      child: TextFormField(
-                        keyboardType: TextInputType.number,
-                        controller: meterNumber,
-                        style: const TextStyle(color: Colors.black87),
-                        decoration: const InputDecoration(
-                          border: InputBorder.none,
-                          enabledBorder: InputBorder.none,
-                          focusedBorder: InputBorder.none,
-                          hintText: 'Enter meter number',
-                          hintStyle: TextStyle(
-                            color: Colors.black38,
-                          ),
-                        ),
-                        onEditingComplete: () {
-                          setState(() {
-                            checkNumber = true;
-                          });
-                        },
-                      ),
-                    ),
-                  ),
+                  buildmeterNumber(),
                   UIHelper.verticalSpaceMedium,
                   checkNumber
                       ? FutureBuilder<VerifyMeterNumberData?>(
@@ -790,22 +406,85 @@ class _BillState extends State<Bill> with SingleTickerProviderStateMixin {
             ),
             contentTwo: ListView(
               children: [
-                const VtuCountrySelector(),
+                //! Select Biller
+                SelectBiller(
+                  vtuProvider: vtuProvider,
+                ),
                 UIHelper.verticalSpaceMedium,
-                const AppNumberField(),
+                //! Select meter type
+                selectMeterType(vtuProvider, context),
                 UIHelper.verticalSpaceMedium,
-                UIHelper.verticalSpaceMedium,
-                buildMeterNumber(),
-                UIHelper.verticalSpaceMedium,
+                //! amount
                 buildAmount(),
                 UIHelper.verticalSpaceMedium,
+                //! Meter number
+                buildmeterNumber(),
+                UIHelper.verticalSpaceMedium,
+                
+                checkNumber
+                    ? FutureBuilder<VerifyMeterNumberData?>(
+                        future: vtuProvider.verifyMeterNumber(
+                          ctx: context,
+                          ctr: meterNumber.text.trim(),
+                          billerCode: "12334555666",
+                        ),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return CircularProgressIndicator(); // Show loading indicator while waiting
+                          } else if (snapshot.hasError) {
+                            return Text('Error: ${snapshot.error}');
+                          } else if (snapshot.hasData &&
+                              snapshot.data != null) {
+                            vtuProvider.setCustomerName(
+                                snapshot.data!.customerName,
+                                snapshot.data!.customerNumber);
+                            return Text(
+                              'Customer Name: ${snapshot.data!.customerName}',
+                              style: getBoldStyle(
+                                  color: ColorManager.activeColor,
+                                  fontSize: 16),
+                            );
+                          } else {
+                            return Text(
+                              'Invalid meter number',
+                              style: getBoldStyle(
+                                  color: ColorManager.primaryColor,
+                                  fontSize: 16),
+                            );
+                          }
+                        },
+                      )
+                    : Container(),
+                UIHelper.verticalSpaceLarge,
+                UIHelper.verticalSpaceLarge,
                 Row(
                   children: [
                     Expanded(
                       child: AppButton(
                         buttonText: "Submit",
                         onPressed: () {
-                          //_confirmationBottomSheetMenu();
+                          if (vtuProvider.customerName != null) {
+                            if (vtuProvider.billerCode != null ||
+                                vtuProvider.billerName != null) {
+                              _confirmationBottomSheetMenu(
+                                amount: amount.text.trim(),
+                                number: vtuProvider.customerNumber!,
+                                provider: vtuProvider,
+                              );
+                            } else {
+                              MekNotification().showMessage(
+                                context,
+                                message:
+                                    "Please select a biller name and code !!!",
+                              );
+                            }
+                          } else {
+                            MekNotification().showMessage(
+                              context,
+                              message: "Unverified Meter number !!!",
+                            );
+                          }
                         },
                         height: 30,
                       ),
@@ -813,8 +492,10 @@ class _BillState extends State<Bill> with SingleTickerProviderStateMixin {
                     UIHelper.horizontalSpaceSmall,
                     Expanded(
                       child: AppButton(
-                        buttonText: "clear",
-                        onPressed: () {},
+                        buttonText: "Back",
+                        onPressed: () {
+                           Navigator.pop(context);
+                        },
                         height: 30,
                         borderColor: ColorManager.primaryColor,
                         buttonColor: ColorManager.whiteColor,
@@ -828,6 +509,199 @@ class _BillState extends State<Bill> with SingleTickerProviderStateMixin {
           ),
         ],
       ),
+    );
+  }
+
+  Widget buildmeterNumber() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "Meter number",
+          style: getBoldStyle(
+            color: ColorManager.deepGreyColor,
+            fontSize: 14,
+          ),
+        ),
+        UIHelper.verticalSpaceSmall,
+        Container(
+                      alignment: Alignment.centerLeft,
+                      decoration: BoxDecoration(
+                        color: ColorManager.greyColor.withOpacity(.4),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      height: 40,
+                      child: Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: TextFormField(
+                          keyboardType: TextInputType.number,
+                          controller: meterNumber,
+                          style: const TextStyle(color: Colors.black87),
+                          decoration: const InputDecoration(
+                            border: InputBorder.none,
+                            enabledBorder: InputBorder.none,
+                            focusedBorder: InputBorder.none,
+                            hintText: 'Enter meter number',
+                            hintStyle: TextStyle(
+                              color: Colors.black38,
+                            ),
+                          ),
+                          onEditingComplete: () {
+                            setState(() {
+                              checkNumber = true;
+                            });
+                          },
+                        ),
+                      ),
+                    ),
+      ],
+    );
+  }
+
+  Widget selectMeterType(VtuProvider vtuProvider, BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "Meter type",
+          style: getBoldStyle(
+            color: ColorManager.deepGreyColor,
+            fontSize: 14,
+          ),
+        ),
+        UIHelper.verticalSpaceSmall,
+        Container(
+                      height: 40,
+                      padding: EdgeInsets.symmetric(horizontal: 15, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: ColorManager.greyColor.withOpacity(.4),
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            vtuProvider.metr ?? "Select Meter type",
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 1.5,
+                              fontFamily: "NT",
+                              color: ColorManager.blackColor,
+                            ),
+                          ),
+                          InkWell(
+                            onTap: () {
+                              appBottomSheet(
+                                context,
+                                isNotTabScreen: true,
+                                Container(
+                                  decoration: BoxDecoration(
+                                    color: ColorManager.whiteColor,
+                                    borderRadius: const BorderRadius.only(
+                                      topLeft: Radius.circular(16),
+                                      topRight: Radius.circular(16),
+                                    ),
+                                  ),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          IconButton(
+                                            onPressed: () {
+                                              Navigator.pop(context);
+                                            },
+                                            icon: const Icon(
+                                              Icons.keyboard_backspace_rounded,
+                                            ),
+                                          ),
+                                          const Label(
+                                            label: "Select Meter Type",
+                                          ),
+                                        ],
+                                      ),
+                                      const Divider(),
+                                      Container(
+                                        height: 280,
+                                        child: Expanded(
+                                          child: SingleChildScrollView(
+                                            child: Padding(
+                                              padding: const EdgeInsets.all(12.0),
+                                              child: Column(
+                                                children: [
+                                                  ...List.generate(
+                                                      vtuProvider.meterType
+                                                          .length, (index) {
+                                                    return InkWell(
+                                                      onTap: () {
+                                                        vtuProvider.setMeter(
+                                                            vtuProvider.meterType[
+                                                                index]['name']);
+                                                        Navigator.pop(context);
+                                                      },
+                                                      child: Padding(
+                                                        padding: const EdgeInsets
+                                                            .symmetric(
+                                                          horizontal: 10.0,
+                                                          vertical: 8,
+                                                        ),
+                                                        child: Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            Text(
+                                                              vtuProvider
+                                                                  .meterType[
+                                                                      index]
+                                                                      ['name']
+                                                                  .toString(),
+                                                              style: TextStyle(
+                                                                color:
+                                                                    Colors.black,
+                                                                fontSize:
+                                                                    screenAwareSize(
+                                                                        19,
+                                                                        context),
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w500,
+                                                                letterSpacing:
+                                                                    1.5,
+                                                              ),
+                                                            ),
+                                                            UIHelper
+                                                                .verticalSpaceSmall,
+                                                            const Divider(),
+                                                            UIHelper
+                                                                .verticalSpaceSmall,
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    );
+                                                  })
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
+                            child: Icon(
+                              Icons.arrow_drop_down,
+                              color: ColorManager.deepGreyColor,
+                              size: 30,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+      ],
     );
   }
 
@@ -1210,6 +1084,216 @@ class _BillState extends State<Bill> with SingleTickerProviderStateMixin {
           ),
         );
       },
+    );
+  }
+}
+
+class SelectBiller extends StatelessWidget {
+  const SelectBiller({
+    super.key, required this.vtuProvider,
+  });
+
+  final VtuProvider vtuProvider;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "Biller",
+          style: getBoldStyle(
+            color: ColorManager.deepGreyColor,
+            fontSize: 14,
+          ),
+        ),
+        UIHelper.verticalSpaceSmall,
+        Row(
+          children: [
+            AppConstants.billerModel != null
+                ? Container(
+                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                    child: Center(
+                      child: Text(
+                        vtuProvider.selectedBiller != null
+                            ? vtuProvider.selectedBiller!.billerName
+                                .substring(0, 2)
+                                .toUpperCase()
+                            : "..",
+                        style: getBoldStyle(
+                          color: ColorManager.blackColor,
+                          fontSize: 18,
+                        ),
+                      ),
+                    ),
+                  )
+                : Text(".."),
+            UIHelper.horizontalSpaceSmall,
+            AppConstants.billerModel != null &&
+                    AppConstants.billerModel!.isNotEmpty
+                ? Expanded(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: ColorManager.greyColor.withOpacity(.4),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              vtuProvider.selectedBiller != null
+                                  ? vtuProvider.selectedBiller!.billerName
+                                  : "Select Biller",
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 1.5,
+                                fontFamily: "NT",
+                                color: ColorManager.blackColor,
+                              ),
+                            ),
+                          ),
+                          InkWell(
+                            onTap: () {
+                              appBottomSheet(
+                                context,
+                                isNotTabScreen: true,
+                                Container(
+                                  decoration: BoxDecoration(
+                                    color: ColorManager.whiteColor,
+                                    borderRadius: const BorderRadius.only(
+                                      topLeft: Radius.circular(16),
+                                      topRight: Radius.circular(16),
+                                    ),
+                                  ),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          IconButton(
+                                            onPressed: () {
+                                              Navigator.pop(context);
+                                            },
+                                            icon: const Icon(
+                                              Icons.keyboard_backspace_rounded,
+                                            ),
+                                          ),
+                                          const Label(
+                                            label: "Select Biller",
+                                          ),
+                                        ],
+                                      ),
+                                      const Divider(),
+                                      Container(
+                                        height: deviceHeight(context) * .5,
+                                        child: SingleChildScrollView(
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(12.0),
+                                            child: Column(
+                                              children: [
+                                                ...List.generate(
+                                                    AppConstants.billerModel!
+                                                        .length, (index) {
+                                                  return InkWell(
+                                                    onTap: () {
+                                                      vtuProvider
+                                                          .setSelectedBiller(
+                                                        AppConstants
+                                                                .billerModel![
+                                                            index],
+                                                      );
+                                                      vtuProvider.setBillerCode(
+                                                          AppConstants
+                                                              .billerModel![
+                                                                  index]
+                                                              .billerCode,
+                                                          AppConstants
+                                                              .billerModel![
+                                                                  index]
+                                                              .billerName);
+
+                                                      Navigator.pop(context);
+                                                    },
+                                                    child: Padding(
+                                                      padding: const EdgeInsets
+                                                          .symmetric(
+                                                        horizontal: 10.0,
+                                                        vertical: 8,
+                                                      ),
+                                                      child: Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Text(
+                                                            AppConstants
+                                                                .billerModel![
+                                                                    index]
+                                                                .billerName,
+                                                            style: TextStyle(
+                                                              color:
+                                                                  Colors.black,
+                                                              fontSize:
+                                                                  screenAwareSize(
+                                                                      19,
+                                                                      context),
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w500,
+                                                              letterSpacing:
+                                                                  1.5,
+                                                            ),
+                                                          ),
+                                                          UIHelper
+                                                              .verticalSpaceSmall,
+                                                          const Divider(),
+                                                          UIHelper
+                                                              .verticalSpaceSmall,
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  );
+                                                })
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
+                            child: Icon(
+                              Icons.arrow_drop_down,
+                              color: ColorManager.deepGreyColor,
+                              size: 30,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+                : Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+                    decoration: BoxDecoration(
+                      color: ColorManager.greyColor.withOpacity(.4),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Text(
+                      "Loading .....",
+                      style: getBoldStyle(color: ColorManager.deepGreyColor),
+                    ),
+                  ),
+          ],
+        ),
+      ],
     );
   }
 }

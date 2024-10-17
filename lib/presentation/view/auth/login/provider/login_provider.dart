@@ -44,7 +44,7 @@ class LoginProvider extends BaseViewModel {
         email: mekMail!.text.toString(),
         password: password.text.toString(),
       );
-      
+      print("login response ---> ${request}");
       changeLoaderStatus(false);
       if (request != null) {
         if (request["status"] == true) {
@@ -76,7 +76,7 @@ class LoginProvider extends BaseViewModel {
     } catch (e) {
       MekNotification().showMessage(
         context,
-        message: e.toString(),
+        message: "An error occurred, please try again later",
       );
     }
   }

@@ -1,6 +1,8 @@
 class ApiConstants {
   static const String loginUrl = "login";
+  static const String verify = "verify-otp";
   static const String registerUrl = "register";
+  static const String resetPassword = "reset-password";
   static const String logoutUrl = "logout";
   static const String home = "home";
   static const String country = "country/country-by-status";
@@ -17,4 +19,5 @@ class ApiConstants {
   static const String verifyIuc = "cable/verify-iuc";
   static const String changePassword = "user/update-password";
   static const String changePin = "user/update-pin";
+  static const String history = "histories";
 }

@@ -2,6 +2,7 @@
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:zuuro/app/base/base_screen.dart';
 import 'package:zuuro/presentation/view/auth/register/provider/reg_provider.dart';
@@ -314,6 +315,7 @@ class PhoneNumberReg extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // AppFormField(
         //   hintText: "Country",
@@ -330,7 +332,7 @@ class PhoneNumberReg extends StatelessWidget {
         ),
         UIHelper.verticalSpaceSmall,
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
           decoration: BoxDecoration(
             color: ColorManager.greyColor.withOpacity(.4),
             borderRadius: BorderRadius.circular(10),
@@ -383,7 +385,7 @@ class PhoneNumberReg extends StatelessWidget {
                           ),
                           const Divider(),
                           Container(
-                            height: 280,
+                            height: deviceHeight(context) * .8,
                             child: Expanded(
                               child: SingleChildScrollView(
                                 child: Padding(
@@ -532,19 +534,99 @@ class PhoneNumberReg extends StatelessWidget {
           ),
         ),
 
-        UIHelper.verticalSpaceSmall,
-        AppFormField(
-          hintText: "8056789800",
-          fieldController: numberController,
-          prefix: Padding(
-            padding: const EdgeInsets.only(left: 8.0, right: 5),
-            child: SvgPicture.asset(
-              ImageAssets.ct,
-            ),
+        UIHelper.verticalSpaceMedium,
+        Text(
+          "Phone Number",
+          style: getBoldStyle(
+            color: ColorManager.deepGreyColor,
+            fontSize: 14,
           ),
-          keyboardType: TextInputType.phone,
-          validator: (String? val) => FieldValidator().validate(val!),
         ),
+        UIHelper.verticalSpaceSmall,
+        Row(
+          children: [
+            
+            Text(
+              registerProvider.selectedCountry != null
+                  ? 
+                      registerProvider.selectedCountry!.countryCode.toUpperCase()
+                  : "",
+              style: getBoldStyle(
+                color: ColorManager.blackColor,
+                fontSize: 18,
+              ),
+            ),
+            UIHelper.horizontalSpaceSmall,
+            Expanded(
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                ),
+                decoration: BoxDecoration(
+                  color: ColorManager.greyColor.withOpacity(.4),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Row(
+                  children: [
+                    Text(
+                     registerProvider.selectedCountry != null ? "${registerProvider.selectedCountry!.phoneCode }  |" : "",
+                      style: getBoldStyle(
+                        color: ColorManager.blackColor,
+                        fontSize: 16,
+                      ),
+                    ),
+                    UIHelper.horizontalSpaceSmall,
+
+                    Expanded(
+                      child: TextFormField(
+                        keyboardType: const TextInputType.numberWithOptions(),
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly,
+                          LengthLimitingTextInputFormatter(10),
+                        ],
+                        controller: numberController,
+                        style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 1.5,
+                            fontFamily: "NT",
+                            color: ColorManager.blackColor),
+                        decoration: const InputDecoration(
+                          border: InputBorder.none,
+                          hintText: 'Enter 10 digits',
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter a value';
+                          }
+                          if (value.length != 10) {
+                            return 'Please enter exactly 10 digits';
+                          }
+                          return null;
+                        },
+                      ),
+                    )
+                
+                  ],
+                ),
+              ),
+            )
+          ],
+        ),
+
+
+        // AppFormField(
+        //   hintText: "8056789800",
+        //   fieldController: numberController,
+        //   prefix: Padding(
+        //     padding: const EdgeInsets.only(left: 8.0, right: 5),
+        //     child: SvgPicture.asset(
+        //       ImageAssets.ct,
+        //     ),
+        //   ),
+        //   keyboardType: TextInputType.phone,
+        //   validator: (String? val) => FieldValidator().validate(val!),
+        // ),
         UIHelper.verticalSpaceSmall,
       ],
     );

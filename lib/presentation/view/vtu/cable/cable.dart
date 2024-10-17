@@ -36,7 +36,7 @@ class _CableState extends State<Cable> with SingleTickerProviderStateMixin {
   TextEditingController numberController = TextEditingController(text: "");
   bool isOtpComplete = false;
 
-   String? newOtp;
+  String? newOtp;
 
   @override
   void initState() {
@@ -47,13 +47,11 @@ class _CableState extends State<Cable> with SingleTickerProviderStateMixin {
     super.initState();
   }
 
-
   void nextField(String value, FocusNode? focusNode) {
     if (value.length == 1) {
       focusNode!.requestFocus();
     }
   }
-
 
   @override
   void dispose() {
@@ -457,216 +455,11 @@ class _CableState extends State<Cable> with SingleTickerProviderStateMixin {
               child: ListView(
                 children: [
                   //!const VtuCountrySelector(),
-                  Text(
-                    "Cable Tv",
-                    style: getBoldStyle(
-                      color: ColorManager.deepGreyColor,
-                      fontSize: 14,
-                    ),
+                  SelectCable(
+                    cableProvider: cableProvider,
                   ),
-                  UIHelper.verticalSpaceSmall,
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 8),
-                        child: Center(
-                          child: Text(
-                            cableProvider.cableCode != null
-                                ? cableProvider.cableCode!
-                                    .toUpperCase()
-                                    .substring(0, 2)
-                                : "..",
-                            style: getBoldStyle(
-                              color: ColorManager.blackColor,
-                              fontSize: 18,
-                            ),
-                          ),
-                        ),
-                      ),
-                      UIHelper.horizontalSpaceSmall,
-                      AppConstants.cableModel != null &&
-                              AppConstants.cableModel!.isNotEmpty
-                          ? Expanded(
-                              child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 10, vertical: 0),
-                                  decoration: BoxDecoration(
-                                    color:
-                                        ColorManager.greyColor.withOpacity(.4),
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  child: DropdownButtonFormField<CableData>(
-                                    decoration: const InputDecoration(
-                                      border: InputBorder.none,
-                                      enabledBorder: InputBorder.none,
-                                    ),
-                                    value: cableProvider.selectedCable,
-                                    onChanged: (CableData? newValue) async {
-                                      cableProvider.setSelectedCable(newValue!);
-                                      cableProvider.setString(
-                                        newValue.providerCode!,
-                                        newValue.providerName!,
-                                      );
-
-                                      await cableProvider.getCableplan(
-                                        newValue.providerCode!,
-                                      );
-
-                                      cableProvider.setPlan();
-                                    },
-                                    items: cableProvider
-                                        .cableList(AppConstants.cableModel!),
-                                  )),
-                            )
-                          : Container(),
-                    ],
-                  ),
-
                   UIHelper.verticalSpaceMedium,
-                  Text(
-                    "Cable Plan",
-                    style: getBoldStyle(
-                      color: ColorManager.deepGreyColor,
-                      fontSize: 14,
-                    ),
-                  ),
-                  UIHelper.verticalSpaceSmall,
-                  Container(
-                    height: 40,
-                    padding: EdgeInsets.symmetric(horizontal: 15, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: ColorManager.greyColor.withOpacity(.4),
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          cableProvider.cablePlan != null
-                              ? cableProvider.cablePlan!.plan
-                              : "Select Cable Plan",
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 1.5,
-                            fontFamily: "NT",
-                            color: ColorManager.blackColor,
-                          ),
-                        ),
-                        InkWell(
-                          onTap: () {
-                            appBottomSheet(
-                              context,
-                              isNotTabScreen: true,
-                              Container(
-                                decoration: BoxDecoration(
-                                  color: ColorManager.whiteColor,
-                                  borderRadius: const BorderRadius.only(
-                                    topLeft: Radius.circular(16),
-                                    topRight: Radius.circular(16),
-                                  ),
-                                ),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        IconButton(
-                                          onPressed: () {
-                                            Navigator.pop(context);
-                                          },
-                                          icon: const Icon(
-                                            Icons.keyboard_backspace_rounded,
-                                          ),
-                                        ),
-                                        const Label(
-                                          label: "Select Cable Plan",
-                                        ),
-                                      ],
-                                    ),
-                                    const Divider(),
-                                    Container(
-                                      height: 280,
-                                      child: Expanded(
-                                        child: SingleChildScrollView(
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(12.0),
-                                            child: Column(
-                                              children: [
-                                                ...List.generate(
-                                                    AppConstants.cablePlanModel!
-                                                        .length, (index) {
-                                                  return InkWell(
-                                                    onTap: () {
-                                                      cableProvider.setSelectedPlan(
-                                                          AppConstants
-                                                                  .cablePlanModel![
-                                                              index]);
-                                                      Navigator.pop(context);
-                                                    },
-                                                    child: Padding(
-                                                      padding: const EdgeInsets
-                                                          .symmetric(
-                                                        horizontal: 10.0,
-                                                        vertical: 8,
-                                                      ),
-                                                      child: Column(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
-                                                        children: [
-                                                          Text(
-                                                            AppConstants
-                                                                    .cablePlanModel![
-                                                                        index]
-                                                                    .plan
-                                                                    .toString() +
-                                                                "------>${AppConstants.currencySymbol} ${AppConstants.cablePlanModel![index].price}",
-                                                            style: TextStyle(
-                                                              color:
-                                                                  Colors.black,
-                                                              fontSize:
-                                                                  screenAwareSize(
-                                                                      19,
-                                                                      context),
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w500,
-                                                              letterSpacing:
-                                                                  1.5,
-                                                            ),
-                                                          ),
-                                                          UIHelper
-                                                              .verticalSpaceSmall,
-                                                          const Divider(),
-                                                          UIHelper
-                                                              .verticalSpaceSmall,
-                                                        ],
-                                                      ),
-                                                    ),
-                                                  );
-                                                })
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            );
-                          },
-                          child: Icon(
-                            Icons.arrow_drop_down,
-                            color: ColorManager.deepGreyColor,
-                            size: 30,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                  selectCableCategories(cableProvider, context),
                   UIHelper.verticalSpaceMedium,
                   //! ------------ amount---------
                   cableProvider.cableCode != null
@@ -680,184 +473,14 @@ class _CableState extends State<Cable> with SingleTickerProviderStateMixin {
                       : Container(),
                   UIHelper.verticalSpaceSmall,
                   cableProvider.cableCode != null
-                      ? Container(
-                          height: 40,
-                          padding:
-                              EdgeInsets.symmetric(horizontal: 15, vertical: 8),
-                          decoration: BoxDecoration(
-                            color: ColorManager.greyColor.withOpacity(.4),
-                            borderRadius: BorderRadius.circular(15),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment
-                                .spaceBetween, //"${AppConstants.currencySymbol}"
-                            children: [
-                              Text(
-                                cableProvider.cablePlan != null
-                                    ? cableProvider.cablePlan!.price
-                                    : "Loading...",
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
-                                  letterSpacing: 1.5,
-                                  fontFamily: "NT",
-                                  color: ColorManager.blackColor,
-                                ),
-                              ),
-                              InkWell(
-                                onTap: () {
-                                  appBottomSheet(
-                                    context,
-                                    isNotTabScreen: true,
-                                    Container(
-                                      decoration: BoxDecoration(
-                                        color: ColorManager.whiteColor,
-                                        borderRadius: const BorderRadius.only(
-                                          topLeft: Radius.circular(16),
-                                          topRight: Radius.circular(16),
-                                        ),
-                                      ),
-                                      child: Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Row(
-                                            children: [
-                                              IconButton(
-                                                onPressed: () {
-                                                  Navigator.pop(context);
-                                                },
-                                                icon: const Icon(
-                                                  Icons
-                                                      .keyboard_backspace_rounded,
-                                                ),
-                                              ),
-                                              const Label(
-                                                label: "List of channels",
-                                              ),
-                                            ],
-                                          ),
-                                          const Divider(),
-                                          Container(
-                                            height: 280,
-                                            child: Expanded(
-                                              child: SingleChildScrollView(
-                                                child: Padding(
-                                                  padding: const EdgeInsets.all(
-                                                      12.0),
-                                                  child: Column(
-                                                    children: [
-                                                      ...List.generate(
-                                                          cableProvider
-                                                              .cablePlan!
-                                                              .channels
-                                                              .length, (index) {
-                                                        return InkWell(
-                                                          onTap: () {
-                                                            Navigator.pop(
-                                                                context);
-                                                          },
-                                                          child: Padding(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                    .symmetric(
-                                                              horizontal: 10.0,
-                                                              vertical: 8,
-                                                            ),
-                                                            child: Column(
-                                                              crossAxisAlignment:
-                                                                  CrossAxisAlignment
-                                                                      .start,
-                                                              children: [
-                                                                Text(
-                                                                  cableProvider
-                                                                      .cablePlan!
-                                                                      .channels[index],
-                                                                  style:
-                                                                      TextStyle(
-                                                                    color: Colors
-                                                                        .black,
-                                                                    fontSize:
-                                                                        screenAwareSize(
-                                                                            19,
-                                                                            context),
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w500,
-                                                                    letterSpacing:
-                                                                        1.5,
-                                                                  ),
-                                                                ),
-                                                                UIHelper
-                                                                    .verticalSpaceSmall,
-                                                                const Divider(),
-                                                                UIHelper
-                                                                    .verticalSpaceSmall,
-                                                              ],
-                                                            ),
-                                                          ),
-                                                        );
-                                                      })
-                                                    ],
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  );
-                                },
-                                child: Icon(
-                                  Icons.arrow_drop_down,
-                                  color: ColorManager.deepGreyColor,
-                                  size: 30,
-                                ),
-                              ),
-                            ],
-                          ),
+                      ? BuildAmount(
+                          cableProvider: cableProvider,
                         )
                       : Container(),
                   UIHelper.verticalSpaceMedium,
                   //! IUC number
-                  Text(
-                    "IUC number",
-                    style: getBoldStyle(
-                      color: ColorManager.deepGreyColor,
-                      fontSize: 14,
-                    ),
-                  ),
-                  UIHelper.verticalSpaceSmall,
-                  Container(
-                    alignment: Alignment.centerLeft,
-                    decoration: BoxDecoration(
-                      color: ColorManager.greyColor.withOpacity(.4),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    height: 40,
-                    child: Padding(
-                      padding: const EdgeInsets.all(10.0),
-                      child: TextFormField(
-                        keyboardType: TextInputType.number,
-                        controller: iucNumber,
-                        style: const TextStyle(color: Colors.black87),
-                        decoration: const InputDecoration(
-                          border: InputBorder.none,
-                          enabledBorder: InputBorder.none,
-                          focusedBorder: InputBorder.none,
-                          hintText: 'Enter Iuc number',
-                          hintStyle: TextStyle(
-                            color: Colors.black38,
-                          ),
-                        ),
-                        onEditingComplete: () {
-                          setState(() {
-                            checkNumber = true;
-                          });
-                        },
-                      ),
-                    ),
-                  ),
+
+                  buildIucNumber(),
                   UIHelper.verticalSpaceMedium,
                   checkNumber
                       ? FutureBuilder<VerifyIucData?>(
@@ -892,7 +515,6 @@ class _CableState extends State<Cable> with SingleTickerProviderStateMixin {
                             }
                           },
                         )
-                      
                       : Container(),
                   UIHelper.verticalSpaceMedium,
                   //! LOAN ---------
@@ -982,10 +604,68 @@ class _CableState extends State<Cable> with SingleTickerProviderStateMixin {
             ),
             contentTwo: Column(
               children: [
-                const VtuCountrySelector(),
+                //!const VtuCountrySelector(),
+                SelectCable(
+                  cableProvider: cableProvider,
+                ),
                 UIHelper.verticalSpaceMedium,
-                const AppNumberField(),
+                selectCableCategories(cableProvider, context),
                 UIHelper.verticalSpaceMedium,
+                //! ------------ amount---------
+                cableProvider.cableCode != null
+                    ? Text(
+                        "Amount",
+                        style: getBoldStyle(
+                          color: ColorManager.deepGreyColor,
+                          fontSize: 14,
+                        ),
+                      )
+                    : Container(),
+                UIHelper.verticalSpaceSmall,
+                cableProvider.cableCode != null
+                    ? BuildAmount(
+                        cableProvider: cableProvider,
+                      )
+                    : Container(),
+                UIHelper.verticalSpaceMedium,
+                //! IUC number
+
+                buildIucNumber(),
+                UIHelper.verticalSpaceMedium,
+                checkNumber
+                    ? FutureBuilder<VerifyIucData?>(
+                        future: cableProvider.verifyIucNumber(
+                          ctx: context,
+                          iuc: iucNumber.text.trim(),
+                        ),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return CircularProgressIndicator(); // Show loading indicator while waiting
+                          } else if (snapshot.hasError) {
+                            return Text('Error: ${snapshot.error}');
+                          } else if (snapshot.hasData &&
+                              snapshot.data != null) {
+                            cableProvider.setCustomerName(
+                                snapshot.data!.customerName,
+                                snapshot.data!.customerNumber);
+                            return Text(
+                              'Customer Name: ${snapshot.data!.customerName}',
+                              style: getBoldStyle(
+                                  color: ColorManager.activeColor,
+                                  fontSize: 16),
+                            );
+                          } else {
+                            return Text(
+                              'Invalid iuc number',
+                              style: getBoldStyle(
+                                  color: ColorManager.primaryColor,
+                                  fontSize: 16),
+                            );
+                          }
+                        },
+                      )
+                    : Container(),
                 UIHelper.verticalSpaceMedium,
                 Row(
                   children: [
@@ -994,6 +674,26 @@ class _CableState extends State<Cable> with SingleTickerProviderStateMixin {
                         buttonText: "Submit",
                         onPressed: () {
                           //_confirmationBottomSheetMenu(amount: "", );
+                          if (cableProvider.customerName != null) {
+                            if (cableProvider.cableName != null ||
+                                cableProvider.cableCode != null) {
+                              _confirmationBottomSheetMenu(
+                                amount: cableProvider.cablePlan!.price,
+                                number: cableProvider.customerNumber!,
+                                provider: cableProvider,
+                              );
+                            } else {
+                              MekNotification().showMessage(
+                                context,
+                                message: "Please a cable tv and plan !!!",
+                              );
+                            }
+                          } else {
+                            MekNotification().showMessage(
+                              context,
+                              message: "Unverified iuc number !!!",
+                            );
+                          }
                         },
                         height: 30,
                       ),
@@ -1001,8 +701,10 @@ class _CableState extends State<Cable> with SingleTickerProviderStateMixin {
                     UIHelper.horizontalSpaceSmall,
                     Expanded(
                       child: AppButton(
-                        buttonText: "clear",
-                        onPressed: () {},
+                        buttonText: "Back",
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
                         height: 30,
                         borderColor: ColorManager.primaryColor,
                         buttonColor: ColorManager.whiteColor,
@@ -1019,6 +721,192 @@ class _CableState extends State<Cable> with SingleTickerProviderStateMixin {
     );
   }
 
+  Widget buildIucNumber() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "IUC number",
+          style: getBoldStyle(
+            color: ColorManager.deepGreyColor,
+            fontSize: 14,
+          ),
+        ),
+        UIHelper.verticalSpaceSmall,
+        Container(
+          alignment: Alignment.centerLeft,
+          decoration: BoxDecoration(
+            color: ColorManager.greyColor.withOpacity(.4),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          height: 40,
+          child: Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: TextFormField(
+              keyboardType: TextInputType.number,
+              controller: iucNumber,
+              style: const TextStyle(color: Colors.black87),
+              decoration: const InputDecoration(
+                border: InputBorder.none,
+                enabledBorder: InputBorder.none,
+                focusedBorder: InputBorder.none,
+                hintText: 'Enter Iuc number',
+                hintStyle: TextStyle(
+                  color: Colors.black38,
+                ),
+              ),
+              onEditingComplete: () {
+                setState(() {
+                  checkNumber = true;
+                });
+              },
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget selectCableCategories(
+      CableProvider cableProvider, BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "Cable Plan",
+          style: getBoldStyle(
+            color: ColorManager.deepGreyColor,
+            fontSize: 14,
+          ),
+        ),
+        UIHelper.verticalSpaceSmall,
+        Container(
+          height: 40,
+          padding: EdgeInsets.symmetric(horizontal: 15, vertical: 8),
+          decoration: BoxDecoration(
+            color: ColorManager.greyColor.withOpacity(.4),
+            borderRadius: BorderRadius.circular(15),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                cableProvider.cablePlan != null
+                    ? cableProvider.cablePlan!.plan
+                    : "Select Cable Plan",
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1.5,
+                  fontFamily: "NT",
+                  color: ColorManager.blackColor,
+                ),
+              ),
+              InkWell(
+                onTap: () {
+                  appBottomSheet(
+                    context,
+                    isNotTabScreen: true,
+                    Container(
+                      decoration: BoxDecoration(
+                        color: ColorManager.whiteColor,
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(16),
+                          topRight: Radius.circular(16),
+                        ),
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Row(
+                            children: [
+                              IconButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                icon: const Icon(
+                                  Icons.keyboard_backspace_rounded,
+                                ),
+                              ),
+                              const Label(
+                                label: "Select Cable Plan",
+                              ),
+                            ],
+                          ),
+                          const Divider(),
+                          Container(
+                            height: 280,
+                            child: Expanded(
+                              child: SingleChildScrollView(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(12.0),
+                                  child: Column(
+                                    children: [
+                                      ...List.generate(
+                                          AppConstants.cablePlanModel!.length,
+                                          (index) {
+                                        return InkWell(
+                                          onTap: () {
+                                            cableProvider.setSelectedPlan(
+                                                AppConstants
+                                                    .cablePlanModel![index]);
+                                            Navigator.pop(context);
+                                          },
+                                          child: Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 10.0,
+                                              vertical: 8,
+                                            ),
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  AppConstants
+                                                          .cablePlanModel![
+                                                              index]
+                                                          .plan
+                                                          .toString() +
+                                                      "------>${AppConstants.currencySymbol} ${AppConstants.cablePlanModel![index].price}",
+                                                  style: TextStyle(
+                                                    color: Colors.black,
+                                                    fontSize: screenAwareSize(
+                                                        19, context),
+                                                    fontWeight: FontWeight.w500,
+                                                    letterSpacing: 1.5,
+                                                  ),
+                                                ),
+                                                UIHelper.verticalSpaceSmall,
+                                                const Divider(),
+                                                UIHelper.verticalSpaceSmall,
+                                              ],
+                                            ),
+                                          ),
+                                        );
+                                      })
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+                child: Icon(
+                  Icons.arrow_drop_down,
+                  color: ColorManager.deepGreyColor,
+                  size: 30,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
 
   _otpInput(CableProvider provider, {required int topUp}) {
     appBottomSheet(
@@ -1219,7 +1107,6 @@ class _CableState extends State<Cable> with SingleTickerProviderStateMixin {
                               ctx: context,
                               iuc: iucNumber.text.trim(),
                             );
-                            
                           });
                     } else {
                       Navigator.pop(context);
@@ -1400,5 +1287,225 @@ class _CableState extends State<Cable> with SingleTickerProviderStateMixin {
       },
     );
   }
+}
 
+class BuildAmount extends StatelessWidget {
+  const BuildAmount({
+    super.key,
+    required this.cableProvider,
+  });
+
+  final CableProvider cableProvider;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 40,
+      padding: EdgeInsets.symmetric(horizontal: 15, vertical: 8),
+      decoration: BoxDecoration(
+        color: ColorManager.greyColor.withOpacity(.4),
+        borderRadius: BorderRadius.circular(15),
+      ),
+      child: Row(
+        mainAxisAlignment:
+            MainAxisAlignment.spaceBetween, //"${AppConstants.currencySymbol}"
+        children: [
+          Text(
+            cableProvider.cablePlan != null
+                ? cableProvider.cablePlan!.price
+                : "Loading...",
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1.5,
+              fontFamily: "NT",
+              color: ColorManager.blackColor,
+            ),
+          ),
+          InkWell(
+            onTap: () {
+              appBottomSheet(
+                context,
+                isNotTabScreen: true,
+                Container(
+                  decoration: BoxDecoration(
+                    color: ColorManager.whiteColor,
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(16),
+                      topRight: Radius.circular(16),
+                    ),
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Row(
+                        children: [
+                          IconButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            icon: const Icon(
+                              Icons.keyboard_backspace_rounded,
+                            ),
+                          ),
+                          const Label(
+                            label: "List of channels",
+                          ),
+                        ],
+                      ),
+                      const Divider(),
+                      Container(
+                        height: 280,
+                        child: Expanded(
+                          child: SingleChildScrollView(
+                            child: Padding(
+                              padding: const EdgeInsets.all(12.0),
+                              child: Column(
+                                children: [
+                                  ...List.generate(
+                                      cableProvider.cablePlan!.channels.length,
+                                      (index) {
+                                    return InkWell(
+                                      onTap: () {
+                                        Navigator.pop(context);
+                                      },
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 10.0,
+                                          vertical: 8,
+                                        ),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              cableProvider
+                                                  .cablePlan!.channels[index],
+                                              style: TextStyle(
+                                                color: Colors.black,
+                                                fontSize: screenAwareSize(
+                                                    19, context),
+                                                fontWeight: FontWeight.w500,
+                                                letterSpacing: 1.5,
+                                              ),
+                                            ),
+                                            UIHelper.verticalSpaceSmall,
+                                            const Divider(),
+                                            UIHelper.verticalSpaceSmall,
+                                          ],
+                                        ),
+                                      ),
+                                    );
+                                  })
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+            child: Icon(
+              Icons.arrow_drop_down,
+              color: ColorManager.deepGreyColor,
+              size: 30,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class SelectCable extends StatelessWidget {
+  const SelectCable({
+    super.key,
+    required this.cableProvider,
+  });
+
+  final CableProvider cableProvider;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "Cable Tv",
+          style: getBoldStyle(
+            color: ColorManager.deepGreyColor,
+            fontSize: 14,
+          ),
+        ),
+        UIHelper.verticalSpaceSmall,
+        Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+              child: Center(
+                child: Text(
+                  cableProvider.cableCode != null
+                      ? cableProvider.cableCode!.toUpperCase().substring(0, 2)
+                      : "..",
+                  style: getBoldStyle(
+                    color: ColorManager.blackColor,
+                    fontSize: 18,
+                  ),
+                ),
+              ),
+            ),
+            UIHelper.horizontalSpaceSmall,
+            AppConstants.cableModel != null &&
+                    AppConstants.cableModel!.isNotEmpty
+                ? Expanded(
+                    child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 0),
+                        decoration: BoxDecoration(
+                          color: ColorManager.greyColor.withOpacity(.4),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: DropdownButtonFormField<CableData>(
+                          decoration: const InputDecoration(
+                            border: InputBorder.none,
+                            enabledBorder: InputBorder.none,
+                          ),
+                          value: cableProvider.selectedCable,
+                          onChanged: (CableData? newValue) async {
+                            cableProvider.setSelectedCable(newValue!);
+                            cableProvider.setString(
+                              newValue.providerCode!,
+                              newValue.providerName!,
+                            );
+
+                            await cableProvider.getCableplan(
+                              newValue.providerCode!,
+                            );
+
+                            cableProvider.setPlan();
+                          },
+                          items:
+                              cableProvider.cableList(AppConstants.cableModel!),
+                        )),
+                  )
+                : Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+                    decoration: BoxDecoration(
+                      color: ColorManager.greyColor.withOpacity(.4),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Text(
+                      "Loading .....",
+                      style: getBoldStyle(color: ColorManager.deepGreyColor),
+                    ),
+                  ),
+          ],
+        ),
+      ],
+    );
+  }
 }

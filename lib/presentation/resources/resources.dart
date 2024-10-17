@@ -10,3 +10,4 @@ export './formfield.dart';
 export './app_button.dart';
 export './bottom_sheet.dart';
 export './label.dart';
+export './shimer_loading.dart';

@@ -23,7 +23,8 @@ appBottomSheet(BuildContext context, Widget sheetBody,
           onTap: () {
             FocusManager.instance.primaryFocus?.unfocus();
           },
-          child: sheetBody),
+          child: sheetBody,
+          ),
     ),
   );
 }

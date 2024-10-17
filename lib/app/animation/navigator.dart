@@ -23,10 +23,12 @@ class NavigateClass {
   pushReplacementNamed({
     required BuildContext context,
     required String routName,
+    dynamic args
   }) {
     Navigator.pushReplacementNamed(
       context,
       routName,
+       arguments: args
     );
   }
 

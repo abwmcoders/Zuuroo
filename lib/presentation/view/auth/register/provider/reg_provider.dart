@@ -87,11 +87,12 @@ class RegisterProvider extends BaseViewModel {
       dob: dobController.text.trim().toString(),
       gender: genderController.text.trim().toString(),
       address: addressController.text.trim().toString(),
-      country: countryController.text.trim().toString(),
+      country: selectedCountry!.countryCode,
       pin: pin,
     );
     try {
       var request = await RegisterRepository().register(user);
+      print("response reg ------->$request");
       changeLoaderStatus(false);
       if (kDebugMode) {
         print(request.toString());
@@ -100,11 +101,13 @@ class RegisterProvider extends BaseViewModel {
         if (request['status'] == true) {
           mekStorage!.putString(
             StorageKeys.onBoardingStorageKey,
-            "reg",
+            "verify",
           );
+          MekSecureStorage().storeByKey(StorageKeys.emailKey, emailController.text.trim().toString());
           NavigateClass().pushNamed(
             context: ctx,
-            routName: Routes.loginRoute,
+            args: emailController.text.trim().toString(),
+            routName: Routes.verify,
           );
           nameController.clear();
           emailController.clear();
@@ -116,6 +119,11 @@ class RegisterProvider extends BaseViewModel {
           telController.clear();
           countryController.clear();
         } else {
+           NavigateClass().pushReplacementNamed(
+            context: ctx,
+            args: "",
+            routName: Routes.registerRoute,
+          );
           MekNotification().showMessage(
             context!,
             message: request['message'].toString(),
@@ -126,22 +134,27 @@ class RegisterProvider extends BaseViewModel {
       // show error snackbar or notify user of the error
       if (kDebugMode) {
         print(e.toString());
+        NavigateClass().pushReplacementNamed(
+          context: ctx,
+          args: "",
+          routName: Routes.registerRoute,
+        );
         MekNotification().showMessage(
           context!,
-          message: e.toString(),
+          message: "An error occurred creating an account for you, Please try again.",
         );
       }
     }
   }
 
-  
   Future<List<CountryModel>?> getCountryList({
     required BuildContext ctx,
   }) async {
     try {
       var request = await UserApiServices().getCountry();
+
       if (request != null) {
-        if (request["success"] == true) {
+        if (request["status"] == true) {
           List<CountryModel> _countryResult = [];
           for (dynamic country in request['data']) {
             final countryModel = CountryModel.fromJson(country);
@@ -176,7 +189,6 @@ class RegisterProvider extends BaseViewModel {
       return null;
     }
   }
-
 
   @override
   FutureOr<void> disposeState() {

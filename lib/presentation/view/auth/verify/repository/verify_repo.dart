@@ -1,24 +1,21 @@
-import 'dart:developer';
 import 'dart:io';
 
-import 'package:zuuro/app/api_constants.dart';
-
+import '../../../../../app/api_constants.dart';
 import '../../../../../app/locator.dart';
 import '../../../../../app/services/base_services.dart';
 
-class LoginRepository {
+class VerifyRepository {
   final baseServices = getIt<BaseServices>();
 
-  Future loginUser({String? email, String? password}) async {
+  Future verifyEmail({String? email, String? otp}) async {
     var body = {
       "email": email,
-      "password": password,
+      "otp": otp,
     };
-    print("body ---> $body");
     try {
+      print("Body for vrificatio  ---> $body");
       var response =
-          baseServices.postRequest(url: ApiConstants.loginUrl, data: body);
-      log("response ---> $response");
+          baseServices.postRequest(url: ApiConstants.verify, data: body);
       return response;
     } on SocketException {
       return "Socket exception occurred";

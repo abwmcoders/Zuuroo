@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:zuuro/presentation/view/auth/Forgot/forgot.dart';
 import 'package:zuuro/presentation/view/auth/login/login.dart';
 import 'package:zuuro/presentation/view/auth/register/register.dart';
+import 'package:zuuro/presentation/view/auth/verify/verify_email.dart';
 import 'package:zuuro/presentation/view/settings/change_password/change_password.dart';
 import 'package:zuuro/presentation/view/settings/change_pin/change_pin.dart';
 import 'package:zuuro/presentation/view/splash/splash.dart';
@@ -29,6 +30,7 @@ class Routes {
   static const String loginRoute = "/login";
   static const String registerRoute = "/register";
   static const String bvnRoute = "/bvn";
+  static const String verify = "/verify-mail";
   static const String forgotPasswordRoute = "/forgotPassword";
   static const String mainRoute = "/main";
   static const String airtimeRoute = "/Airtime";
@@ -66,8 +68,11 @@ class RouteGenerator {
       case Routes.bvnRoute:
       final String args = routeSettings.arguments as String;
         return MaterialPageRoute(builder: (_) => BvnScreen(from: args,));
+      case Routes.verify:
+      final String args = routeSettings.arguments as String;
+        return MaterialPageRoute(builder: (_) => VerifyEmail(email: args,));
       case Routes.forgotPasswordRoute:
-        return MaterialPageRoute(builder: (_) => const ForgotPassword());
+        return MaterialPageRoute(builder: (_) => ForgotPassword());
       case Routes.mainRoute:
         return MaterialPageRoute(builder: (_) => const Dashboard());
       case Routes.transactionDetail:

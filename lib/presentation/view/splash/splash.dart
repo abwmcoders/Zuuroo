@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:zuuro/app/cache/storage.dart';
 
 import '../../../app/animation/navigator.dart';
 import '../../../app/animation/slidein_animation.dart';
@@ -18,6 +19,7 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen> {
   final _storageServices = getIt<StorageCredentials>();
   String? splashStatusBool;
+  String? email;
 
   Future<dynamic> waiting(Function() action) {
     Future<dynamic> navigateAfterFuture =
@@ -27,6 +29,8 @@ class _SplashScreenState extends State<SplashScreen> {
 
   Future<void> checkStatus() async {
     splashStatusBool = await _storageServices.onBoardingCredentailStatus;
+    email =
+        await MekSecureStorage().getSecuredKeyStoreData(StorageKeys.emailKey);
   }
 
   @override
@@ -68,18 +72,22 @@ class _SplashScreenState extends State<SplashScreen> {
         args: "password",
         routName: Routes.registerRoute,
       );
-    } 
-    else if (splashStatusBool == "password") {
+    } else if (splashStatusBool == "password") {
       NavigateClass().pushNamed(
         context: context,
         args: "pin",
         routName: Routes.registerRoute,
       );
-    } 
-    else if (splashStatusBool == "pin") {
+    } else if (splashStatusBool == "pin") {
       NavigateClass().pushNamed(
         context: context,
         routName: Routes.loginRoute,
+      );
+    } else if (splashStatusBool == "verify") {
+      NavigateClass().pushNamed(
+        context: context,
+        args: email,
+        routName: Routes.verify,
       );
     } else {
       NavigateClass().pushNamed(

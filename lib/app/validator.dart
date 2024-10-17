@@ -45,4 +45,13 @@ class FieldValidator {
 
     return null;
   }
+
+  String? validateRequiredLength(String val, int lenght) {
+    val = val.trim();
+
+    if (val.isEmpty) return 'This field cannot be empty';
+    if (val.length < lenght) return 'At least $lenght characters';
+    return null;
+  }
+
 }

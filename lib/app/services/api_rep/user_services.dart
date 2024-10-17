@@ -73,6 +73,21 @@ class UserApiServices extends BaseServices {
     }
   }
 
+  Future getHistories() async {
+    var rm;
+    String token = await getUserToken();
+    try {
+      await getUserToken().then(
+        (value) {
+          rm = tokenizedGetRequest(token: value, url: ApiConstants.history);
+        },
+      );
+      return rm;
+    } catch (e) {
+      return null;
+    }
+  }
+
   Future getOperatorList(String countryCode) async {
     var rm;
     String token = await getUserToken();

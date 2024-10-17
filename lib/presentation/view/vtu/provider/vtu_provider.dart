@@ -70,7 +70,6 @@ class VtuProvider extends BaseViewModel {
     billerCode = newCode;
     billerName = newName;
     notifyListeners();
-    
   }
 
   setCustomerName(String name, String number) {
@@ -179,6 +178,7 @@ class VtuProvider extends BaseViewModel {
 
   getBiller() async {
     final response = await UserApiServices().getBillerList();
+    log("billers resp -----> $response");
     if (response != null && response['data'] != null) {
       List<BillerData> _billerResult = AppConstants.billerModel ?? [];
       for (dynamic biller in response['data']) {
@@ -268,15 +268,15 @@ class VtuProvider extends BaseViewModel {
       required String amount}) async {
     dismissKeyboard(context);
     changeLoaderStatus(true);
-    var body =     {
-    "billerName": billerCode,
-    "meterType": meterType,
-    "meterNumber": meterNumber,
-    "amount": amount,
-    "customerName": customerName,
-    "customerPhoneNumber": customerNumber,
-    "pin": otp,
-};
+    var body = {
+      "billerName": billerCode,
+      "meterType": meterType,
+      "meterNumber": meterNumber,
+      "amount": amount,
+      "customerName": customerName,
+      "customerPhoneNumber": customerNumber,
+      "pin": otp,
+    };
 
     print("object for airtime purchase ---> $body");
     try {
@@ -342,12 +342,12 @@ class VtuProvider extends BaseViewModel {
     }
   }
 
-  Future<VerifyMeterNumberData?> verifyMeterNumber(
-      {required BuildContext ctx,
-      required String ctr,
-      required String billerCode,
-      String meterType = "prepaid",
-      }) async {
+  Future<VerifyMeterNumberData?> verifyMeterNumber({
+    required BuildContext ctx,
+    required String ctr,
+    required String billerCode,
+    String meterType = "prepaid",
+  }) async {
     dismissKeyboard(context);
     var body = {
       "serviceID": ctr,

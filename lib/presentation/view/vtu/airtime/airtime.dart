@@ -189,6 +189,8 @@ class _AirtimeState extends State<Airtime> with SingleTickerProviderStateMixin {
                   appBottomSheet(
                     context,
                     Container(
+                      padding: EdgeInsets.only(
+                          bottom: MediaQuery.of(context).viewInsets.bottom),
                       decoration: BoxDecoration(
                         color: ColorManager.whiteColor,
                         borderRadius: const BorderRadius.only(
@@ -215,56 +217,53 @@ class _AirtimeState extends State<Airtime> with SingleTickerProviderStateMixin {
                             ],
                           ),
                           const Divider(),
-                          Container(
-                            height: 80,
-                            child: Expanded(
-                              child: SingleChildScrollView(
-                                child: Padding(
-                                  padding: const EdgeInsets.all(12.0),
-                                  child: Column(
-                                    children: [
-                                      ...List.generate(
-                                          AppConstants.operatorModel!.length,
-                                          (index) {
-                                        return InkWell(
-                                          onTap: () {
-                                            vtuProvider.setOperatorCode(
+                          SizedBox(
+                            height: deviceHeight(context) * .4,
+                            child: SingleChildScrollView(
+                              child: Padding(
+                                padding: const EdgeInsets.all(12.0),
+                                child: Column(
+                                  children: [
+                                    ...List.generate(
+                                        AppConstants.operatorModel!.length,
+                                        (index) {
+                                      return InkWell(
+                                        onTap: () {
+                                          vtuProvider.setOperatorCode(
+                                              AppConstants.operatorModel![index]
+                                                  .operatorCode);
+                                          Navigator.pop(context);
+                                        },
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 10.0,
+                                            vertical: 8,
+                                          ),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
                                                 AppConstants
                                                     .operatorModel![index]
-                                                    .operatorCode);
-                                            Navigator.pop(context);
-                                          },
-                                          child: Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                              horizontal: 10.0,
-                                              vertical: 8,
-                                            ),
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  AppConstants
-                                                      .operatorModel![index]
-                                                      .operatorCode,
-                                                  style: TextStyle(
-                                                    color: Colors.black,
-                                                    fontSize: screenAwareSize(
-                                                        19, context),
-                                                    fontWeight: FontWeight.w500,
-                                                    letterSpacing: 1.5,
-                                                  ),
+                                                    .operatorCode,
+                                                style: TextStyle(
+                                                  color: Colors.black,
+                                                  fontSize: screenAwareSize(
+                                                      19, context),
+                                                  fontWeight: FontWeight.w500,
+                                                  letterSpacing: 1.5,
                                                 ),
-                                                UIHelper.verticalSpaceSmall,
-                                                const Divider(),
-                                                UIHelper.verticalSpaceSmall,
-                                              ],
-                                            ),
+                                              ),
+                                              UIHelper.verticalSpaceSmall,
+                                              const Divider(),
+                                              UIHelper.verticalSpaceSmall,
+                                            ],
                                           ),
-                                        );
-                                      })
-                                    ],
-                                  ),
+                                        ),
+                                      );
+                                    })
+                                  ],
                                 ),
                               ),
                             ),
@@ -334,7 +333,7 @@ class _AirtimeState extends State<Airtime> with SingleTickerProviderStateMixin {
               )
             ],
           ),
-          // : Container(),
+
           UIHelper.verticalSpaceMedium,
 
           Text(
@@ -878,55 +877,52 @@ class _AirtimeState extends State<Airtime> with SingleTickerProviderStateMixin {
                           ),
                           const Divider(),
                           Container(
-                            height: 80,
-                            child: Expanded(
-                              child: SingleChildScrollView(
-                                child: Padding(
-                                  padding: const EdgeInsets.all(12.0),
-                                  child: Column(
-                                    children: [
-                                      ...List.generate(
-                                          AppConstants.operatorModel!.length,
-                                          (index) {
-                                        return InkWell(
-                                          onTap: () {
-                                            vtuProvider.setOperatorCode(
+                            height: deviceHeight(context) * .4,
+                            child: SingleChildScrollView(
+                              child: Padding(
+                                padding: const EdgeInsets.all(12.0),
+                                child: Column(
+                                  children: [
+                                    ...List.generate(
+                                        AppConstants.operatorModel!.length,
+                                        (index) {
+                                      return InkWell(
+                                        onTap: () {
+                                          vtuProvider.setOperatorCode(
+                                              AppConstants.operatorModel![index]
+                                                  .operatorCode);
+                                          Navigator.pop(context);
+                                        },
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 10.0,
+                                            vertical: 8,
+                                          ),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
                                                 AppConstants
                                                     .operatorModel![index]
-                                                    .operatorCode);
-                                            Navigator.pop(context);
-                                          },
-                                          child: Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                              horizontal: 10.0,
-                                              vertical: 8,
-                                            ),
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  AppConstants
-                                                      .operatorModel![index]
-                                                      .operatorCode,
-                                                  style: TextStyle(
-                                                    color: Colors.black,
-                                                    fontSize: screenAwareSize(
-                                                        19, context),
-                                                    fontWeight: FontWeight.w500,
-                                                    letterSpacing: 1.5,
-                                                  ),
+                                                    .operatorCode,
+                                                style: TextStyle(
+                                                  color: Colors.black,
+                                                  fontSize: screenAwareSize(
+                                                      19, context),
+                                                  fontWeight: FontWeight.w500,
+                                                  letterSpacing: 1.5,
                                                 ),
-                                                UIHelper.verticalSpaceSmall,
-                                                const Divider(),
-                                                UIHelper.verticalSpaceSmall,
-                                              ],
-                                            ),
+                                              ),
+                                              UIHelper.verticalSpaceSmall,
+                                              const Divider(),
+                                              UIHelper.verticalSpaceSmall,
+                                            ],
                                           ),
-                                        );
-                                      })
-                                    ],
-                                  ),
+                                        ),
+                                      );
+                                    })
+                                  ],
                                 ),
                               ),
                             ),
@@ -1756,6 +1752,7 @@ class _AirtimeState extends State<Airtime> with SingleTickerProviderStateMixin {
                       //!
                       _otpInput(provider, topUp: topUp);
                     } else {
+                      Navigator.pop(context);
                       MekNotification().showMessage(
                         context,
                         message: "Insufficient fund !!!",
@@ -1771,7 +1768,6 @@ class _AirtimeState extends State<Airtime> with SingleTickerProviderStateMixin {
       },
     );
   }
-
 }
 
 class AppAmountField extends StatelessWidget {

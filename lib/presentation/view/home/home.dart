@@ -6,11 +6,13 @@ import 'package:zuuro/presentation/view/home/provider/home_provider.dart';
 
 import '../../../app/animation/navigator.dart';
 import '../../../app/app_constants.dart';
+import '../../../app/services/api_rep/user_services.dart';
 import '../../resources/resources.dart';
+import '../history/model/history_model.dart';
 
 String getFirstTwoLetters(String text) {
   if (text.length < 2) {
-    return text; 
+    return text;
   }
   return text.substring(0, 2); // Get the first 2 letters
 }
@@ -34,7 +36,6 @@ class _HomeXState extends State<HomeX> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
@@ -338,7 +339,6 @@ class _HomeXState extends State<HomeX> {
           ),
         ),
       ),
-    
     );
   }
 }
@@ -385,16 +385,27 @@ class Home extends StatelessWidget {
                             shape: BoxShape.circle,
                             color: ColorManager.greyColor,
                           ),
-                          child: Center(child: Text(AppConstants.homeModel != null ? AppConstants.homeModel!.data.user.name
-                                .substring(0, 2)
-                                .toUpperCase() : "" , style: getBoldStyle(color: ColorManager.blackColor, fontSize: 20,),)),
+                          child: Center(
+                              child: Text(
+                            AppConstants.homeModel != null
+                                ? AppConstants.homeModel!.data.user.name
+                                    .substring(0, 2)
+                                    .toUpperCase()
+                                : "",
+                            style: getBoldStyle(
+                              color: ColorManager.blackColor,
+                              fontSize: 20,
+                            ),
+                          )),
                         ),
                         UIHelper.horizontalSpaceSmall,
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              AppConstants.homeModel != null ? "Hello ${AppConstants.homeModel!.data.user.username}!" : "Hello !",
+                              AppConstants.homeModel != null
+                                  ? "Hello ${AppConstants.homeModel!.data.user.username}!"
+                                  : "Hello !",
                               style:
                                   getBoldStyle(color: ColorManager.blackColor)
                                       .copyWith(fontSize: 16),
@@ -459,7 +470,14 @@ class Home extends StatelessWidget {
                             ],
                           ),
                           Text(
-                          AppConstants.homeModel != null ?  homeProvider.showBalance ? formatCurrency(double.parse(AppConstants.homeModel!.data.wallet.balance),) : "********" : "${AppConstants.currencySymbol} 0.00", //
+                            AppConstants.homeModel != null
+                                ? homeProvider.showBalance
+                                    ? formatCurrency(
+                                        double.parse(AppConstants
+                                            .homeModel!.data.wallet.balance),
+                                      )
+                                    : "********"
+                                : "${AppConstants.currencySymbol} 0.00", //
                             style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.normal,
@@ -562,6 +580,7 @@ class Home extends StatelessWidget {
                 ),
                 UIHelper.verticalSpaceMedium,
                 Container(
+                  height: screenAwareSize(600, context),
                   padding:
                       const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
                   decoration: BoxDecoration(
@@ -569,99 +588,261 @@ class Home extends StatelessWidget {
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            "Transaction History",
-                            style: getBoldStyle(
-                              color: ColorManager.blackColor,
-                              fontSize: 14,
-                            ),
-                          ),
-                          Text(
-                            "View all",
-                            style: getRegularStyle(
-                                color: ColorManager.blackColor, fontSize: 14),
-                          ),
-                        ],
+                      Text(
+                        "Transaction History",
+                        style: getBoldStyle(
+                          color: ColorManager.blackColor,
+                          fontSize: 14,
+                        ),
                       ),
                       UIHelper.verticalSpaceSmall,
-                      ...List.generate(5, (index) {
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 8.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Row(
-                                children: [
-                                  Container(
-                                    height: screenAwareSize(50, context),
-                                    width: screenAwareSize(50, context),
-                                    padding: const EdgeInsets.all(5),
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: ColorManager.primaryColor
-                                          .withOpacity(.2),
-                                    ),
-                                    child: SvgPicture.asset(ImageAssets.airt),
-                                  ),
-                                  UIHelper.horizontalSpaceSmall,
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                      
+                      Expanded(
+                        child: FutureBuilder(
+                            future: UserApiServices().getHistories(),
+                            builder: (context, snapshot) {
+                              print('histories beneficiaries ----> ${snapshot.data}');
+                              if (snapshot.hasData) {
+                                HistoryResponse _history =
+                                    HistoryResponse.fromJson(snapshot.data);
+                                    if(_history.data.length == 0) {
+                                      return Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment: CrossAxisAlignment.center,
                                     children: [
-                                      Text(
-                                        "Airtime",
-                                        style: getRegularStyle(
-                                          color: ColorManager.blackColor,
-                                          fontSize: 14,
+                                      Center(
+                                        child: Column(
+                                          children: [
+                                            SizedBox(
+                                              width:
+                                                  screenAwareSize(300, context),
+                                              height:
+                                                  screenAwareSize(300, context),
+                                                  child: Icon(Icons.light_mode_sharp, color: ColorManager.primaryColor, size: 50,),
+                                              // child: Image.asset(
+                                              //     "assets/images/noRTransaction.png"),
+                                            ),
+                                            Text(
+                                              "You have no transaction history",
+                                              style: getBoldStyle(color: ColorManager.blackColor,),
+                                            ),
+                                          ],
                                         ),
+                                      )
+                                    ],
+                                  );
+                                    } else {
+                                       return ListView.builder(
+                                    itemCount: 5, //_cBeneficiary.data!.length,
+                                    itemBuilder: (context, index) {
+                                      return Column(
+                                        children: [
+                                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 8.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Row(
+                                  children: [
+                                    Container(
+                                      height: screenAwareSize(50, context),
+                                      width: screenAwareSize(50, context),
+                                      padding: const EdgeInsets.all(5),
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: ColorManager.primaryColor
+                                            .withOpacity(.2),
                                       ),
-                                      Text(
-                                        "July 12th, 11:45:04",
+                                      child: Center(child: Text(_history.data[index].operatorCode.substring(0,2).toUpperCase(), style: getBoldStyle(color: ColorManager.blackColor, fontSize: 18,),)),
+                                     // child: SvgPicture.asset(ImageAssets.airt),
+                                    ),
+                                    UIHelper.horizontalSpaceSmall,
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          _history.data[index].purchase,
+                                          style: getRegularStyle(
+                                            color: ColorManager.blackColor,
+                                            fontSize: 14,
+                                          ),
+                                        ),
+                                        Text(
+                                          //"July 12th, 11:45:04",
+                                          _history.data[index].completedUtc,
+                                          style: getRegularStyle(
+                                            color: ColorManager.blackColor,
+                                            fontSize: 10,
+                                          ),
+                                        ),
+                                      ],
+                                    )
+                                  ],
+                                ),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      //"₦ 2000.00",
+                                      "₦ ${_history.data[index].sellingPrice}",
+                                      style: getRegularStyle(
+                                        color: ColorManager.blackColor,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 5, vertical: 5),
+                                      decoration: BoxDecoration(
+                                        color: _history.data[index].processingState == "failed" ? ColorManager.errorColor : _history.data[index].processingState == "pending" ? ColorManager.pendColor :  ColorManager.activeColor
+                                            .withOpacity(.2),
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      child: Text(
+                                        //"Successful",
+                                        _history.data[index].processingState.toString(),
                                         style: getRegularStyle(
-                                          color: ColorManager.blackColor,
+                                          color: ColorManager.activeColor,
                                           fontSize: 10,
                                         ),
                                       ),
-                                    ],
-                                  )
-                                ],
-                              ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    "₦ 2000.00",
-                                    style: getRegularStyle(
-                                      color: ColorManager.blackColor,
-                                      fontSize: 12,
-                                    ),
-                                  ),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 5, vertical: 5),
-                                    decoration: BoxDecoration(
-                                      color: ColorManager.activeColor
-                                          .withOpacity(.2),
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                    child: Text(
-                                      "Successful",
-                                      style: getRegularStyle(
-                                        color: ColorManager.activeColor,
-                                        fontSize: 10,
-                                      ),
-                                    ),
-                                  )
-                                ],
-                              )
-                            ],
+                                    )
+                                  ],
+                                )
+                              ],
+                            ),
                           ),
-                        );
-                      })
+                        
+                                          UIHelper.verticalSpaceSmall,
+                                          Divider(),
+                                        ],
+                                      );
+                                    },
+                                  );
+                                    }
+                              } 
+                              else if(snapshot.hasError) {
+                                 return Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Center(
+                                      child: Column(
+                                        children: [
+                                          SizedBox(
+                                            width:
+                                                screenAwareSize(300, context),
+                                            height:
+                                                screenAwareSize(300, context),
+                                            child: Icon(
+                                              Icons.light_mode_sharp,
+                                              color: ColorManager.primaryColor,
+                                              size: 50,
+                                            ),
+                                            // child: Image.asset(
+                                            //     "assets/images/noRTransaction.png"),
+                                          ),
+                                          Text(
+                                            "An error occurred trying to get history\nPlease try again later",
+                                            textAlign: TextAlign.center,
+                                            style: getBoldStyle(
+                                              color: ColorManager.blackColor,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    )
+                                  ],
+                                );
+                              }
+                              else if(snapshot.connectionState == ConnectionState.waiting){
+                                return WidgetListLoaderShimmer();
+                              }
+                              else {
+                                 return WidgetListLoaderShimmer();
+                              }
+                            }),
+                      ),
+                          
+                      // ...List.generate(5, (index) {
+                      //   return Padding(
+                      //     padding: const EdgeInsets.symmetric(vertical: 8.0),
+                      //     child: Row(
+                      //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      //       children: [
+                      //         Row(
+                      //           children: [
+                      //             Container(
+                      //               height: screenAwareSize(50, context),
+                      //               width: screenAwareSize(50, context),
+                      //               padding: const EdgeInsets.all(5),
+                      //               decoration: BoxDecoration(
+                      //                 shape: BoxShape.circle,
+                      //                 color: ColorManager.primaryColor
+                      //                     .withOpacity(.2),
+                      //               ),
+                      //               child: SvgPicture.asset(ImageAssets.airt),
+                      //             ),
+                      //             UIHelper.horizontalSpaceSmall,
+                      //             Column(
+                      //               crossAxisAlignment:
+                      //                   CrossAxisAlignment.start,
+                      //               children: [
+                      //                 Text(
+                      //                   "Airtime",
+                      //                   style: getRegularStyle(
+                      //                     color: ColorManager.blackColor,
+                      //                     fontSize: 14,
+                      //                   ),
+                      //                 ),
+                      //                 Text(
+                      //                   "July 12th, 11:45:04",
+                      //                   style: getRegularStyle(
+                      //                     color: ColorManager.blackColor,
+                      //                     fontSize: 10,
+                      //                   ),
+                      //                 ),
+                      //               ],
+                      //             )
+                      //           ],
+                      //         ),
+                      //         Column(
+                      //           crossAxisAlignment: CrossAxisAlignment.start,
+                      //           children: [
+                      //             Text(
+                      //               "₦ 2000.00",
+                      //               style: getRegularStyle(
+                      //                 color: ColorManager.blackColor,
+                      //                 fontSize: 12,
+                      //               ),
+                      //             ),
+                      //             Container(
+                      //               padding: const EdgeInsets.symmetric(
+                      //                   horizontal: 5, vertical: 5),
+                      //               decoration: BoxDecoration(
+                      //                 color: ColorManager.activeColor
+                      //                     .withOpacity(.2),
+                      //                 borderRadius: BorderRadius.circular(10),
+                      //               ),
+                      //               child: Text(
+                      //                 "Successful",
+                      //                 style: getRegularStyle(
+                      //                   color: ColorManager.activeColor,
+                      //                   fontSize: 10,
+                      //                 ),
+                      //               ),
+                      //             )
+                      //           ],
+                      //         )
+                      //       ],
+                      //     ),
+                      //   );
+                      
+                      // })
+                   
                     ],
                   ),
                 )
@@ -675,8 +856,8 @@ class Home extends StatelessWidget {
 }
 
 String formatCurrency(double amount) {
-  final format =
-      NumberFormat.currency(locale: 'en_NG', symbol: AppConstants.currencySymbol); // US Dollar
+  final format = NumberFormat.currency(
+      locale: 'en_NG', symbol: AppConstants.currencySymbol); // US Dollar
   return format.format(amount);
 }
 

@@ -40,6 +40,7 @@ class PersonalInfo extends StatelessWidget {
                       ),),
             ),
             UIHelper.verticalSpaceLarge,
+
             RowTile(
               title: "Full name",
               value: user.name,
@@ -51,15 +52,15 @@ class PersonalInfo extends StatelessWidget {
             ),
              RowTile(
               title: "Nickname",
-              value: user.username,
+              value: user.username.isEmpty ? "..." : user.username,
             ),
              RowTile(
               title: "Gender",
-              value: user.gender.toUpperCase(),
+              value: user.gender != null ? user.gender!.toUpperCase() : "NILL",
             ),
              RowTile(
               title: "Date of birth",
-              value: user.dateOfBirth,
+              value: user.dateOfBirth != null ? user.dateOfBirth! : "--/--/----",
             ),
             RowTile(
               title: "Email",
@@ -68,8 +69,9 @@ class PersonalInfo extends StatelessWidget {
             ),
              RowTile(
               title: "Address",
-              value: user.address,
+              value: user.address != null ? user.address! : "---------------",
             ),
+           
             UIHelper.verticalSpaceSmall,
             Align(
               alignment: Alignment.bottomRight,
