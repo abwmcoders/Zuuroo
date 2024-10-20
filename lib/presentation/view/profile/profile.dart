@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:pay_with_paystack/pay_with_paystack.dart';
 import 'package:zuuro/app/cache/storage.dart';
 import 'package:zuuro/presentation/resources/resources.dart';
 import 'package:zuuro/presentation/resources/ui_helper.dart';
@@ -9,7 +10,7 @@ import '../../../app/app_constants.dart';
 import '../../../app/locator.dart';
 
 class Profile extends StatelessWidget {
-  const Profile({super.key});
+  Profile({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -26,29 +27,29 @@ class Profile extends StatelessWidget {
               Positioned(
                 top: 5,
                 left: 15,
-                child: 
-                    Row(
+                child: Row(
                   children: [
                     Container(
                       height: screenAwareSize(100, context),
                       width: screenAwareSize(100, context),
                       decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        gradient: ColorManager.buttonGradient
-                        //color: ColorManager.primaryColor,
-                      ),
+                          shape: BoxShape.circle,
+                          gradient: ColorManager.buttonGradient
+                          //color: ColorManager.primaryColor,
+                          ),
                       child: Center(
-                          child: Text(
-                        AppConstants.homeModel != null
-                            ? AppConstants.homeModel!.data.user.username
-                                .substring(0, 2)
-                                .toUpperCase()
-                            : "",
-                        style: getBoldStyle(
-                          color: ColorManager.whiteColor,
-                          fontSize: 25,
+                        child: Text(
+                          AppConstants.homeModel != null
+                              ? AppConstants.homeModel!.data.user.username
+                                  .substring(0, 2)
+                                  .toUpperCase()
+                              : "",
+                          style: getBoldStyle(
+                            color: ColorManager.whiteColor,
+                            fontSize: 25,
+                          ),
                         ),
-                      ),),
+                      ),
                     ),
                     UIHelper.horizontalSpaceSmall,
                     Column(
@@ -109,10 +110,27 @@ class Profile extends StatelessWidget {
                                 subTitle: "1 linked card/account",
                                 icon: Icons.group,
                                 onPressed: () {
-                                  NavigateClass().pushNamed(
-                                    context: context,
-                                    routName: Routes.bank,
-                                  );
+                                   final uniqueTransRef =
+                                      PayWithPayStack().generateUuidV4();
+
+                                  PayWithPayStack().now(
+                                    callbackUrl: 'https://api.paystack.co/transaction/initialize',
+                                      context: context,
+                                      secretKey: "sk_test_52fdad00c5f938381b29d16a6e4c516bea328ff5",
+                                      customerEmail: "popekabu@gmail.com",
+                                      reference: uniqueTransRef,
+                                      currency: "NGN",
+                                      amount: 20000,
+                                      transactionCompleted: () {
+                                        print("Transaction Successful");
+                                      },
+                                      transactionNotCompleted: () {
+                                        print("Transaction Not Successful!");
+                                      });
+                                  // NavigateClass().pushNamed(
+                                  //   context: context,
+                                  //   routName: Routes.bank,
+                                  // );
                                 },
                                 isLast: true,
                               ),
@@ -188,10 +206,10 @@ class Profile extends StatelessWidget {
                                 subTitle: "Learn more about us.",
                                 icon: Icons.source,
                                 onPressed: () {
-                                  // NavigateClass().pushNamed(
-                                  //   context: context,
-                                  //   routName: Routes.about,
-                                  // );
+                                  NavigateClass().pushNamed(
+                                    context: context,
+                                    routName: Routes.about,
+                                  );
                                 },
                               ),
                               ProfileTile(
@@ -200,10 +218,10 @@ class Profile extends StatelessWidget {
                                     "Feel free to reach out for any concerns.",
                                 icon: Icons.help,
                                 onPressed: () {
-                                  // NavigateClass().pushNamed(
-                                  //   context: context,
-                                  //   routName: Routes.support,
-                                  // );
+                                  NavigateClass().pushNamed(
+                                    context: context,
+                                    routName: Routes.support,
+                                  );
                                 },
                               ),
                               ProfileTile(
@@ -211,7 +229,11 @@ class Profile extends StatelessWidget {
                                 subTitle: "See our website.",
                                 icon: Icons.web,
                                 onPressed: () {
-                                  //_launchWebsiteUrl();
+                                   NavigateClass().pushNamed(
+                                    context: context,
+                                    routName: Routes.website,
+                                  );
+                                  
                                 },
                               ),
                               ProfileTile(

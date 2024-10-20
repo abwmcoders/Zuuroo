@@ -18,8 +18,11 @@ import '../view/money/card/card_funding.dart';
 import '../view/money/money.dart';
 import '../view/money/transfer/transfer.dart';
 import '../view/onboarding/onboarding.dart';
+import '../view/settings/about/about.dart';
 import '../view/settings/personal_info/personal_info.dart';
+import '../view/settings/support/support.dart';
 import '../view/settings/t_and_c/t_and_c.dart';
+import '../view/settings/website/website.dart';
 import '../view/vtu/cable/cable.dart';
 import '../view/vtu/success/success.dart';
 import 'resources.dart';
@@ -48,6 +51,9 @@ class Routes {
   static const String bankTransfer = "/bank-transfer";
   static const String cardFunding = "/card-funding";
   static const String terms = "/terms-and-condition";
+  static const String about = "/about-us";
+  static const String website = "/website";
+  static const String support = "/support";
   static const String profile = "/${AppStrings.profile}";
 
 }
@@ -105,6 +111,12 @@ class RouteGenerator {
         return MaterialPageRoute(builder: (_) => const CardFunding());
       case Routes.terms:
         return MaterialPageRoute(builder: (_) => const TAndC());
+      case Routes.about:
+        return MaterialPageRoute(builder: (_) => const About());
+      case Routes.website:
+        return MaterialPageRoute(builder: (_) => Website());
+      case Routes.support:
+        return MaterialPageRoute(builder: (_) => Support());
       default:
         return unDefinedRoute();
     }

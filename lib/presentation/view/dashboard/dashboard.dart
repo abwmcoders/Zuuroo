@@ -22,7 +22,7 @@ class _DashboardState extends State<Dashboard> {
     const Home(),
     const Wallet(),
    const TransactionHistory(),
-   const Profile(),
+  Profile(),
   ];
 
   @override
