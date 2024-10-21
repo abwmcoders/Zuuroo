@@ -48,6 +48,18 @@ class VtuProvider extends BaseViewModel {
   bool operatorSet = false;
   String? otp;
   String? metr;
+  int currentPage = 0;
+  bool isOtpComplete = false;
+
+  setIndex(int ind) {
+    currentPage = ind;
+    notifyListeners();
+  }
+
+  setBool(bool asking) {
+    isOtpComplete = asking;
+    notifyListeners();
+  }
 
   final List<Map> meterType = [
     {

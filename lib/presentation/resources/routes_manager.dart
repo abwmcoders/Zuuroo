@@ -91,7 +91,7 @@ class RouteGenerator {
       final HistoryData args = routeSettings.arguments as HistoryData;
         return MaterialPageRoute(builder: (_) => TransactionDetails(history: args,));
       case Routes.airtimeRoute:
-        return MaterialPageRoute(builder: (_) => const Airtime());
+        return MaterialPageRoute(builder: (_) => Airtime());
       case Routes.dataRoute:
         return MaterialPageRoute(builder: (_) => const DataPage());
       case Routes.betRoute:
