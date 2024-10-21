@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../../../app/base/base_screen.dart';
-import '../../../../app/cache/storage.dart';
-import '../../../../app/locator.dart';
 import '../../../../app/validator.dart';
 import '../../../resources/resources.dart';
-import '../../auth/login/provider/login_provider.dart';
 import '../../history/transaction_details.dart';
 import '../../onboarding/onboarding.dart';
 import 'model/kyc_model.dart';

@@ -161,29 +161,37 @@ class Wallet extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         UIHelper.verticalSpaceLarge,
-                        Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 2),
-                            decoration: BoxDecoration(
-                                gradient: ColorManager.buttonGradient,
-                                borderRadius: BorderRadius.circular(30)),
-                            child: Row(
-                              children: [
-                                Icon(
-                                  Icons.add,
-                                  color: ColorManager.whiteColor,
-                                  size: 20,
-                                ),
-                                UIHelper.horizontalSpaceSmall,
-                                Text(
-                                  "Pay Up",
-                                  style: getBoldStyle(
+                        InkWell(
+                          onTap: (){
+                             NavigateClass().pushNamed(
+                              context: context,
+                              routName: Routes.addMoney,
+                            );
+                          },
+                          child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 2),
+                              decoration: BoxDecoration(
+                                  gradient: ColorManager.buttonGradient,
+                                  borderRadius: BorderRadius.circular(30)),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.add,
                                     color: ColorManager.whiteColor,
-                                    fontSize: 12,
+                                    size: 20,
                                   ),
-                                )
-                              ],
-                            ),),
+                                  UIHelper.horizontalSpaceSmall,
+                                  Text(
+                                    "Pay Up",
+                                    style: getBoldStyle(
+                                      color: ColorManager.whiteColor,
+                                      fontSize: 12,
+                                    ),
+                                  )
+                                ],
+                              ),),
+                        ),
                       ],
                     ),
                   ],

@@ -1950,9 +1950,11 @@ class ContainerWidget extends StatelessWidget {
   const ContainerWidget({
     super.key,
     required this.content,
+    this.color,
   });
 
   final Widget content;
+  final Color? color;
 
   @override
   Widget build(BuildContext context) {
@@ -1964,7 +1966,7 @@ class ContainerWidget extends StatelessWidget {
           vertical: 15,
         ),
         decoration: BoxDecoration(
-          color: ColorManager.whiteColor,
+          color: color ?? ColorManager.whiteColor,
           borderRadius: BorderRadius.circular(15),
         ),
         child: content,

@@ -53,11 +53,7 @@ class _TransactionHistoryState extends State<TransactionHistory> {
     },
     {
       'id': 2,
-      'name': 'pending',
-    },
-    {
-      'id': 3,
-      'name': 'Completed',
+      'name': 'delivered',
     },
   ];
 

@@ -9,14 +9,14 @@ import '../../history/transaction_details.dart';
 import '../airtime/airtime.dart';
 import '../elect/elect.dart';
 
-class Data extends StatefulWidget {
-  const Data({super.key});
+class DataPage extends StatefulWidget {
+  const DataPage({super.key});
 
   @override
-  State<Data> createState() => _DataState();
+  State<DataPage> createState() => _DataPageState();
 }
 
-class _DataState extends State<Data> with SingleTickerProviderStateMixin {
+class _DataPageState extends State<DataPage> with SingleTickerProviderStateMixin {
 
   TabController? _tabController;
 

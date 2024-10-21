@@ -154,3 +154,49 @@ class User {
     };
   }
 }
+
+
+
+class Record {
+  final int id;
+  final String resReference;
+  final String userName;
+  final String userEmail;
+  final String accountName;
+  final String accountNumber;
+  final String bankName;
+  final String bankCode;
+  final String accountStatus;
+  final String createdAt;
+  final String updatedAt;
+
+  Record({
+    required this.id,
+    required this.resReference,
+    required this.userName,
+    required this.userEmail,
+    required this.accountName,
+    required this.accountNumber,
+    required this.bankName,
+    required this.bankCode,
+    required this.accountStatus,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+
+  factory Record.fromJson(Map<String, dynamic> json) {
+    return Record(
+      id: json['id'],
+      resReference: json['res_reference'],
+      userName: json['user_name'],
+      userEmail: json['user_email'],
+      accountName: json['account_name'],
+      accountNumber: json['account_number'],
+      bankName: json['bank_name'],
+      bankCode: json['bank_code'],
+      accountStatus: json['account_status'],
+      createdAt: json['created_at'],
+      updatedAt: json['updated_at'],
+    );
+  }
+}

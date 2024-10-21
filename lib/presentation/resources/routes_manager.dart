@@ -4,6 +4,7 @@ import 'package:zuuro/presentation/view/auth/login/login.dart';
 import 'package:zuuro/presentation/view/auth/register/register.dart';
 import 'package:zuuro/presentation/view/auth/verify/verify_email.dart';
 import 'package:zuuro/presentation/view/history/model/history_model.dart';
+import 'package:zuuro/presentation/view/home/model/home_model.dart';
 import 'package:zuuro/presentation/view/settings/change_password/change_password.dart';
 import 'package:zuuro/presentation/view/settings/change_pin/change_pin.dart';
 import 'package:zuuro/presentation/view/splash/splash.dart';
@@ -21,6 +22,7 @@ import '../view/money/transfer/transfer.dart';
 import '../view/onboarding/onboarding.dart';
 import '../view/settings/about/about.dart';
 import '../view/settings/kyc/kyc.dart';
+import '../view/settings/personal_info/edit_profile.dart';
 import '../view/settings/personal_info/personal_info.dart';
 import '../view/settings/support/support.dart';
 import '../view/settings/t_and_c/t_and_c.dart';
@@ -57,6 +59,7 @@ class Routes {
   static const String website = "/website";
   static const String support = "/support";
   static const String kyc = "/kyc";
+  static const String editProfile = "/kedit-profileyc";
   static const String profile = "/${AppStrings.profile}";
 
 }
@@ -90,7 +93,7 @@ class RouteGenerator {
       case Routes.airtimeRoute:
         return MaterialPageRoute(builder: (_) => const Airtime());
       case Routes.dataRoute:
-        return MaterialPageRoute(builder: (_) => const Data());
+        return MaterialPageRoute(builder: (_) => const DataPage());
       case Routes.betRoute:
         return MaterialPageRoute(builder: (_) => const Bet());
       case Routes.electRoute:
@@ -123,6 +126,9 @@ class RouteGenerator {
         return MaterialPageRoute(builder: (_) => Support());
       case Routes.kyc:
         return MaterialPageRoute(builder: (_) => Kyc());
+      case Routes.editProfile:
+      final User args = routeSettings.arguments as User;
+        return MaterialPageRoute(builder: (_) => EditProfile(user: args,));
       default:
         return unDefinedRoute();
     }

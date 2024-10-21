@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:zuuro/app/app_constants.dart';
 import 'package:zuuro/presentation/view/home/model/home_model.dart';
 
+import '../../../../app/animation/navigator.dart';
 import '../../../resources/resources.dart';
 import '../../history/transaction_details.dart';
 import '../../vtu/airtime/airtime.dart';
@@ -75,18 +76,27 @@ class PersonalInfo extends StatelessWidget {
             UIHelper.verticalSpaceSmall,
             Align(
               alignment: Alignment.bottomRight,
-              child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                  decoration: BoxDecoration(
-                      gradient: ColorManager.buttonGradient,
-                      borderRadius: BorderRadius.circular(30)),
-                  child: Text(
-                    "Edit Profile",
-                    style: getBoldStyle(
-                      color: ColorManager.whiteColor,
-                      fontSize: 12,
-                    ),
-                  )),
+              child: InkWell(
+                onTap: (){
+                  NavigateClass().pushNamed(
+                    context: context,
+                    args: user,
+                    routName: Routes.editProfile,
+                  );
+                },
+                child: Container(
+                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                    decoration: BoxDecoration(
+                        gradient: ColorManager.buttonGradient,
+                        borderRadius: BorderRadius.circular(30)),
+                    child: Text(
+                      "Edit Profile",
+                      style: getBoldStyle(
+                        color: ColorManager.whiteColor,
+                        fontSize: 12,
+                      ),
+                    )),
+              ),
             ),
           ],
         ),
