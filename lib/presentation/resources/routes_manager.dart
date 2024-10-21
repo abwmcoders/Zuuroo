@@ -3,6 +3,7 @@ import 'package:zuuro/presentation/view/auth/Forgot/forgot.dart';
 import 'package:zuuro/presentation/view/auth/login/login.dart';
 import 'package:zuuro/presentation/view/auth/register/register.dart';
 import 'package:zuuro/presentation/view/auth/verify/verify_email.dart';
+import 'package:zuuro/presentation/view/history/model/history_model.dart';
 import 'package:zuuro/presentation/view/settings/change_password/change_password.dart';
 import 'package:zuuro/presentation/view/settings/change_pin/change_pin.dart';
 import 'package:zuuro/presentation/view/splash/splash.dart';
@@ -19,6 +20,7 @@ import '../view/money/money.dart';
 import '../view/money/transfer/transfer.dart';
 import '../view/onboarding/onboarding.dart';
 import '../view/settings/about/about.dart';
+import '../view/settings/kyc/kyc.dart';
 import '../view/settings/personal_info/personal_info.dart';
 import '../view/settings/support/support.dart';
 import '../view/settings/t_and_c/t_and_c.dart';
@@ -54,6 +56,7 @@ class Routes {
   static const String about = "/about-us";
   static const String website = "/website";
   static const String support = "/support";
+  static const String kyc = "/kyc";
   static const String profile = "/${AppStrings.profile}";
 
 }
@@ -82,7 +85,8 @@ class RouteGenerator {
       case Routes.mainRoute:
         return MaterialPageRoute(builder: (_) => const Dashboard());
       case Routes.transactionDetail:
-        return MaterialPageRoute(builder: (_) => const TransactionDetails());
+      final HistoryData args = routeSettings.arguments as HistoryData;
+        return MaterialPageRoute(builder: (_) => TransactionDetails(history: args,));
       case Routes.airtimeRoute:
         return MaterialPageRoute(builder: (_) => const Airtime());
       case Routes.dataRoute:
@@ -117,6 +121,8 @@ class RouteGenerator {
         return MaterialPageRoute(builder: (_) => Website());
       case Routes.support:
         return MaterialPageRoute(builder: (_) => Support());
+      case Routes.kyc:
+        return MaterialPageRoute(builder: (_) => Kyc());
       default:
         return unDefinedRoute();
     }

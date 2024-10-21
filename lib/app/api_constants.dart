@@ -20,4 +20,9 @@ class ApiConstants {
   static const String changePassword = "user/update-password";
   static const String changePin = "user/update-pin";
   static const String history = "histories";
+  static const String about = "about-us";
+  static const String terms = "term-conditions";
+  static const String faqs = "faqs";
+  static const String support = "supports";
+  static const String kyc = "kyc/verification";
 }

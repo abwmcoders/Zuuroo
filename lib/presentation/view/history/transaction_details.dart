@@ -3,9 +3,12 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_svg/svg.dart';
 
 import '../../resources/resources.dart';
+import 'model/history_model.dart';
 
 class TransactionDetails extends StatelessWidget {
-  const TransactionDetails({super.key});
+  const TransactionDetails({super.key, required this.history});
+
+  final HistoryData history;
 
   @override
   Widget build(BuildContext context) {
@@ -28,10 +31,20 @@ class TransactionDetails extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Image.asset(ImageAssets.mtn),
+                    Container(
+                      height: screenAwareSize(80, context),
+                      width: screenAwareSize(80, context),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: ColorManager.buttonGradient,
+                      ),
+                      child: Center(
+                        child: Text(history.purchase.substring(0,2).toUpperCase(), style: getBoldStyle(color: ColorManager.whiteColor, fontSize: 20),),
+                      ),
+                    ),
                     UIHelper.verticalSpaceSmall,
                     Text(
-                      "MTN",
+                      history.purchase,
                       style: getRegularStyle(
                         color: ColorManager.blackColor,
                         fontSize: 12,
@@ -39,7 +52,7 @@ class TransactionDetails extends StatelessWidget {
                     ),
                     UIHelper.verticalSpaceSmall,
                     Text(
-                      "₦ 2000.00",
+                      "₦ ${history.costPrice}",
                       style: getBoldStyle(
                         color: ColorManager.blackColor,
                         fontSize: 14,
@@ -55,19 +68,23 @@ class TransactionDetails extends StatelessWidget {
                           //padding: EdgeInsets.all(8),
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: ColorManager.activeColor,
+                            color: history.processingState != "delivered"
+                                ? ColorManager.errorColor
+                                : ColorManager.activeColor,
                           ),
                           child: Icon(
-                            Icons.check,
+                            history.processingState != "delivered" ? Icons.close : Icons.check,
                             color: ColorManager.whiteColor,
                             size: 20,
                           ),
                         ),
                         UIHelper.horizontalSpaceSmall,
                         Text(
-                          "Successful",
+                          history.processingState.toUpperCase(),
                           style: getBoldStyle(
-                            color: ColorManager.activeColor,
+                            color: history.processingState != "delivered"
+                                    ? ColorManager.errorColor
+                                    : ColorManager.activeColor,
                             fontSize: 13,
                           ),
                         ),
@@ -97,25 +114,25 @@ class TransactionDetails extends StatelessWidget {
                       ),
                     ),
                     UIHelper.verticalSpaceSmall,
-                    const DeatilsTile(
+                    DeatilsTile(
                       value: "Payment Number",
-                      detail: "0806789435",
+                      detail: history.phoneNumber
                     ),
-                    const DeatilsTile(
+                    DeatilsTile(
                       value: "Payment Type",
-                      detail: "Airtime",
+                      detail: history.plan,
                     ),
-                    const DeatilsTile(
-                      value: "Payment Method",
-                      detail: "Loan",
+                     DeatilsTile(
+                      value: "Payment Currency",
+                      detail: history.receiveCurrency,
                     ),
-                    const DeatilsTile(
+                     DeatilsTile(
                       value: "Transaction Number",
-                      detail: "575849394857678348",
+                      detail: history.transferRef,
                     ),
-                    const DeatilsTile(
+                     DeatilsTile(
                       value: "Transaction Date",
-                      detail: "July 12th,2024 09:45 :35",
+                      detail: history.completedUtc,
                     ),
                   ],
                 ),
@@ -133,7 +150,7 @@ class TransactionDetails extends StatelessWidget {
                   UIHelper.horizontalSpaceSmall,
                   Expanded(
                     child: AppButton(
-                      buttonText: "Chat with support",
+                      buttonText: "Support",
                       onPressed: () {},
                       buttonColor: ColorManager.whiteColor,
                       buttonTextColor: ColorManager.primaryColor,
@@ -165,18 +182,23 @@ class DeatilsTile extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            value,
-            style: getRegularStyle(
-              color: ColorManager.deepGreyColor,
-              fontSize: 12,
+          Expanded(
+            child: Text(
+              value,
+              style: getRegularStyle(
+                color: ColorManager.deepGreyColor,
+                fontSize: 12,
+              ),
             ),
           ),
-          Text(
-            detail,
-            style: getBoldStyle(
-              color: ColorManager.deepGreyColor,
-              fontSize: 14,
+          Expanded(
+            child: Text(
+              detail,
+              overflow: TextOverflow.ellipsis,
+              style: getBoldStyle(
+                color: ColorManager.deepGreyColor,
+                fontSize: 14,
+              ),
             ),
           ),
         ],

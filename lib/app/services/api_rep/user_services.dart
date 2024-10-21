@@ -33,6 +33,7 @@ class UserApiServices extends BaseServices {
       return null;
     }
   }
+  
   Future getCountry() async {
     var rm;
     try {
@@ -73,13 +74,75 @@ class UserApiServices extends BaseServices {
     }
   }
 
-  Future getHistories() async {
+  Future getHistories({String? params, bool isStatus = false}) async {
     var rm;
     String token = await getUserToken();
+    Map<String, String> status = {
+      "status" : params ?? "",
+    };
+    Map<String, String>  purchase = {
+      "purchase" : params ?? "",
+    };
     try {
       await getUserToken().then(
         (value) {
-          rm = tokenizedGetRequest(token: value, url: ApiConstants.history);
+          rm = tokenizedGetRequest(token: value, url: ApiConstants.history, queryParams: isStatus ? status : purchase);
+        },
+      );
+      return rm;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Future getAbout() async {
+    var rm;
+    try {
+      await getUserToken().then(
+        (value) {
+          rm = tokenizedGetRequest(token: value, url: ApiConstants.about);
+        },
+      );
+      return rm;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Future getFaqs() async {
+    var rm;
+    try {
+      await getUserToken().then(
+        (value) {
+          rm = tokenizedGetRequest(token: value, url: ApiConstants.faqs);
+        },
+      );
+      return rm;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Future getSocials() async {
+    var rm;
+    try {
+      await getUserToken().then(
+        (value) {
+          rm = tokenizedGetRequest(token: value, url: ApiConstants.support);
+        },
+      );
+      return rm;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Future getTerms() async {
+    var rm;
+    try {
+      await getUserToken().then(
+        (value) {
+          rm = tokenizedGetRequest(token: value, url: ApiConstants.terms);
         },
       );
       return rm;
@@ -205,6 +268,18 @@ class UserApiServices extends BaseServices {
     try {
       await getUserToken().then((token) {
         rm = tokenizedPostRequest(token: token, url: ApiConstants.verifyIuc, data: data);
+      });
+      return rm;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Future logout() async {
+    var rm;
+    try {
+      await getUserToken().then((token) {
+        rm = tokenizedPostRequest(token: token, url: ApiConstants.logoutUrl);
       });
       return rm;
     } catch (e) {

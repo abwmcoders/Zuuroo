@@ -2,6 +2,9 @@ class AppStrings{
   static const String noRouteFound = "No Route Found";
   static const String login = "Login";
   static const String email = "Email";
+  static const String first = "First Name";
+  static const String last = "Last Name";
+  static const String middle = "Middle Name";
   static const String password = "Password";
   static const String loginInstruction = "By signing in you are agreeing our";
   static const String tc = "Term and privacy policy";

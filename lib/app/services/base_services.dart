@@ -22,7 +22,8 @@ class BaseServices {
 
   //get request
   Future tokenizedGetRequest(
-      {String? token, dynamic data, required String url}) async {
+      {String? token, dynamic data, required String url, Map<String, String>? queryParams,
+  }) async {
     final String url0 = baseUrl;
     var headers = {
       'Content-Type': 'application/json',
@@ -30,7 +31,7 @@ class BaseServices {
       'Authorization': 'Bearer $token',
     };
     try {
-      final response = await http.get(Uri.parse(url0 + url), headers: headers);
+      final response = await http.get(Uri.parse(url0 + url).replace(queryParameters: queryParams), headers: headers);
       final result = jsonDecode(response.body);
       if (response.statusCode == 200) {
         return result;
@@ -55,7 +56,6 @@ class BaseServices {
         "Accept": "application/json",
         "Content-Type": "application/json"
       });
-      print("request body ----> ${_response.body}");
       final _result =
           decodeJson == true ? _response : jsonDecode(_response.body);
 
@@ -155,7 +155,6 @@ class BaseServices {
           .post(Uri.parse(url0 + url), headers: headers, body: jsonEncode(data))
           .timeout(const Duration(seconds: 20));
       final result = jsonDecode(response.body);
-      print("request body ----> ${response.body}");
       if (response.statusCode == 201 || response.statusCode == 200) {
         return result;
       } else if (response.statusCode == 422) {
@@ -167,7 +166,7 @@ class BaseServices {
       print("Socket issues");
       return null;
     } catch (e) {
-       print("catcht issues -----> ${e.toString()}");
+      print("catcht issues -----> ${e.toString()}");
       return null;
     }
   }

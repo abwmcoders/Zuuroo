@@ -14,11 +14,9 @@ class LoginRepository {
       "email": email,
       "password": password,
     };
-    print("body ---> $body");
     try {
       var response =
           baseServices.postRequest(url: ApiConstants.loginUrl, data: body);
-      log("response ---> $response");
       return response;
     } on SocketException {
       return "Socket exception occurred";

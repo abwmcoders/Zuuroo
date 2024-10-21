@@ -598,19 +598,21 @@ class Home extends StatelessWidget {
                         ),
                       ),
                       UIHelper.verticalSpaceSmall,
-                      
+
                       Expanded(
                         child: FutureBuilder(
                             future: UserApiServices().getHistories(),
                             builder: (context, snapshot) {
-                              print('histories beneficiaries ----> ${snapshot.data}');
+                              print(
+                                  'histories beneficiaries ----> ${snapshot.data}');
                               if (snapshot.hasData) {
                                 HistoryResponse _history =
                                     HistoryResponse.fromJson(snapshot.data);
-                                    if(_history.data.length == 0) {
-                                      return Column(
+                                if (_history.data.length == 0) {
+                                  return Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
                                     children: [
                                       Center(
                                         child: Column(
@@ -620,112 +622,181 @@ class Home extends StatelessWidget {
                                                   screenAwareSize(300, context),
                                               height:
                                                   screenAwareSize(300, context),
-                                                  child: Icon(Icons.light_mode_sharp, color: ColorManager.primaryColor, size: 50,),
+                                              child: Icon(
+                                                Icons.light_mode_sharp,
+                                                color:
+                                                    ColorManager.primaryColor,
+                                                size: 50,
+                                              ),
                                               // child: Image.asset(
                                               //     "assets/images/noRTransaction.png"),
                                             ),
                                             Text(
                                               "You have no transaction history",
-                                              style: getBoldStyle(color: ColorManager.blackColor,),
+                                              style: getBoldStyle(
+                                                color: ColorManager.blackColor,
+                                              ),
                                             ),
                                           ],
                                         ),
                                       )
                                     ],
                                   );
-                                    } else {
-                                       return ListView.builder(
+                                } else {
+                                  return ListView.builder(
                                     itemCount: 5, //_cBeneficiary.data!.length,
                                     itemBuilder: (context, index) {
                                       return Column(
                                         children: [
                                           Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 8.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Row(
-                                  children: [
-                                    Container(
-                                      height: screenAwareSize(50, context),
-                                      width: screenAwareSize(50, context),
-                                      padding: const EdgeInsets.all(5),
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: ColorManager.primaryColor
-                                            .withOpacity(.2),
-                                      ),
-                                      child: Center(child: Text(_history.data[index].operatorCode.substring(0,2).toUpperCase(), style: getBoldStyle(color: ColorManager.blackColor, fontSize: 18,),)),
-                                     // child: SvgPicture.asset(ImageAssets.airt),
-                                    ),
-                                    UIHelper.horizontalSpaceSmall,
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          _history.data[index].purchase,
-                                          style: getRegularStyle(
-                                            color: ColorManager.blackColor,
-                                            fontSize: 14,
+                                            padding: const EdgeInsets.symmetric(
+                                                vertical: 5.0),
+                                            child: InkWell(
+                                              onTap: () {
+                                                NavigateClass().pushNamed(
+                                                  context: context,
+                                                  routName:
+                                                      Routes.transactionDetail,
+                                                  args: _history.data[index],
+                                                );
+                                              },
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Row(
+                                                    children: [
+                                                      Container(
+                                                        height: screenAwareSize(
+                                                            60, context),
+                                                        width: screenAwareSize(
+                                                            60, context),
+                                                        padding:
+                                                            const EdgeInsets.all(
+                                                                5),
+                                                        decoration: BoxDecoration(
+                                                          shape: BoxShape.circle,
+                                                          color: ColorManager
+                                                              .primaryColor
+                                                              .withOpacity(.2),
+                                                        ),
+                                                        child: Center(
+                                                            child: Text(
+                                                          _history.data[index]
+                                                              .operatorCode
+                                                              .substring(0, 2)
+                                                              .toUpperCase(),
+                                                          style: getBoldStyle(
+                                                            color: ColorManager
+                                                                .blackColor,
+                                                            fontSize: 18,
+                                                          ),
+                                                        )),
+                                                        // child: SvgPicture.asset(ImageAssets.airt),
+                                                      ),
+                                                      UIHelper
+                                                          .horizontalSpaceSmall,
+                                                      Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Text(
+                                                            _history.data[index]
+                                                                .purchase,
+                                                            style: getBoldStyle(
+                                                              color: ColorManager
+                                                                  .blackColor,
+                                                              fontSize: 14,
+                                                            ),
+                                                          ),
+                                                          UIHelper
+                                                              .verticalSpaceSmall,
+                                                          Text(
+                                                            //"July 12th, 11:45:04",
+                                                            _history.data[index]
+                                                                .completedUtc,
+                                                            style:
+                                                                getRegularStyle(
+                                                              color: ColorManager
+                                                                  .blackColor,
+                                                              fontSize: 10,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      )
+                                                    ],
+                                                  ),
+                                                  Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment.start,
+                                                    children: [
+                                                      Text(
+                                                        //"₦ 2000.00",
+                                                        "₦ ${_history.data[index].sellingPrice}",
+                                                        style: getBoldStyle(
+                                                          color: ColorManager
+                                                              .blackColor,
+                                                          fontSize: 12,
+                                                        ),
+                                                      ),
+                                                      UIHelper.verticalSpaceSmall,
+                                                      Container(
+                                                        padding: const EdgeInsets
+                                                            .symmetric(
+                                                            horizontal: 8,
+                                                            vertical: 5),
+                                                        decoration: BoxDecoration(
+                                                          color: _history
+                                                                      .data[index]
+                                                                      .processingState !=
+                                                                  "delivered"
+                                                              ? ColorManager
+                                                                  .errorColor
+                                                                  .withOpacity(.1)
+                                                              : ColorManager
+                                                                      .activeColor
+                                                                      .withOpacity(
+                                                                          .1),
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(10),
+                                                        ),
+                                                        child: Text(
+                                                          //"Successful",
+                                                          _history.data[index]
+                                                              .processingState
+                                                              .toString(),
+                                                          style: getRegularStyle(
+                                                            color: _history
+                                                                        .data[
+                                                                            index]
+                                                                        .processingState !=
+                                                                    "delivered"
+                                                                ? ColorManager
+                                                                    .errorColor
+                                                                : ColorManager
+                                                                        .activeColor,
+                                                            fontSize: 10,
+                                                          ),
+                                                        ),
+                                                      )
+                                                    ],
+                                                  )
+                                                ],
+                                              ),
+                                            ),
                                           ),
-                                        ),
-                                        Text(
-                                          //"July 12th, 11:45:04",
-                                          _history.data[index].completedUtc,
-                                          style: getRegularStyle(
-                                            color: ColorManager.blackColor,
-                                            fontSize: 10,
-                                          ),
-                                        ),
-                                      ],
-                                    )
-                                  ],
-                                ),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      //"₦ 2000.00",
-                                      "₦ ${_history.data[index].sellingPrice}",
-                                      style: getRegularStyle(
-                                        color: ColorManager.blackColor,
-                                        fontSize: 12,
-                                      ),
-                                    ),
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 5, vertical: 5),
-                                      decoration: BoxDecoration(
-                                        color: _history.data[index].processingState == "failed" ? ColorManager.errorColor : _history.data[index].processingState == "pending" ? ColorManager.pendColor :  ColorManager.activeColor
-                                            .withOpacity(.2),
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                      child: Text(
-                                        //"Successful",
-                                        _history.data[index].processingState.toString(),
-                                        style: getRegularStyle(
-                                          color: ColorManager.activeColor,
-                                          fontSize: 10,
-                                        ),
-                                      ),
-                                    )
-                                  ],
-                                )
-                              ],
-                            ),
-                          ),
-                        
                                           UIHelper.verticalSpaceSmall,
                                           Divider(),
                                         ],
                                       );
                                     },
                                   );
-                                    }
-                              } 
-                              else if(snapshot.hasError) {
-                                 return Column(
+                                }
+                              } else if (snapshot.hasError) {
+                                return Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
@@ -757,16 +828,15 @@ class Home extends StatelessWidget {
                                     )
                                   ],
                                 );
-                              }
-                              else if(snapshot.connectionState == ConnectionState.waiting){
+                              } else if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
                                 return WidgetListLoaderShimmer();
-                              }
-                              else {
-                                 return WidgetListLoaderShimmer();
+                              } else {
+                                return WidgetListLoaderShimmer();
                               }
                             }),
                       ),
-                          
+
                       // ...List.generate(5, (index) {
                       //   return Padding(
                       //     padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -840,9 +910,8 @@ class Home extends StatelessWidget {
                       //       ],
                       //     ),
                       //   );
-                      
+
                       // })
-                   
                     ],
                   ),
                 )

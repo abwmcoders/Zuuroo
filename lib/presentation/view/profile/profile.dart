@@ -2,12 +2,15 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:pay_with_paystack/pay_with_paystack.dart';
 import 'package:zuuro/app/cache/storage.dart';
+import 'package:zuuro/app/services/api_rep/user_services.dart';
 import 'package:zuuro/presentation/resources/resources.dart';
 import 'package:zuuro/presentation/resources/ui_helper.dart';
 
 import '../../../app/animation/navigator.dart';
 import '../../../app/app_constants.dart';
+import '../../../app/functions.dart';
 import '../../../app/locator.dart';
+import 'model/logout_model.dart';
 
 class Profile extends StatelessWidget {
   Profile({super.key});
@@ -110,17 +113,19 @@ class Profile extends StatelessWidget {
                                 subTitle: "1 linked card/account",
                                 icon: Icons.group,
                                 onPressed: () {
-                                   final uniqueTransRef =
+                                  final uniqueTransRef =
                                       PayWithPayStack().generateUuidV4();
 
                                   PayWithPayStack().now(
-                                    callbackUrl: 'https://api.paystack.co/transaction/initialize',
+                                      callbackUrl:
+                                          'https://api.paystack.co/transaction/initialize',
                                       context: context,
-                                      secretKey: "sk_test_52fdad00c5f938381b29d16a6e4c516bea328ff5",
+                                      secretKey:
+                                          "sk_test_52fdad00c5f938381b29d16a6e4c516bea328ff5",
                                       customerEmail: "popekabu@gmail.com",
                                       reference: uniqueTransRef,
                                       currency: "NGN",
-                                      amount: 20000,
+                                      amount: 50,
                                       transactionCompleted: () {
                                         print("Transaction Successful");
                                       },
@@ -159,7 +164,10 @@ class Profile extends StatelessWidget {
                                 subTitle: "Please verify your identity.",
                                 icon: Icons.security,
                                 onPressed: () {
-                                  //!TODO: KYC
+                                  NavigateClass().pushNamed(
+                                    context: context,
+                                    routName: Routes.kyc,
+                                  );
                                 },
                               ),
                               ProfileTile(
@@ -229,11 +237,10 @@ class Profile extends StatelessWidget {
                                 subTitle: "See our website.",
                                 icon: Icons.web,
                                 onPressed: () {
-                                   NavigateClass().pushNamed(
+                                  NavigateClass().pushNamed(
                                     context: context,
                                     routName: Routes.website,
                                   );
-                                  
                                 },
                               ),
                               ProfileTile(
@@ -252,11 +259,26 @@ class Profile extends StatelessWidget {
                                 subTitle: "See our website.",
                                 icon: Icons.logout_sharp,
                                 onPressed: () {
-                                  final storageService = getIt<MekStorage>();
-                                  storageService.clear();
-                                  NavigateClass().pushReplacementNamed(
-                                    context: context,
-                                    routName: Routes.loginRoute,
+                                  UserApiServices().logout().then(
+                                    (logout) {
+                                      LogoutResponse logoutResponse =
+                                          LogoutResponse.fromJson(logout);
+                                      if (logoutResponse.message ==
+                                          "Logged out successfully") {
+                                        final storageService =
+                                            getIt<MekStorage>();
+                                        storageService.clear();
+                                        NavigateClass().pushReplacementNamed(
+                                          context: context,
+                                          routName: Routes.loginRoute,
+                                        );
+                                      } else {
+                                        MekNotification().showMessage(
+                                          context,
+                                          message: logoutResponse.message,
+                                        );
+                                      }
+                                    },
                                   );
                                 },
                                 isLast: true,

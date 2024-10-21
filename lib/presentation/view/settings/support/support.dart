@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../../app/services/api_rep/user_services.dart';
 import '../../../resources/resources.dart';
 import '../../history/transaction_details.dart';
 import '../../vtu/airtime/airtime.dart';
+import 'model/faqs_model.dart';
+import 'model/support_model.dart';
 
 class Support extends StatefulWidget {
   const Support({super.key});
@@ -58,11 +61,11 @@ class _SupportState extends State<Support> {
     }
   }
 
-  Future<void> _launchLinkedinUrl() async {
-    if (await canLaunchUrl(_urlLinkedin)) {
-      await launchUrl(_urlLinkedin, mode: LaunchMode.externalApplication);
+  Future<void> _launchUrl(String url) async {
+    if (await canLaunchUrl(Uri.parse(url))) {
+      await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
     } else {
-      throw 'Could not launch $_urlLinkedin';
+      throw 'Could not launch $Uri.parse(url)';
     }
   }
 
@@ -70,93 +73,300 @@ class _SupportState extends State<Support> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const SimpleAppBar(title: "Help & Support"),
-      body: ContainerWidget(
-        content: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Text(
-              "Connect with us on our social handles",
-              style: getBoldStyle(color: ColorManager.blackColor),
-            ),
-            UIHelper.verticalSpaceMedium,
-            supportTile(
-              "Facebook",
-              "assets/icons/facebook.png",
-              "https://www.facebook.com/",
-              _launchFacebookUrl,
-            ),
-            supportTile(
-              "Twitter",
-              "assets/icons/twitter.png",
-              "https://www.twitter.com/",
-              _launchTwitterUrl,
-            ),
-            supportTile(
-              "Instagram",
-              "assets/icons/instagram.png",
-              "https://www.instagram.com/",
-              _launchTwitterUrl,
-            ),
-            supportTile(
-              "Linkedin",
-              "assets/icons/linkedin.png",
-              "https://www.instagram.com/",
-              _launchLinkedinUrl,
-            ),
-            UIHelper.verticalSpaceLarge,
-            Text(
-              "FAQS",
-              style: getBoldStyle(color: ColorManager.blackColor),
-            ),
-            UIHelper.verticalSpaceSmall,
-            Expanded(
-              child: ListView.builder(
-                itemCount: faqData.length,
-                itemBuilder: (context, index) {
-                  return Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: ClipRRect(
-                      borderRadius:
-                          BorderRadius.circular(15), // Rounded corners
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(15),
-                          border: Border.all(color: ColorManager.blackColor),
-                          color: Colors.white,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey.withOpacity(0.3),
-                              spreadRadius: 2,
-                              blurRadius: 5,
-                              offset: Offset(0, 3), // Shadow position
-                            ),
-                          ],
-                        ),
-                        child: Theme(
-                          data: Theme.of(context).copyWith(
-                            dividerColor:
-                                Colors.transparent, // Hide divider line
-                          ),
-                          child: ExpansionTile(
-                            title: Text(
-                              faqData[index]['question']!,
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Text(faqData[index]['answer']!),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+        child: ListView(
+          children: [
+            Container(
+              width: deviceWidth(context),
+              padding: const EdgeInsets.symmetric(
+                vertical: 15,
+                horizontal: 10,
+              ),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(15),
+                color: ColorManager.whiteColor,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Connect with us on our handles",
+                    style: getBoldStyle(
+                      color: ColorManager.blackColor,
+                      fontSize: 18,
                     ),
-                  );
-                },
+                  ),
+                  UIHelper.verticalSpaceSmall,
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+                    height: screenAwareSize(500, context),
+                    child: FutureBuilder(
+                      future: UserApiServices().getSocials(),
+                      builder: (context, snapshot) {
+                        print('socials beneficiaries ----> ${snapshot.data}');
+                        if (snapshot.hasData) {
+                          SupportResponse _socials =
+                              SupportResponse.fromJson(snapshot.data);
+                          if (_socials.data.length == 0) {
+                            return Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Center(
+                                  child: Column(
+                                    children: [
+                                      SizedBox(
+                                        width: screenAwareSize(300, context),
+                                        height: screenAwareSize(300, context),
+                                        child: Icon(
+                                          Icons.light_mode_sharp,
+                                          color: ColorManager.primaryColor,
+                                          size: 50,
+                                        ),
+                                        // child: Image.asset(
+                                        //     "assets/images/noRTransaction.png"),
+                                      ),
+                                      Text(
+                                        "You have no transaction history",
+                                        style: getBoldStyle(
+                                          color: ColorManager.blackColor,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                )
+                              ],
+                            );
+                          } else {
+                            return ListView.builder(
+                              itemCount: _socials
+                                  .data.length, //_cBeneficiary.data!.length,
+                              itemBuilder: (context, index) {
+                                return supportTile(
+                                  _socials.data[index].pageName,
+                                  _socials.data[index].pageName.toLowerCase() ==
+                                          "facebook"
+                                      ? "assets/icons/facebook.png"
+                                      : _socials.data[index].pageName
+                                                  .toLowerCase() ==
+                                              "twitter"
+                                          ? "assets/icons/twitter.png"
+                                          : _socials.data[index].pageName
+                                                      .toLowerCase() ==
+                                                  "instagram"
+                                              ? "assets/icons/instagram.png"
+                                              : "assets/icons/linkedin.png",
+                                  _socials.data[index].pageLink,
+                                  () {
+                                    _launchUrl(_socials.data[index].pageLink);
+                                  },
+                                  // _launchUrl(_socials.data[index].pageLink),
+                                );
+                              },
+                            );
+                          }
+                        } else if (snapshot.hasError) {
+                          return Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Center(
+                                child: Column(
+                                  children: [
+                                    SizedBox(
+                                      width: screenAwareSize(300, context),
+                                      height: screenAwareSize(300, context),
+                                      child: Icon(
+                                        Icons.light_mode_sharp,
+                                        color: ColorManager.primaryColor,
+                                        size: 50,
+                                      ),
+                                      // child: Image.asset(
+                                      //     "assets/images/noRTransaction.png"),
+                                    ),
+                                    Text(
+                                      "An error occurred trying to get history\nPlease try again later",
+                                      textAlign: TextAlign.center,
+                                      style: getBoldStyle(
+                                        color: ColorManager.blackColor,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              )
+                            ],
+                          );
+                        } else if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return WidgetListLoaderShimmer();
+                        } else {
+                          return WidgetListLoaderShimmer();
+                        }
+                      },
+                    ),
+                  ),
+                ],
               ),
             ),
+            UIHelper.verticalSpaceMedium,
+                  
+            Container(
+                    width: deviceWidth(context),
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 15,
+                                    horizontal: 10,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(15),
+                                    color: ColorManager.whiteColor,
+                                  ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                    "FAQS",
+                    style: getBoldStyle(
+                      color: ColorManager.blackColor,
+                      fontSize: 18,
+                    ),
+                  ),
+                  UIHelper.verticalSpaceSmall,
+                        Container(
+                          height: screenAwareSize(500, context),
+                          child: FutureBuilder(
+                            future: UserApiServices().getFaqs(),
+                            builder: (context, snapshot) {
+                              print('faqs beneficiaries ----> ${snapshot.data}');
+                              if (snapshot.hasData) {
+                                FaqsResponse _faqs =
+                                    FaqsResponse.fromJson(snapshot.data);
+                                if (_faqs.data.length == 0) {
+                                  return Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                      Center(
+                                        child: Column(
+                                          children: [
+                                            SizedBox(
+                                              width: screenAwareSize(300, context),
+                                              height: screenAwareSize(300, context),
+                                              child: Icon(
+                                                Icons.light_mode_sharp,
+                                                color: ColorManager.primaryColor,
+                                                size: 50,
+                                              ),
+                                              // child: Image.asset(
+                                              //     "assets/images/noRTransaction.png"),
+                                            ),
+                                            Text(
+                                              "Empthy",
+                                              style: getBoldStyle(
+                                                color: ColorManager.blackColor,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      )
+                                    ],
+                                  );
+                                } else {
+                                  return ListView.builder(
+                                    itemCount: _faqs
+                                        .data.length, //_cBeneficiary.data!.length,
+                                    itemBuilder: (context, index) {
+                                      return Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: ClipRRect(
+                                    borderRadius:
+                                        BorderRadius.circular(15), // Rounded corners
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(15),
+                                        border:
+                                            Border.all(color: ColorManager.blackColor),
+                                        color: Colors.white,
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.grey.withOpacity(0.3),
+                                            spreadRadius: 2,
+                                            blurRadius: 5,
+                                            offset: Offset(0, 3), // Shadow position
+                                          ),
+                                        ],
+                                      ),
+                                      child: Theme(
+                                        data: Theme.of(context).copyWith(
+                                          dividerColor:
+                                              Colors.transparent, // Hide divider line
+                                        ),
+                                        child: ExpansionTile(
+                                          title: Text(
+                                            _faqs.data[index].question,
+                                            style:
+                                                TextStyle(fontWeight: FontWeight.bold),
+                                          ),
+                                          children: [
+                                            Padding(
+                                              padding: const EdgeInsets.all(8.0),
+                                              child: Text(faqData[index]['answer']!, style: getRegularStyle(color: ColorManager.deepGreyColor),),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                );
+                                    },
+                                  );
+                                }
+                              } else if (snapshot.hasError) {
+                                return Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Center(
+                                      child: Column(
+                                        children: [
+                                          SizedBox(
+                                            width: screenAwareSize(300, context),
+                                            height: screenAwareSize(300, context),
+                                            child: Icon(
+                                              Icons.light_mode_sharp,
+                                              color: ColorManager.primaryColor,
+                                              size: 50,
+                                            ),
+                                            // child: Image.asset(
+                                            //     "assets/images/noRTransaction.png"),
+                                          ),
+                                          Text(
+                                            "An error occurred trying to get history\nPlease try again later",
+                                            textAlign: TextAlign.center,
+                                            style: getBoldStyle(
+                                              color: ColorManager.blackColor,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    )
+                                  ],
+                                );
+                              } else if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return WidgetListLoaderShimmer();
+                              } else {
+                                return WidgetListLoaderShimmer();
+                              }
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+               
+            UIHelper.verticalSpaceMedium,
+            
           ],
         ),
       ),
@@ -206,3 +416,99 @@ class _SupportState extends State<Support> {
     );
   }
 }
+
+
+            // ContainerWidget(
+            //   content: Column(
+            //     mainAxisAlignment: MainAxisAlignment.start,
+            //     crossAxisAlignment: CrossAxisAlignment.start,
+            //     children: <Widget>[
+            //       Text(
+            //         "Connect with us on our social handles",
+            //         style: getBoldStyle(color: ColorManager.blackColor),
+            //       ),
+            //       UIHelper.verticalSpaceMedium,
+            //       supportTile(
+            //         "Facebook",
+            //         "assets/icons/facebook.png",
+            //         "https://www.facebook.com/",
+            //         _launchFacebookUrl,
+            //       ),
+            //       supportTile(
+            //         "Twitter",
+            //         "assets/icons/twitter.png",
+            //         "https://www.twitter.com/",
+            //         _launchTwitterUrl,
+            //       ),
+            //       supportTile(
+            //         "Instagram",
+            //         "assets/icons/instagram.png",
+            //         "https://www.instagram.com/",
+            //         _launchTwitterUrl,
+            //       ),
+            //       supportTile(
+            //         "Linkedin",
+            //         "assets/icons/linkedin.png",
+            //         "https://www.instagram.com/",
+            //         _launchLinkedinUrl,
+            //       ),
+            //       UIHelper.verticalSpaceLarge,
+            //       Text(
+            //         "FAQS",
+            //         style: getBoldStyle(color: ColorManager.blackColor),
+            //       ),
+            //       UIHelper.verticalSpaceSmall,
+            //       Expanded(
+            //         child: ListView.builder(
+            //           itemCount: faqData.length,
+            //           itemBuilder: (context, index) {
+            //             return Padding(
+            //               padding: const EdgeInsets.all(8.0),
+            //               child: ClipRRect(
+            //                 borderRadius:
+            //                     BorderRadius.circular(15), // Rounded corners
+            //                 child: Container(
+            //                   decoration: BoxDecoration(
+            //                     borderRadius: BorderRadius.circular(15),
+            //                     border:
+            //                         Border.all(color: ColorManager.blackColor),
+            //                     color: Colors.white,
+            //                     boxShadow: [
+            //                       BoxShadow(
+            //                         color: Colors.grey.withOpacity(0.3),
+            //                         spreadRadius: 2,
+            //                         blurRadius: 5,
+            //                         offset: Offset(0, 3), // Shadow position
+            //                       ),
+            //                     ],
+            //                   ),
+            //                   child: Theme(
+            //                     data: Theme.of(context).copyWith(
+            //                       dividerColor:
+            //                           Colors.transparent, // Hide divider line
+            //                     ),
+            //                     child: ExpansionTile(
+            //                       title: Text(
+            //                         faqData[index]['question']!,
+            //                         style:
+            //                             TextStyle(fontWeight: FontWeight.bold),
+            //                       ),
+            //                       children: [
+            //                         Padding(
+            //                           padding: const EdgeInsets.all(8.0),
+            //                           child: Text(faqData[index]['answer']!),
+            //                         ),
+            //                       ],
+            //                     ),
+            //                   ),
+            //                 ),
+            //               ),
+            //             );
+                      
+            //           },
+            //         ),
+            //       ),
+            //     ],
+            //   ),
+            // ),
+          

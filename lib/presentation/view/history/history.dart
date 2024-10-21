@@ -4,6 +4,7 @@ import 'package:zuuro/app/animation/navigator.dart';
 import 'package:zuuro/presentation/resources/resources.dart';
 
 import '../../../app/services/api_rep/user_services.dart';
+import '../vtu/elect/elect.dart';
 import 'model/history_model.dart';
 
 class TransactionHistory extends StatefulWidget {
@@ -16,6 +17,56 @@ class TransactionHistory extends StatefulWidget {
 class _TransactionHistoryState extends State<TransactionHistory> {
   bool openCat = false;
   bool openStatus = false;
+  int? _selectedIndexCat;
+  int? _selectedIndexStatus;
+  String selectedCat = '';
+  String selectedStatus = '';
+  Future? fetchHistoryData;
+
+  final List<Map> categories = [
+    {
+      'id': 1,
+      'name': 'airtime',
+    },
+    {
+      'id': 2,
+      'name': 'data',
+    },
+    {
+      'id': 3,
+      'name': 'cable',
+    },
+    {
+      'id': 4,
+      'name': 'electricity',
+    },
+    {
+      'id': 4,
+      'name': 'betting',
+    },
+  ];
+
+  final List<Map> status = [
+    {
+      'id': 1,
+      'name': 'failed',
+    },
+    {
+      'id': 2,
+      'name': 'pending',
+    },
+    {
+      'id': 3,
+      'name': 'Completed',
+    },
+  ];
+
+  @override
+  void initState() {
+    fetchHistoryData = UserApiServices().getHistories();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -28,8 +79,8 @@ class _TransactionHistoryState extends State<TransactionHistory> {
               decoration: BoxDecoration(
                 color: ColorManager.whiteColor,
                 borderRadius: const BorderRadius.only(
-                  bottomLeft: Radius.circular(15),
-                  bottomRight: Radius.circular(15),
+                  bottomLeft: Radius.circular(20),
+                  bottomRight: Radius.circular(20),
                 ),
               ),
               child: Column(
@@ -91,13 +142,83 @@ class _TransactionHistoryState extends State<TransactionHistory> {
                       ),
                     ],
                   ),
+                  UIHelper.verticalSpaceMedium,
                   openCat
-                      ? Container(
-                          height: 50,
+                      ? SizedBox(
+                          height: 80,
+                          child: GridView.builder(
+                            shrinkWrap: true,
+                            physics: const ScrollPhysics(),
+                            itemCount: categories.length,
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 3,
+                              mainAxisExtent: 30,
+                              mainAxisSpacing: 10,
+                              crossAxisSpacing: 10,
+                            ),
+                            itemBuilder: (BuildContext context, int index) {
+                              return CategorySelection(
+                                accountType: categories[index]['name'],
+                                active:
+                                    _selectedIndexCat == index ? true : false,
+                                onPressed: () {
+                                  setState(() {
+                                    if (_selectedIndexCat == index) {
+                                      _selectedIndexCat = null;
+                                    } else {
+                                      _selectedIndexCat = index;
+                                    }
+                                    selectedCat =
+                                        "${categories[_selectedIndexCat!]["name"]}";
+                                    fetchHistoryData = UserApiServices()
+                                        .getHistories(
+                                            params: selectedCat,
+                                          );
+                                  });
+                                },
+                              );
+                            },
+                          ),
                         )
                       : openStatus
-                          ? Container(
-                              height: 90,
+                          ? SizedBox(
+                              height: 50,
+                              child: GridView.builder(
+                                shrinkWrap: true,
+                                physics: const ScrollPhysics(),
+                                itemCount: status.length,
+                                gridDelegate:
+                                    const SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 3,
+                                  mainAxisExtent: 30,
+                                  mainAxisSpacing: 10,
+                                  crossAxisSpacing: 10,
+                                ),
+                                itemBuilder: (BuildContext context, int index) {
+                                  return CategorySelection(
+                                    accountType: status[index]['name'],
+                                    active: _selectedIndexStatus == index
+                                        ? true
+                                        : false,
+                                    onPressed: () {
+                                      setState(() {
+                                        if (_selectedIndexStatus == index) {
+                                          _selectedIndexStatus = null;
+                                        } else {
+                                          _selectedIndexStatus = index;
+                                        }
+                                        selectedStatus =
+                                            "${status[_selectedIndexStatus!]["name"]}";
+                                        fetchHistoryData = UserApiServices()
+                                            .getHistories(
+                                                params: selectedStatus,
+                                                isStatus: true);
+                                      });
+                                    },
+                                  );
+                                },
+                              ),
                             )
                           : const SizedBox(
                               height: 0,
@@ -114,10 +235,9 @@ class _TransactionHistoryState extends State<TransactionHistory> {
                 borderRadius: BorderRadius.circular(10),
               ),
               child: FutureBuilder(
-                  future: UserApiServices().getHistories(),
+                  future: fetchHistoryData,
                   builder: (context, snapshot) {
-                    print(
-                        'histories beneficiaries ----> ${snapshot.data}');
+                    print('histories beneficiaries ----> ${snapshot.data}');
                     if (snapshot.hasData) {
                       HistoryResponse _history =
                           HistoryResponse.fromJson(snapshot.data);
@@ -153,126 +273,131 @@ class _TransactionHistoryState extends State<TransactionHistory> {
                         );
                       } else {
                         return ListView.builder(
-                          itemCount: 5, //_cBeneficiary.data!.length,
+                          itemCount: _history
+                              .data.length, //_cBeneficiary.data!.length,
                           itemBuilder: (context, index) {
                             return Column(
                               children: [
                                 Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      vertical: 8.0),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          Container(
-                                            height: screenAwareSize(
-                                                50, context),
-                                            width: screenAwareSize(
-                                                50, context),
-                                            padding:
-                                                const EdgeInsets.all(5),
-                                            decoration: BoxDecoration(
-                                              shape: BoxShape.circle,
-                                              color: ColorManager
-                                                  .primaryColor
-                                                  .withOpacity(.2),
-                                            ),
-                                            child: Center(
-                                                child: Text(
-                                              _history.data[index]
-                                                  .operatorCode
-                                                  .substring(0, 2)
-                                                  .toUpperCase(),
-                                              style: getBoldStyle(
-                                                color: ColorManager
-                                                    .blackColor,
-                                                fontSize: 18,
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 5.0),
+                                  child: InkWell(
+                                    onTap: () {
+                                      NavigateClass().pushNamed(
+                                        context: context,
+                                        routName: Routes.transactionDetail,
+                                        args: _history.data[index],
+                                      );
+                                    },
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            Container(
+                                              height:
+                                                  screenAwareSize(60, context),
+                                              width:
+                                                  screenAwareSize(60, context),
+                                              padding: const EdgeInsets.all(5),
+                                              decoration: BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                color: ColorManager.primaryColor
+                                                    .withOpacity(.2),
                                               ),
-                                            )),
-                                            // child: SvgPicture.asset(ImageAssets.airt),
-                                          ),
-                                          UIHelper.horizontalSpaceSmall,
-                                          Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
+                                              child: Center(
+                                                  child: Text(
                                                 _history
-                                                    .data[index].purchase,
-                                                style: getRegularStyle(
-                                                  color: ColorManager
-                                                      .blackColor,
-                                                  fontSize: 14,
+                                                    .data[index].operatorCode
+                                                    .substring(0, 2)
+                                                    .toUpperCase(),
+                                                style: getBoldStyle(
+                                                  color:
+                                                      ColorManager.blackColor,
+                                                  fontSize: 18,
                                                 ),
+                                              )),
+                                              // child: SvgPicture.asset(ImageAssets.airt),
+                                            ),
+                                            UIHelper.horizontalSpaceSmall,
+                                            Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  _history.data[index].purchase,
+                                                  style: getBoldStyle(
+                                                    color:
+                                                        ColorManager.blackColor,
+                                                    fontSize: 14,
+                                                  ),
+                                                ),
+                                                UIHelper.verticalSpaceSmall,
+                                                Text(
+                                                  //"July 12th, 11:45:04",
+                                                  _history
+                                                      .data[index].completedUtc,
+                                                  style: getRegularStyle(
+                                                    color:
+                                                        ColorManager.blackColor,
+                                                    fontSize: 10,
+                                                  ),
+                                                ),
+                                              ],
+                                            )
+                                          ],
+                                        ),
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              //"₦ 2000.00",
+                                              "₦ ${_history.data[index].sellingPrice}",
+                                              style: getBoldStyle(
+                                                color: ColorManager.blackColor,
+                                                fontSize: 12,
                                               ),
-                                              Text(
-                                                //"July 12th, 11:45:04",
-                                                _history.data[index]
-                                                    .completedUtc,
+                                            ),
+                                            UIHelper.verticalSpaceSmall,
+                                            Container(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 8,
+                                                      vertical: 5),
+                                              decoration: BoxDecoration(
+                                                color: _history.data[index]
+                                                            .processingState !=
+                                                        "delivered"
+                                                    ? ColorManager.errorColor
+                                                        .withOpacity(.1)
+                                                    :  ColorManager
+                                                            .activeColor
+                                                            .withOpacity(.1),
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
+                                              ),
+                                              child: Text(
+                                                //"Successful",
+                                                _history
+                                                    .data[index].processingState
+                                                    .toString(),
                                                 style: getRegularStyle(
-                                                  color: ColorManager
-                                                      .blackColor,
+                                                  color: _history.data[index]
+                                                              .processingState !=
+                                                          "delivered"
+                                                      ? ColorManager.errorColor
+                                                      : ColorManager
+                                                              .activeColor,
                                                   fontSize: 10,
                                                 ),
                                               ),
-                                            ],
-                                          )
-                                        ],
-                                      ),
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            //"₦ 2000.00",
-                                            "₦ ${_history.data[index].sellingPrice}",
-                                            style: getRegularStyle(
-                                              color:
-                                                  ColorManager.blackColor,
-                                              fontSize: 12,
-                                            ),
-                                          ),
-                                          Container(
-                                            padding: const EdgeInsets
-                                                .symmetric(
-                                                horizontal: 5,
-                                                vertical: 5),
-                                            decoration: BoxDecoration(
-                                              color: _history.data[index]
-                                                          .processingState ==
-                                                      "failed"
-                                                  ? ColorManager
-                                                      .errorColor
-                                                  : _history.data[index]
-                                                              .processingState ==
-                                                          "pending"
-                                                      ? ColorManager
-                                                          .pendColor
-                                                      : ColorManager
-                                                          .activeColor
-                                                          .withOpacity(
-                                                              .2),
-                                              borderRadius:
-                                                  BorderRadius.circular(
-                                                      10),
-                                            ),
-                                            child: Text(
-                                              //"Successful",
-                                              _history.data[index]
-                                                  .processingState
-                                                  .toString(),
-                                              style: getRegularStyle(
-                                                color: ColorManager
-                                                    .activeColor,
-                                                fontSize: 10,
-                                              ),
-                                            ),
-                                          )
-                                        ],
-                                      )
-                                    ],
+                                            )
+                                          ],
+                                        )
+                                      ],
+                                    ),
                                   ),
                                 ),
                                 UIHelper.verticalSpaceSmall,
@@ -320,10 +445,63 @@ class _TransactionHistoryState extends State<TransactionHistory> {
                       return WidgetListLoaderShimmer();
                     }
                   }),
+            
             ),
           ],
         ),
       )),
+    );
+  }
+}
+
+class CategorySelection extends StatelessWidget {
+  const CategorySelection({
+    super.key,
+    required this.accountType,
+    required this.onPressed,
+    this.active = false,
+  });
+
+  final String accountType;
+  final VoidCallback onPressed;
+  final bool active;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onPressed,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+        margin: const EdgeInsets.only(right: 10),
+        decoration: BoxDecoration(
+          color: active
+              ? ColorManager.primaryColor.withOpacity(.2)
+              : ColorManager.whiteColor,
+          borderRadius: const BorderRadius.all(
+            Radius.circular(30),
+          ),
+          border: Border.all(
+            color: active ? ColorManager.primaryColor : ColorManager.blackColor,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: ColorManager.greyColor.withOpacity(.5),
+              spreadRadius: 5,
+              blurRadius: 7,
+              offset: const Offset(2, 5), // changes position of shadow
+            ),
+          ],
+        ),
+        child: Center(
+          child: Text(
+            accountType.toUpperCase(),
+            style: getSemiBoldStyle(
+              color:
+                  active ? ColorManager.primaryColor : ColorManager.blackColor,
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

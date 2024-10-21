@@ -44,7 +44,6 @@ class LoginProvider extends BaseViewModel {
         email: mekMail!.text.toString(),
         password: password.text.toString(),
       );
-      print("login response ---> ${request}");
       changeLoaderStatus(false);
       if (request != null) {
         if (request["status"] == true) {

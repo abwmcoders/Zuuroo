@@ -9,6 +9,7 @@ import '../presentation/view/auth/Forgot/provider/forgot_pass_provider.dart';
 import '../presentation/view/auth/login/provider/login_provider.dart';
 import '../presentation/view/auth/register/provider/reg_provider.dart';
 import '../presentation/view/auth/verify/provider/verify_provider.dart';
+import '../presentation/view/settings/kyc/provider/kyc_provider.dart';
 import '../presentation/view/vtu/provider/vtu_provider.dart';
 import 'services/base_services.dart';
 
@@ -26,6 +27,7 @@ initializer() async {
 final allProviders = <SingleChildWidget>[
   ChangeNotifierProvider(create: (_) => RegisterProvider()),
   ChangeNotifierProvider(create: (_) => LoginProvider()),
+  ChangeNotifierProvider(create: (_) => KycProvider()),
   ChangeNotifierProvider(create: (_) => VerifyProvider()),
   ChangeNotifierProvider(create: (_) => ForgetPasswordProvider()),
   ChangeNotifierProvider(create: (_) => HomeProvider()),
