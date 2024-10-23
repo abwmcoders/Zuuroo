@@ -8,6 +8,7 @@ import 'package:zuuro/presentation/view/home/model/home_model.dart';
 import '../../../../app/app_constants.dart';
 import '../../../../app/base/base_view_model/base_vm.dart';
 import '../../../../app/services/api_rep/user_services.dart';
+import '../model/loan_model.dart';
 
 class HomeProvider extends BaseViewModel {
   BuildContext? context;
@@ -29,6 +30,7 @@ class HomeProvider extends BaseViewModel {
         changeCallInitState(false);
       }
     }
+    await getLoanLimit();
   }
 
   changeCallInitState(bool state) {
@@ -44,6 +46,23 @@ class HomeProvider extends BaseViewModel {
       final _userResults = HomeModel.fromJson(homeData);
       AppConstants.homeModel = _userResults;
       notifyListeners();
+    }
+  }
+
+  getLoanLimit() async {
+    final response = await UserApiServices().getLoanLimitList();
+    if (response != null && response['data'] != null) {
+      List<LoanLimit> _loanResult = AppConstants.loanModel ?? [];
+      for (dynamic loan in response['data']) {
+        final loanModel = LoanLimit.fromJson(loan);
+        bool exists = _loanResult.any(
+            (existingLoan) => existingLoan.labelName == loanModel.labelName);
+        if (!exists) {
+          _loanResult.add(loanModel);
+        }
+        AppConstants.loanModel = _loanResult;
+        notifyListeners();
+      }
     }
   }
 

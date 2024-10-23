@@ -233,7 +233,6 @@ class _TransactionHistoryState extends State<TransactionHistory> {
               child: FutureBuilder(
                   future: fetchHistoryData,
                   builder: (context, snapshot) {
-                    print('histories beneficiaries ----> ${snapshot.data}');
                     if (snapshot.hasData) {
                       HistoryResponse _history =
                           HistoryResponse.fromJson(snapshot.data);

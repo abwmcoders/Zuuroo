@@ -34,6 +34,22 @@ class UserApiServices extends BaseServices {
     }
   }
   
+
+  Future getLoanLimitList() async {
+    var rm;
+    String token = await getUserToken();
+    try {
+      await getUserToken().then(
+        (value) {
+          rm = tokenizedGetRequest(token: value, url: ApiConstants.loan);
+        },
+      );
+      return rm;
+    } catch (e) {
+      return null;
+    }
+  }
+  
   Future getCountry() async {
     var rm;
     try {
@@ -158,6 +174,34 @@ class UserApiServices extends BaseServices {
       await getUserToken().then((value) {
         rm = tokenizedGetRequest(
             token: value, url: "${ApiConstants.operator}" + "$countryCode");
+      });
+      return rm;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Future getDataCatList(String operatorCode) async {
+    var rm;
+    String token = await getUserToken();
+    try {
+      await getUserToken().then((value) {
+        rm = tokenizedGetRequest(
+            token: value, url: "${ApiConstants.dataCat}" + "$operatorCode");
+      });
+      return rm;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Future getDataPlanList(Map<String, String> params) async {
+    var rm;
+    String token = await getUserToken();
+    try {
+      await getUserToken().then((value) {
+        rm = tokenizedGetRequest(
+            token: value, url: ApiConstants.dataPlan, queryParams: params);
       });
       return rm;
     } catch (e) {

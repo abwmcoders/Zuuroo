@@ -93,7 +93,7 @@ class RouteGenerator {
       case Routes.airtimeRoute:
         return MaterialPageRoute(builder: (_) => Airtime());
       case Routes.dataRoute:
-        return MaterialPageRoute(builder: (_) => const DataPage());
+        return MaterialPageRoute(builder: (_) => DataPage());
       case Routes.betRoute:
         return MaterialPageRoute(builder: (_) => const Bet());
       case Routes.electRoute:

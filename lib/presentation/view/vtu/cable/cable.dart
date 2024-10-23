@@ -780,6 +780,7 @@ class _CableState extends State<Cable> with SingleTickerProviderStateMixin {
           ),
         ),
         UIHelper.verticalSpaceSmall,
+        
         Container(
           height: 40,
           padding: EdgeInsets.symmetric(horizontal: 15, vertical: 8),
@@ -904,6 +905,7 @@ class _CableState extends State<Cable> with SingleTickerProviderStateMixin {
             ],
           ),
         ),
+     
       ],
     );
   }

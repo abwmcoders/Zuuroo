@@ -10,6 +10,7 @@ class ApiConstants {
   static const String biller = "bill/electricity-billers/status/1";
   static const String cable = "cable-subscriptions/status/active";
   static const String operator = "operator/by-country/";
+  static const String dataCat = "product/categories-byoperator/";
   static const String cablePlan = "cable-plans/provider/";
   static const String airtime = "airtime/purchase";
   static const String cablePayment = "cable/payment";
@@ -24,5 +25,7 @@ class ApiConstants {
   static const String terms = "term-conditions";
   static const String faqs = "faqs";
   static const String support = "supports";
+  static const String dataPlan = "product/plan";
+  static const String loan = "loan-limits";
   static const String kyc = "kyc/verification";
 }

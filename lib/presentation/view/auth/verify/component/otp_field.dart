@@ -24,12 +24,12 @@ class AppPinField extends StatelessWidget {
   Widget build(BuildContext context) {
     final screen = MediaQuery.of(context).size.width;
     const horizontalPadding = 48;
-    final minimumSpacing = 16 * length;
+    final minimumSpacing = 10 * length;
     final spaceForFields = (screen - horizontalPadding - minimumSpacing);
     final width = (spaceForFields / length).clamp(32.0, 100.0);
     //final colors = ColorManager();
-    final outlineColor = ColorManager.activeColor;
-    final bg = ColorManager.greyColor;
+    final outlineColor = ColorManager.primaryColor;
+    final bg = ColorManager.scaffoldBg;
 
     return PinCodeTextField(
       obscureText: obscure,

@@ -8,12 +8,15 @@ import 'package:zuuro/app/app_constants.dart';
 import 'package:zuuro/app/base/base_view_model/base_vm.dart';
 import 'package:zuuro/presentation/resources/resources.dart';
 import 'package:zuuro/presentation/resources/style_manager.dart';
+import 'package:zuuro/presentation/view/home/model/loan_model.dart';
 import 'package:zuuro/presentation/view/vtu/model/biller_model.dart';
 
 import '../../../../app/animation/navigator.dart';
 import '../../../../app/functions.dart';
 import '../../../../app/services/api_rep/user_services.dart';
 import '../model/country_model.dart';
+import '../model/data_cat_model.dart';
+import '../model/data_plan_model.dart';
 import '../model/meter_number_model.dart';
 import '../model/operator_model.dart';
 
@@ -49,10 +52,41 @@ class VtuProvider extends BaseViewModel {
   String? otp;
   String? metr;
   int currentPage = 0;
+  int? selectedLoanIndex;
   bool isOtpComplete = false;
+  final otpField = TextEditingController();
+  TextEditingController amountController = TextEditingController(text: "");
+  TextEditingController numberController = TextEditingController(text: "");
+  LoanLimit? loanLimit;
+  DataCategory? selectedDataCat;
+  DataPlan? selectedDataPlan;
 
   setIndex(int ind) {
     currentPage = ind;
+    notifyListeners();
+  }
+
+  setDataCat(DataCategory cat) {
+    selectedDataCat = cat;
+    notifyListeners();
+  }
+
+  setDataPlan(DataPlan plan) {
+    selectedDataPlan = plan;
+    notifyListeners();
+  }
+
+  setLoanLimit(LoanLimit limit) {
+    loanLimit = limit;
+    notifyListeners();
+  }
+
+  setLoanIndex(int ind) {
+    if (selectedLoanIndex == ind) {
+      selectedLoanIndex = null;
+    } else {
+      selectedLoanIndex = ind;
+    }
     notifyListeners();
   }
 
@@ -226,10 +260,29 @@ class VtuProvider extends BaseViewModel {
     }
   }
 
+  getDataCategory(String code) async {
+    final response = await UserApiServices().getDataCatList(code);
+    print("data categories ---> $response");
+    if (response != null) {
+      List<DataCategory> _operatorsResults = [];
+      for (dynamic operator in response['data']) {
+        final operators = OperatorModel.fromJson(operator);
+        bool exists = _operatorsResults.any((existingOperator) =>
+            existingOperator.operatorCode == operators.operatorCode);
+        if (!exists) {
+          _operatorsResults.add(
+            DataCategory.fromJson(operator),
+          );
+        }
+        AppConstants.dataCategoryModel = _operatorsResults;
+        notifyListeners();
+      }
+    }
+  }
+
   void purchaseAirtime(
       {required BuildContext ctx,
       int topUp = 1,
-      required String number,
       required String amount}) async {
     dismissKeyboard(context);
     changeLoaderStatus(true);
@@ -237,7 +290,7 @@ class VtuProvider extends BaseViewModel {
       "pin": otp,
       "top_up": topUp,
       "country": countryCode,
-      "phoneNumber": number,
+      "phoneNumber": numberController.text.trim(),
       "network_operator":
           operatorCode ?? AppConstants.operatorModel![0].operatorCode,
       "amount": amount,
@@ -320,37 +373,47 @@ class VtuProvider extends BaseViewModel {
     }
   }
 
-  void verifyPin(
-      {required BuildContext ctx, required Function onSuccess}) async {
+  void verifyPin({
+    required BuildContext ctx,
+    required Function onSuccess,
+    Function? onError,
+  }) async {
     dismissKeyboard(context);
     changeLoaderStatus(true);
     var body = {
-      "pin": otp,
+      "pin": otpField.text.trim(),
     };
 
     try {
       var request = await UserApiServices().verifyPin(body);
       changeLoaderStatus(false);
+      print("pin verification ---> $request");
       if (request != null) {
         if (request["status"] == true) {
-          onSuccess();
+          await onSuccess();
         } else {
+          Navigator.pop(ctx);
           MekNotification().showMessage(
             ctx,
             message: request['message'].toString(),
           );
+          otpField.clear();
         }
       } else {
+        Navigator.pop(ctx);
         MekNotification().showMessage(
           ctx,
           message: request['message'].toString(),
         );
+        otpField.clear();
       }
     } catch (e) {
+      Navigator.pop(ctx);
       MekNotification().showMessage(
         ctx,
-        message: e.toString(),
+        message: "An error occurred, Please check your internet connection",
       );
+      otpField.clear();
     }
   }
 

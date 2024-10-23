@@ -903,8 +903,7 @@ class _BillState extends State<Bill> with SingleTickerProviderStateMixin {
                             provider.purchaseAirtime(
                               ctx: context,
                               topUp: topUp,
-                              amount: amountController.text.trim(),
-                              number: numberController.text.trim(),
+                             amount: "",
                             );
                           });
                     } else {

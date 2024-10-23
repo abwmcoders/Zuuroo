@@ -603,8 +603,6 @@ class Home extends StatelessWidget {
                         child: FutureBuilder(
                             future: UserApiServices().getHistories(),
                             builder: (context, snapshot) {
-                              print(
-                                  'histories beneficiaries ----> ${snapshot.data}');
                               if (snapshot.hasData) {
                                 HistoryResponse _history =
                                     HistoryResponse.fromJson(snapshot.data);
