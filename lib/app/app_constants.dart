@@ -7,6 +7,7 @@ import '../presentation/view/vtu/model/cable_model.dart';
 import '../presentation/view/vtu/model/cable_plan_model.dart';
 import '../presentation/view/vtu/model/country_model.dart';
 import '../presentation/view/vtu/model/data_cat_model.dart';
+import '../presentation/view/vtu/model/data_plan_model.dart';
 
 class AppConstants {
   static HomeModel? homeModel;
@@ -15,6 +16,7 @@ class AppConstants {
   static List<CableData>? cableModel = [];
   static List<BillerData>? billerModel = [];
   static List<DataCategory>? dataCategoryModel = [];
+  static List<DataPlan>? dataPlanModel = [];
   static List<OperatorModel>? operatorModel = [];
   static List<CablePlan>? cablePlanModel = [];
   static const currencySymbol = '₦';

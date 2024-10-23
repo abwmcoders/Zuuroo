@@ -577,3 +577,19 @@ class _BetState extends State<Bet>  with SingleTickerProviderStateMixin{
     );
   }
 }
+
+final List<Map> loanPeriod = [
+  {
+    'id': 1,
+    'name': '3 days',
+  },
+  {
+    'id': 2,
+    'name': '5 days',
+  },
+  {
+    'id': 3,
+    'name': '7 days',
+  },
+];
+

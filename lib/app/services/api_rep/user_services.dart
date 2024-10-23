@@ -33,7 +33,6 @@ class UserApiServices extends BaseServices {
       return null;
     }
   }
-  
 
   Future getLoanLimitList() async {
     var rm;
@@ -49,7 +48,7 @@ class UserApiServices extends BaseServices {
       return null;
     }
   }
-  
+
   Future getCountry() async {
     var rm;
     try {
@@ -94,15 +93,18 @@ class UserApiServices extends BaseServices {
     var rm;
     String token = await getUserToken();
     Map<String, String> status = {
-      "status" : params ?? "",
+      "status": params ?? "",
     };
-    Map<String, String>  purchase = {
-      "purchase" : params ?? "",
+    Map<String, String> purchase = {
+      "purchase": params ?? "",
     };
     try {
       await getUserToken().then(
         (value) {
-          rm = tokenizedGetRequest(token: value, url: ApiConstants.history, queryParams: isStatus ? status : purchase);
+          rm = tokenizedGetRequest(
+              token: value,
+              url: ApiConstants.history,
+              queryParams: isStatus ? status : purchase);
         },
       );
       return rm;
@@ -183,7 +185,6 @@ class UserApiServices extends BaseServices {
 
   Future getDataCatList(String operatorCode) async {
     var rm;
-    String token = await getUserToken();
     try {
       await getUserToken().then((value) {
         rm = tokenizedGetRequest(
@@ -197,7 +198,6 @@ class UserApiServices extends BaseServices {
 
   Future getDataPlanList(Map<String, String> params) async {
     var rm;
-    String token = await getUserToken();
     try {
       await getUserToken().then((value) {
         rm = tokenizedGetRequest(
@@ -227,7 +227,21 @@ class UserApiServices extends BaseServices {
     var rm;
     try {
       await getUserToken().then((token) {
-        rm = tokenizedPostRequest(token: token, url: ApiConstants.airtime, data: data);
+        rm = tokenizedPostRequest(
+            token: token, url: ApiConstants.airtime, data: data);
+      });
+      return rm;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Future purchaseData(dynamic data) async {
+    var rm;
+    try {
+      await getUserToken().then((token) {
+        rm = tokenizedPostRequest(
+            token: token, url: ApiConstants.data, data: data);
       });
       return rm;
     } catch (e) {
@@ -239,7 +253,8 @@ class UserApiServices extends BaseServices {
     var rm;
     try {
       await getUserToken().then((token) {
-        rm = tokenizedPostRequest(token: token, url: ApiConstants.cablePayment, data: data);
+        rm = tokenizedPostRequest(
+            token: token, url: ApiConstants.cablePayment, data: data);
       });
       return rm;
     } catch (e) {
@@ -251,7 +266,8 @@ class UserApiServices extends BaseServices {
     var rm;
     try {
       await getUserToken().then((token) {
-        rm = tokenizedPutRequest(token: token, url: ApiConstants.changePassword, data: data);
+        rm = tokenizedPutRequest(
+            token: token, url: ApiConstants.changePassword, data: data);
       });
       return rm;
     } catch (e) {
@@ -263,7 +279,8 @@ class UserApiServices extends BaseServices {
     var rm;
     try {
       await getUserToken().then((token) {
-        rm = tokenizedPutRequest(token: token, url: ApiConstants.changePin, data: data);
+        rm = tokenizedPutRequest(
+            token: token, url: ApiConstants.changePin, data: data);
       });
       return rm;
     } catch (e) {
@@ -275,7 +292,8 @@ class UserApiServices extends BaseServices {
     var rm;
     try {
       await getUserToken().then((token) {
-        rm = tokenizedPostRequest(token: token, url: ApiConstants.bill, data: data);
+        rm = tokenizedPostRequest(
+            token: token, url: ApiConstants.bill, data: data);
       });
       return rm;
     } catch (e) {
@@ -287,7 +305,8 @@ class UserApiServices extends BaseServices {
     var rm;
     try {
       await getUserToken().then((token) {
-        rm = tokenizedPostRequest(token: token, url: ApiConstants.pin, data: data);
+        rm = tokenizedPostRequest(
+            token: token, url: ApiConstants.pin, data: data);
       });
       return rm;
     } catch (e) {
@@ -299,7 +318,8 @@ class UserApiServices extends BaseServices {
     var rm;
     try {
       await getUserToken().then((token) {
-        rm = tokenizedPostRequest(token: token, url: ApiConstants.verifyMeter, data: data);
+        rm = tokenizedPostRequest(
+            token: token, url: ApiConstants.verifyMeter, data: data);
       });
       return rm;
     } catch (e) {
@@ -311,7 +331,8 @@ class UserApiServices extends BaseServices {
     var rm;
     try {
       await getUserToken().then((token) {
-        rm = tokenizedPostRequest(token: token, url: ApiConstants.verifyIuc, data: data);
+        rm = tokenizedPostRequest(
+            token: token, url: ApiConstants.verifyIuc, data: data);
       });
       return rm;
     } catch (e) {

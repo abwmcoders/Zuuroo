@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:provider/provider.dart';
 import 'package:zuuro/app/validator.dart';
 import 'package:zuuro/presentation/resources/color_manager.dart';
 import 'package:zuuro/presentation/resources/style_manager.dart';
@@ -161,14 +162,15 @@ class DataPage extends StatelessWidget {
                         ctx: context,
                         onSuccess: () {
                           Navigator.pop(context);
-                          provider.purchaseAirtime(
+                          provider.purchaseData(
                             ctx: context,
                             topUp: topUp,
-                            amount: topUp == 2
-                                ? calculateLoanRepayment(
-                                    provider.amountController.text.trim(),
-                                    provider.loanLimit!.percentage)
-                                : provider.amountController.text.trim(),
+                            pin:  provider.otpField.text,
+                            // amount: topUp == 2
+                            //     ? calculateLoanRepayment(
+                            //         provider.amountController.text.trim(),
+                            //         provider.loanLimit!.percentage)
+                            //     : provider.amountController.text.trim(),
                           );
                         },
                         onError: () {
@@ -194,7 +196,8 @@ class DataPage extends StatelessWidget {
   void _confirmationBottomSheetMenu(
       {required BuildContext ctx,
       required String amount,
-      String? type = "Airtime",
+      String? type = "Data",
+      required DataPlan plan,
       required String number,
       int topUp = 1,
       required VtuProvider provider}) {
@@ -203,7 +206,7 @@ class DataPage extends StatelessWidget {
       backgroundColor: ColorManager.whiteColor,
       builder: (builder) {
         return Container(
-          height: deviceHeight(ctx) * .5,
+          height: deviceHeight(ctx) * .6,
           color: Colors.transparent,
           padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
           child: Container(
@@ -239,9 +242,9 @@ class DataPage extends StatelessWidget {
                       ),
                       Row(
                         children: [
-                          SvgPicture.asset(
-                            ImageAssets.mtn,
-                          ),
+                          // SvgPicture.asset(
+                          //   ImageAssets.mtn,
+                          // ),
                           Text(
                             type!,
                             style: getBoldStyle(
@@ -254,30 +257,21 @@ class DataPage extends StatelessWidget {
                     ],
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(
-                    bottom: 10.0,
-                    top: 10.0,
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Payment Number",
-                        style: getRegularStyle(
-                          color: ColorManager.deepGreyColor,
-                          fontSize: 12,
-                        ),
-                      ),
-                      Text(
-                        number,
-                        style: getBoldStyle(
-                          color: ColorManager.blackColor,
-                          fontSize: 12,
-                        ),
-                      ),
-                    ],
-                  ),
+                CheckoutTile(
+                  title: "Payment Number",
+                  value: number,
+                ),
+                CheckoutTile(
+                  title: "Plan Name",
+                  value: plan.productName,
+                ),
+                CheckoutTile(
+                  title: "Plan Validity",
+                  value: plan.validity,
+                ),
+                CheckoutTile(
+                  title: "Plan Unit",
+                  value: plan.sendValue.toString(),
                 ),
                 UIHelper.verticalSpaceSmall,
                 Container(
@@ -310,10 +304,15 @@ class DataPage extends StatelessWidget {
                         ],
                       ),
                       int.parse(AppConstants.homeModel!.data.wallet.balance) >=
-                              int.parse(amount)
-                          ? Icon(
+                              int.parse(amount) 
+                          ? topUp == 2 ?
+                           Icon(
                               Icons.check,
                               color: ColorManager.activeColor,
+                            )
+                          : Icon(
+                              Icons.close,
+                              color: ColorManager.primaryColor,
                             )
                           : Icon(
                               Icons.close,
@@ -328,18 +327,25 @@ class DataPage extends StatelessWidget {
                     double? balance = double.tryParse(
                         AppConstants.homeModel?.data.wallet.balance ?? '');
                     double? inputAmount = double.tryParse(amount);
-                    if (balance != null &&
-                        inputAmount != null &&
-                        balance >= inputAmount) {
+                    if(topUp == 2){
                       Navigator.pop(ctx);
                       _otpInput(provider: provider, topUp: topUp, context: ctx);
-                    } else {
-                      Navigator.pop(ctx);
-                      MekNotification().showMessage(
-                        ctx,
-                        message: "Insufficient fund !!!",
-                      );
+                    }else {
+                      if (balance != null &&
+                          inputAmount != null &&
+                          balance >= inputAmount) {
+                        Navigator.pop(ctx);
+                        _otpInput(
+                            provider: provider, topUp: topUp, context: ctx);
+                      } else {
+                        Navigator.pop(ctx);
+                        MekNotification().showMessage(
+                          ctx,
+                          message: "Insufficient fund !!!",
+                        );
+                      }
                     }
+                    
                   },
                   buttonText: "Pay",
                 ),
@@ -401,7 +407,13 @@ class DataPage extends StatelessWidget {
                             await vtuProvider.getOperator(
                               newValue.countryCode,
                             );
-
+                            await vtuProvider.getDataCategory(
+                                AppConstants.operatorModel!.first.operatorCode);
+                            await vtuProvider.getDataPlan(
+                              AppConstants.operatorModel!.first.operatorCode,
+                              AppConstants
+                                  .dataCategoryModel!.first.categoryCode,
+                            );
                             vtuProvider.isOpSet();
                           },
                           items: vtuProvider
@@ -480,6 +492,8 @@ class DataPage extends StatelessWidget {
                                           vtuProvider.setOperatorCode(
                                               AppConstants.operatorModel![index]
                                                   .operatorCode);
+                                          vtuProvider.getDataCategory(
+                                              vtuProvider.operatorCode!);
                                           Navigator.pop(context);
                                         },
                                         child: Padding(
@@ -583,379 +597,21 @@ class DataPage extends StatelessWidget {
           ),
           UIHelper.verticalSpaceMedium,
           vtuProvider.operatorSet == true
-              ? FutureBuilder(
-                  future: UserApiServices().getDataCatList(
-                      vtuProvider.operatorCode ??
-                          AppConstants.operatorModel!.first.operatorCode),
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData) {
-                      DataCategoryResponse dataCategoryResponse =
-                          DataCategoryResponse.fromJson(snapshot.data);
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Data Category",
-                            style: getBoldStyle(
-                              color: ColorManager.deepGreyColor,
-                              fontSize: 14,
-                            ),
-                          ),
-                          UIHelper.verticalSpaceSmall,
-        
-                          Container(
-                            height: 50,
-                            padding:
-                                EdgeInsets.symmetric(horizontal: 15, vertical: 8),
-                            decoration: BoxDecoration(
-                              color: ColorManager.greyColor.withOpacity(.4),
-                              borderRadius: BorderRadius.circular(15),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  dataCategoryResponse.data.isNotEmpty
-                                      ? vtuProvider.selectedDataCat != null
-                                          ? vtuProvider
-                                              .selectedDataCat!.categoryName
-                                          : dataCategoryResponse
-                                              .data.first.categoryName
-                                      : "Select Data Category",
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                    letterSpacing: 1.5,
-                                    fontFamily: "NT",
-                                    color: ColorManager.blackColor,
-                                  ),
-                                ),
-                                InkWell(
-                                  onTap: () {
-                                    appBottomSheet(
-                                      context,
-                                      isNotTabScreen: true,
-                                      Container(
-                                        decoration: BoxDecoration(
-                                          color: ColorManager.whiteColor,
-                                          borderRadius: const BorderRadius.only(
-                                            topLeft: Radius.circular(16),
-                                            topRight: Radius.circular(16),
-                                          ),
-                                        ),
-                                        child: Column(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Row(
-                                              children: [
-                                                IconButton(
-                                                  onPressed: () {
-                                                    Navigator.pop(context);
-                                                  },
-                                                  icon: const Icon(
-                                                    Icons
-                                                        .keyboard_backspace_rounded,
-                                                  ),
-                                                ),
-                                                const Label(
-                                                  label: "Select Data Categpory",
-                                                ),
-                                              ],
-                                            ),
-                                            const Divider(),
-                                            Container(
-                                              height: 300,
-                                              child: SingleChildScrollView(
-                                                child: Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(12.0),
-                                                  child: Column(
-                                                    children: [
-                                                      ...List.generate(
-                                                          dataCategoryResponse
-                                                              .data
-                                                              .length, (index) {
-                                                        return InkWell(
-                                                          onTap: () {
-                                                            vtuProvider.setDataCat(
-                                                                dataCategoryResponse
-                                                                    .data[index]);
-                                                            Navigator.pop(
-                                                                context);
-                                                          },
-                                                          child: Padding(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                    .symmetric(
-                                                              horizontal: 10.0,
-                                                              vertical: 8,
-                                                            ),
-                                                            child: Column(
-                                                              crossAxisAlignment:
-                                                                  CrossAxisAlignment
-                                                                      .start,
-                                                              children: [
-                                                                Text(
-                                                                  dataCategoryResponse
-                                                                      .data[index]
-                                                                      .categoryName,
-                                                                  style:
-                                                                      TextStyle(
-                                                                    color: Colors
-                                                                        .black,
-                                                                    fontSize:
-                                                                        screenAwareSize(
-                                                                            19,
-                                                                            context),
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w500,
-                                                                    letterSpacing:
-                                                                        1.5,
-                                                                  ),
-                                                                ),
-                                                                UIHelper
-                                                                    .verticalSpaceSmall,
-                                                                const Divider(),
-                                                                UIHelper
-                                                                    .verticalSpaceSmall,
-                                                              ],
-                                                            ),
-                                                          ),
-                                                        );
-                                                      })
-                                                    ],
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                  child: Icon(
-                                    Icons.arrow_drop_down,
-                                    color: ColorManager.deepGreyColor,
-                                    size: 30,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      );
-                    } else {
-                      return Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 0),
-                        decoration: BoxDecoration(
-                          color: ColorManager.greyColor.withOpacity(.4),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Text(
-                          "Loading .....",
-                          style:
-                              getBoldStyle(color: ColorManager.deepGreyColor),
-                        ),
-                      );
-                    }
-                  },
-                )
+              ? selectDataCategories(vtuProvider, context)
               : Container(),
           UIHelper.verticalSpaceMedium,
           vtuProvider.operatorSet == true || vtuProvider.selectedDataCat != null
-              ? FutureBuilder(
-                  future: UserApiServices().getDataPlanList({
-                    "operator_code": vtuProvider.operatorCode ??
-                        AppConstants.operatorModel!.first.operatorCode,
-                    "category_code": vtuProvider.selectedDataCat != null ? vtuProvider.selectedDataCat!.categoryCode : "",
-                  }),
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData) {
-                      DataPlanResponse dataPlanResponse =
-                          DataPlanResponse.fromJson(snapshot.data);
-                      WidgetsBinding.instance.addPostFrameCallback((_) {
-                        vtuProvider.setDataPlan(dataPlanResponse.data.first);
-                      });
-
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Data Plan",
-                            style: getBoldStyle(
-                              color: ColorManager.deepGreyColor,
-                              fontSize: 14,
-                            ),
-                          ),
-                          UIHelper.verticalSpaceSmall,
-                          Container(
-                            height: 50,
-                            padding:
-                                EdgeInsets.symmetric(horizontal: 15, vertical: 8),
-                            decoration: BoxDecoration(
-                              color: ColorManager.greyColor.withOpacity(.4),
-                              borderRadius: BorderRadius.circular(15),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  dataPlanResponse.data.isNotEmpty
-                                      ? vtuProvider.selectedDataPlan != null
-                                          ? "${vtuProvider.selectedDataPlan!.operatorCode} ${vtuProvider.selectedDataPlan!.productName} | ${vtuProvider.selectedDataPlan!.validity}"
-                                          : "${dataPlanResponse.data.first.operatorCode} ${dataPlanResponse.data.first.productName} | ${dataPlanResponse.data.first.validity}"
-
-                                      : "Select Data Plan",
-                                      overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                    letterSpacing: 1.5,
-                                    fontFamily: "NT",
-                                    color: ColorManager.blackColor,
-                                  ),
-                                ),
-                                InkWell(
-                                  onTap: () {
-                                    appBottomSheet(
-                                      context,
-                                      isNotTabScreen: true,
-                                      Container(
-                                        decoration: BoxDecoration(
-                                          color: ColorManager.whiteColor,
-                                          borderRadius: const BorderRadius.only(
-                                            topLeft: Radius.circular(16),
-                                            topRight: Radius.circular(16),
-                                          ),
-                                        ),
-                                        child: Column(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Row(
-                                              children: [
-                                                IconButton(
-                                                  onPressed: () {
-                                                    Navigator.pop(context);
-                                                  },
-                                                  icon: const Icon(
-                                                    Icons
-                                                        .keyboard_backspace_rounded,
-                                                  ),
-                                                ),
-                                                const Label(
-                                                  label: "Select Data Plan",
-                                                ),
-                                              ],
-                                            ),
-                                            const Divider(),
-                                            Container(
-                                              height: 300,
-                                              child: SingleChildScrollView(
-                                                child: Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(12.0),
-                                                  child: Column(
-                                                    children: [
-                                                      ...List.generate(
-                                                          dataPlanResponse
-                                                              .data
-                                                              .length, (index) {
-                                                        return InkWell(
-                                                          onTap: () {
-                                                            vtuProvider.setDataPlan(
-                                                                dataPlanResponse
-                                                                    .data[index]);
-                                                            Navigator.pop(
-                                                                context);
-                                                          },
-                                                          child: Padding(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                    .symmetric(
-                                                              horizontal: 10.0,
-                                                              vertical: 8,
-                                                            ),
-                                                            child: Column(
-                                                              crossAxisAlignment:
-                                                                  CrossAxisAlignment
-                                                                      .start,
-                                                              children: [
-                                                                Text(
-                                                                  dataPlanResponse
-                                                                      .data[index]
-                                                                      .productName,
-                                                                  style:
-                                                                      TextStyle(
-                                                                    color: Colors
-                                                                        .black,
-                                                                    fontSize:
-                                                                        screenAwareSize(
-                                                                            19,
-                                                                            context),
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w500,
-                                                                    letterSpacing:
-                                                                        1.5,
-                                                                  ),
-                                                                ),
-                                                                UIHelper
-                                                                    .verticalSpaceSmall,
-                                                                const Divider(),
-                                                                UIHelper
-                                                                    .verticalSpaceSmall,
-                                                              ],
-                                                            ),
-                                                          ),
-                                                        );
-                                                      })
-                                                    ],
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                  child: Icon(
-                                    Icons.arrow_drop_down,
-                                    color: ColorManager.deepGreyColor,
-                                    size: 30,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      );
-                    } else {
-                      return Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 0),
-                        decoration: BoxDecoration(
-                          color: ColorManager.greyColor.withOpacity(.4),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Text(
-                          "Loading .....",
-                          style:
-                              getBoldStyle(color: ColorManager.deepGreyColor),
-                        ),
-                      );
-                    }
-                  },
-                )
+              ? selectDataPlan(vtuProvider, context)
               : Container(),
           UIHelper.verticalSpaceMedium,
-          vtuProvider.selectedDataPlan != null ? AppAmountField(
+          vtuProvider.selectedDataPlan != null
+              ? AppAmountField(
                   isEdit: false,
                   title: "Amount",
                   label: vtuProvider.selectedDataPlan!.costPrice.toString(),
-                ) : Container(),
+                )
+              : Container(),
+          UIHelper.verticalSpaceMedium,
           UIHelper.verticalSpaceMedium,
           UIHelper.verticalSpaceLarge,
           Row(
@@ -966,11 +622,13 @@ class DataPage extends StatelessWidget {
                   onPressed: () {
                     if (formKey.currentState!.validate()) {
                       _confirmationBottomSheetMenu(
-                          amount: vtuProvider.amountController.text,
-                          number: vtuProvider.numberController.text,
-                          provider: vtuProvider,
-                          topUp: 2,
-                          ctx: context);
+                        plan: vtuProvider.selectedDataPlan!,
+                        amount:
+                            "${vtuProvider.selectedDataPlan!.costPrice.toInt()}",
+                        number: vtuProvider.numberController.text,
+                        provider: vtuProvider,
+                        ctx: context,
+                      );
                     } else {
                       MekNotification().showMessage(
                         context,
@@ -1051,7 +709,13 @@ class DataPage extends StatelessWidget {
                             await vtuProvider.getOperator(
                               newValue.countryCode,
                             );
-
+                            await vtuProvider.getDataCategory(
+                                AppConstants.operatorModel!.first.operatorCode);
+                            await vtuProvider.getDataPlan(
+                              AppConstants.operatorModel!.first.operatorCode,
+                              AppConstants
+                                  .dataCategoryModel!.first.categoryCode,
+                            );
                             vtuProvider.isOpSet();
                           },
                           items: vtuProvider
@@ -1130,6 +794,8 @@ class DataPage extends StatelessWidget {
                                           vtuProvider.setOperatorCode(
                                               AppConstants.operatorModel![index]
                                                   .operatorCode);
+                                          vtuProvider.getDataCategory(
+                                              vtuProvider.operatorCode!);
                                           Navigator.pop(context);
                                         },
                                         child: Padding(
@@ -1233,379 +899,391 @@ class DataPage extends StatelessWidget {
           ),
           UIHelper.verticalSpaceMedium,
           vtuProvider.operatorSet == true
-              ? FutureBuilder(
-                  future: UserApiServices().getDataCatList(
-                      vtuProvider.operatorCode ??
-                          AppConstants.operatorModel!.first.operatorCode),
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData) {
-                      DataCategoryResponse dataCategoryResponse =
-                          DataCategoryResponse.fromJson(snapshot.data);
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Data Category",
-                            style: getBoldStyle(
-                              color: ColorManager.deepGreyColor,
-                              fontSize: 14,
-                            ),
-                          ),
-                          UIHelper.verticalSpaceSmall,
-        
-                          Container(
-                            height: 50,
-                            padding:
-                                EdgeInsets.symmetric(horizontal: 15, vertical: 8),
-                            decoration: BoxDecoration(
-                              color: ColorManager.greyColor.withOpacity(.4),
-                              borderRadius: BorderRadius.circular(15),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  dataCategoryResponse.data.isNotEmpty
-                                      ? vtuProvider.selectedDataCat != null
-                                          ? vtuProvider
-                                              .selectedDataCat!.categoryName
-                                          : dataCategoryResponse
-                                              .data.first.categoryName
-                                      : "Select Data Category",
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                    letterSpacing: 1.5,
-                                    fontFamily: "NT",
-                                    color: ColorManager.blackColor,
-                                  ),
-                                ),
-                                InkWell(
-                                  onTap: () {
-                                    appBottomSheet(
-                                      context,
-                                      isNotTabScreen: true,
-                                      Container(
-                                        decoration: BoxDecoration(
-                                          color: ColorManager.whiteColor,
-                                          borderRadius: const BorderRadius.only(
-                                            topLeft: Radius.circular(16),
-                                            topRight: Radius.circular(16),
-                                          ),
-                                        ),
-                                        child: Column(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Row(
-                                              children: [
-                                                IconButton(
-                                                  onPressed: () {
-                                                    Navigator.pop(context);
-                                                  },
-                                                  icon: const Icon(
-                                                    Icons
-                                                        .keyboard_backspace_rounded,
-                                                  ),
-                                                ),
-                                                const Label(
-                                                  label: "Select Data Categpory",
-                                                ),
-                                              ],
-                                            ),
-                                            const Divider(),
-                                            Container(
-                                              height: 300,
-                                              child: SingleChildScrollView(
-                                                child: Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(12.0),
-                                                  child: Column(
-                                                    children: [
-                                                      ...List.generate(
-                                                          dataCategoryResponse
-                                                              .data
-                                                              .length, (index) {
-                                                        return InkWell(
-                                                          onTap: () {
-                                                            vtuProvider.setDataCat(
-                                                                dataCategoryResponse
-                                                                    .data[index]);
-                                                            Navigator.pop(
-                                                                context);
-                                                          },
-                                                          child: Padding(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                    .symmetric(
-                                                              horizontal: 10.0,
-                                                              vertical: 8,
-                                                            ),
-                                                            child: Column(
-                                                              crossAxisAlignment:
-                                                                  CrossAxisAlignment
-                                                                      .start,
-                                                              children: [
-                                                                Text(
-                                                                  dataCategoryResponse
-                                                                      .data[index]
-                                                                      .categoryName,
-                                                                  style:
-                                                                      TextStyle(
-                                                                    color: Colors
-                                                                        .black,
-                                                                    fontSize:
-                                                                        screenAwareSize(
-                                                                            19,
-                                                                            context),
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w500,
-                                                                    letterSpacing:
-                                                                        1.5,
-                                                                  ),
-                                                                ),
-                                                                UIHelper
-                                                                    .verticalSpaceSmall,
-                                                                const Divider(),
-                                                                UIHelper
-                                                                    .verticalSpaceSmall,
-                                                              ],
-                                                            ),
-                                                          ),
-                                                        );
-                                                      })
-                                                    ],
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                  child: Icon(
-                                    Icons.arrow_drop_down,
-                                    color: ColorManager.deepGreyColor,
-                                    size: 30,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      );
-                    } else {
-                      return Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 0),
-                        decoration: BoxDecoration(
-                          color: ColorManager.greyColor.withOpacity(.4),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Text(
-                          "Loading .....",
-                          style:
-                              getBoldStyle(color: ColorManager.deepGreyColor),
-                        ),
-                      );
-                    }
-                  },
-                )
+              ? selectDataCategories(vtuProvider, context)
               : Container(),
+          // vtuProvider.operatorSet == true
+          //     ? FutureBuilder(
+          //         future: UserApiServices().getDataCatList(
+          //             vtuProvider.operatorCode ??
+          //                 AppConstants.operatorModel!.first.operatorCode),
+          //         builder: (context, snapshot) {
+          //           print("categories response ----> $snapshot");
+          //           if (snapshot.hasData) {
+          //             DataCategoryResponse dataCategoryResponse =
+          //                 DataCategoryResponse.fromJson(snapshot.data);
+          //             return Column(
+          //               crossAxisAlignment: CrossAxisAlignment.start,
+          //               children: [
+          //                 Text(
+          //                   "Data Category",
+          //                   style: getBoldStyle(
+          //                     color: ColorManager.deepGreyColor,
+          //                     fontSize: 14,
+          //                   ),
+          //                 ),
+          //                 UIHelper.verticalSpaceSmall,
+          //                 Container(
+          //                   height: 50,
+          //                   padding: EdgeInsets.symmetric(
+          //                       horizontal: 15, vertical: 8),
+          //                   decoration: BoxDecoration(
+          //                     color: ColorManager.greyColor.withOpacity(.4),
+          //                     borderRadius: BorderRadius.circular(15),
+          //                   ),
+          //                   child: Row(
+          //                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          //                     children: [
+          //                       Text(
+          //                         dataCategoryResponse.data.isNotEmpty
+          //                             ? vtuProvider.selectedDataCat != null
+          //                                 ? vtuProvider
+          //                                     .selectedDataCat!.categoryName
+          //                                 : dataCategoryResponse
+          //                                     .data.first.categoryName
+          //                             : "Select Data Category",
+          //                         style: TextStyle(
+          //                           fontSize: 14,
+          //                           fontWeight: FontWeight.bold,
+          //                           letterSpacing: 1.5,
+          //                           fontFamily: "NT",
+          //                           color: ColorManager.blackColor,
+          //                         ),
+          //                       ),
+          //                       InkWell(
+          //                         onTap: () {
+          //                           appBottomSheet(
+          //                             context,
+          //                             isNotTabScreen: true,
+          //                             Container(
+          //                               decoration: BoxDecoration(
+          //                                 color: ColorManager.whiteColor,
+          //                                 borderRadius: const BorderRadius.only(
+          //                                   topLeft: Radius.circular(16),
+          //                                   topRight: Radius.circular(16),
+          //                                 ),
+          //                               ),
+          //                               child: Column(
+          //                                 mainAxisSize: MainAxisSize.min,
+          //                                 children: [
+          //                                   Row(
+          //                                     children: [
+          //                                       IconButton(
+          //                                         onPressed: () {
+          //                                           Navigator.pop(context);
+          //                                         },
+          //                                         icon: const Icon(
+          //                                           Icons
+          //                                               .keyboard_backspace_rounded,
+          //                                         ),
+          //                                       ),
+          //                                       const Label(
+          //                                         label:
+          //                                             "Select Data Categpory",
+          //                                       ),
+          //                                     ],
+          //                                   ),
+          //                                   const Divider(),
+          //                                   Container(
+          //                                     height: 300,
+          //                                     child: SingleChildScrollView(
+          //                                       child: Padding(
+          //                                         padding: const EdgeInsets.all(
+          //                                             12.0),
+          //                                         child: Column(
+          //                                           children: [
+          //                                             ...List.generate(
+          //                                                 dataCategoryResponse
+          //                                                     .data
+          //                                                     .length, (index) {
+          //                                               return InkWell(
+          //                                                 onTap: () {
+          //                                                   vtuProvider.setDataCat(
+          //                                                       dataCategoryResponse
+          //                                                               .data[
+          //                                                           index]);
+          //                                                   Navigator.pop(
+          //                                                       context);
+          //                                                 },
+          //                                                 child: Padding(
+          //                                                   padding:
+          //                                                       const EdgeInsets
+          //                                                           .symmetric(
+          //                                                     horizontal: 10.0,
+          //                                                     vertical: 8,
+          //                                                   ),
+          //                                                   child: Column(
+          //                                                     crossAxisAlignment:
+          //                                                         CrossAxisAlignment
+          //                                                             .start,
+          //                                                     children: [
+          //                                                       Text(
+          //                                                         dataCategoryResponse
+          //                                                             .data[
+          //                                                                 index]
+          //                                                             .categoryName,
+          //                                                         style:
+          //                                                             TextStyle(
+          //                                                           color: Colors
+          //                                                               .black,
+          //                                                           fontSize:
+          //                                                               screenAwareSize(
+          //                                                                   19,
+          //                                                                   context),
+          //                                                           fontWeight:
+          //                                                               FontWeight
+          //                                                                   .w500,
+          //                                                           letterSpacing:
+          //                                                               1.5,
+          //                                                         ),
+          //                                                       ),
+          //                                                       UIHelper
+          //                                                           .verticalSpaceSmall,
+          //                                                       const Divider(),
+          //                                                       UIHelper
+          //                                                           .verticalSpaceSmall,
+          //                                                     ],
+          //                                                   ),
+          //                                                 ),
+          //                                               );
+          //                                             })
+          //                                           ],
+          //                                         ),
+          //                                       ),
+          //                                     ),
+          //                                   ),
+          //                                 ],
+          //                               ),
+          //                             ),
+          //                           );
+          //                         },
+          //                         child: Icon(
+          //                           Icons.arrow_drop_down,
+          //                           color: ColorManager.deepGreyColor,
+          //                           size: 30,
+          //                         ),
+          //                       ),
+          //                     ],
+          //                   ),
+          //                 ),
+          //               ],
+          //             );
+          //           } else {
+          //             return Container(
+          //               padding: const EdgeInsets.symmetric(
+          //                   horizontal: 10, vertical: 0),
+          //               decoration: BoxDecoration(
+          //                 color: ColorManager.greyColor.withOpacity(.4),
+          //                 borderRadius: BorderRadius.circular(10),
+          //               ),
+          //               child: Text(
+          //                 "Loading .....",
+          //                 style:
+          //                     getBoldStyle(color: ColorManager.deepGreyColor),
+          //               ),
+          //             );
+          //           }
+          //         },
+          //       )
+          //     : Container(),
           UIHelper.verticalSpaceMedium,
           vtuProvider.operatorSet == true || vtuProvider.selectedDataCat != null
-              ? FutureBuilder(
-                  future: UserApiServices().getDataPlanList({
-                    "operator_code": vtuProvider.operatorCode ??
-                        AppConstants.operatorModel!.first.operatorCode,
-                    "category_code": vtuProvider.selectedDataCat != null ? vtuProvider.selectedDataCat!.categoryCode : "",
-                  }),
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData) {
-                      DataPlanResponse dataPlanResponse =
-                          DataPlanResponse.fromJson(snapshot.data);
-                      WidgetsBinding.instance.addPostFrameCallback((_) {
-                        vtuProvider.setDataPlan(dataPlanResponse.data.first);
-                      });
-
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Data Plan",
-                            style: getBoldStyle(
-                              color: ColorManager.deepGreyColor,
-                              fontSize: 14,
-                            ),
-                          ),
-                          UIHelper.verticalSpaceSmall,
-                          Container(
-                            height: 50,
-                            padding:
-                                EdgeInsets.symmetric(horizontal: 15, vertical: 8),
-                            decoration: BoxDecoration(
-                              color: ColorManager.greyColor.withOpacity(.4),
-                              borderRadius: BorderRadius.circular(15),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  dataPlanResponse.data.isNotEmpty
-                                      ? vtuProvider.selectedDataPlan != null
-                                          ? "${vtuProvider.selectedDataPlan!.operatorCode} ${vtuProvider.selectedDataPlan!.productName} | ${vtuProvider.selectedDataPlan!.validity}"
-                                          : "${dataPlanResponse.data.first.operatorCode} ${dataPlanResponse.data.first.productName} | ${dataPlanResponse.data.first.validity}"
-
-                                      : "Select Data Plan",
-                                      overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                    letterSpacing: 1.5,
-                                    fontFamily: "NT",
-                                    color: ColorManager.blackColor,
-                                  ),
-                                ),
-                                InkWell(
-                                  onTap: () {
-                                    appBottomSheet(
-                                      context,
-                                      isNotTabScreen: true,
-                                      Container(
-                                        decoration: BoxDecoration(
-                                          color: ColorManager.whiteColor,
-                                          borderRadius: const BorderRadius.only(
-                                            topLeft: Radius.circular(16),
-                                            topRight: Radius.circular(16),
-                                          ),
-                                        ),
-                                        child: Column(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Row(
-                                              children: [
-                                                IconButton(
-                                                  onPressed: () {
-                                                    Navigator.pop(context);
-                                                  },
-                                                  icon: const Icon(
-                                                    Icons
-                                                        .keyboard_backspace_rounded,
-                                                  ),
-                                                ),
-                                                const Label(
-                                                  label: "Select Data Plan",
-                                                ),
-                                              ],
-                                            ),
-                                            const Divider(),
-                                            Container(
-                                              height: 300,
-                                              child: SingleChildScrollView(
-                                                child: Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(12.0),
-                                                  child: Column(
-                                                    children: [
-                                                      ...List.generate(
-                                                          dataPlanResponse
-                                                              .data
-                                                              .length, (index) {
-                                                        return InkWell(
-                                                          onTap: () {
-                                                            vtuProvider.setDataPlan(
-                                                                dataPlanResponse
-                                                                    .data[index]);
-                                                            Navigator.pop(
-                                                                context);
-                                                          },
-                                                          child: Padding(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                    .symmetric(
-                                                              horizontal: 10.0,
-                                                              vertical: 8,
-                                                            ),
-                                                            child: Column(
-                                                              crossAxisAlignment:
-                                                                  CrossAxisAlignment
-                                                                      .start,
-                                                              children: [
-                                                                Text(
-                                                                  dataPlanResponse
-                                                                      .data[index]
-                                                                      .productName,
-                                                                  style:
-                                                                      TextStyle(
-                                                                    color: Colors
-                                                                        .black,
-                                                                    fontSize:
-                                                                        screenAwareSize(
-                                                                            19,
-                                                                            context),
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w500,
-                                                                    letterSpacing:
-                                                                        1.5,
-                                                                  ),
-                                                                ),
-                                                                UIHelper
-                                                                    .verticalSpaceSmall,
-                                                                const Divider(),
-                                                                UIHelper
-                                                                    .verticalSpaceSmall,
-                                                              ],
-                                                            ),
-                                                          ),
-                                                        );
-                                                      })
-                                                    ],
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                  child: Icon(
-                                    Icons.arrow_drop_down,
-                                    color: ColorManager.deepGreyColor,
-                                    size: 30,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      );
-                    } else {
-                      return Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 0),
-                        decoration: BoxDecoration(
-                          color: ColorManager.greyColor.withOpacity(.4),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Text(
-                          "Loading .....",
-                          style:
-                              getBoldStyle(color: ColorManager.deepGreyColor),
-                        ),
-                      );
-                    }
-                  },
-                )
+              ? selectDataPlan(vtuProvider, context)
               : Container(),
+          // vtuProvider.operatorSet == true || vtuProvider.selectedDataCat != null
+          //     ? FutureBuilder(
+          //         future: UserApiServices().getDataPlanList({
+          //           "operator_code": vtuProvider.operatorCode ??
+          //               AppConstants.operatorModel!.first.operatorCode,
+          //           "category_code": vtuProvider.selectedDataCat != null
+          //               ? vtuProvider.selectedDataCat!.categoryCode
+          //               : "",
+          //         }),
+          //         builder: (context, snapshot) {
+          //           if (snapshot.hasData) {
+          //             DataPlanResponse dataPlanResponse =
+          //                 DataPlanResponse.fromJson(snapshot.data);
+          //             WidgetsBinding.instance.addPostFrameCallback((_) {
+          //               vtuProvider.setDataPlan(dataPlanResponse.data.first);
+          //             });
+          //             return Column(
+          //               crossAxisAlignment: CrossAxisAlignment.start,
+          //               children: [
+          //                 Text(
+          //                   "Data Plan",
+          //                   style: getBoldStyle(
+          //                     color: ColorManager.deepGreyColor,
+          //                     fontSize: 14,
+          //                   ),
+          //                 ),
+          //                 UIHelper.verticalSpaceSmall,
+          //                 Container(
+          //                   height: 50,
+          //                   padding: EdgeInsets.symmetric(
+          //                       horizontal: 15, vertical: 8),
+          //                   decoration: BoxDecoration(
+          //                     color: ColorManager.greyColor.withOpacity(.4),
+          //                     borderRadius: BorderRadius.circular(15),
+          //                   ),
+          //                   child: Row(
+          //                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          //                     children: [
+          //                       Text(
+          //                         dataPlanResponse.data.isNotEmpty
+          //                             ? vtuProvider.selectedDataPlan != null
+          //                                 ? "${vtuProvider.selectedDataPlan!.operatorCode} ${vtuProvider.selectedDataPlan!.productName} | ${vtuProvider.selectedDataPlan!.validity}"
+          //                                 : "${dataPlanResponse.data.first.operatorCode} ${dataPlanResponse.data.first.productName} | ${dataPlanResponse.data.first.validity}"
+          //                             : "Select Data Plan",
+          //                         overflow: TextOverflow.ellipsis,
+          //                         style: TextStyle(
+          //                           fontSize: 14,
+          //                           fontWeight: FontWeight.bold,
+          //                           letterSpacing: 1.5,
+          //                           fontFamily: "NT",
+          //                           color: ColorManager.blackColor,
+          //                         ),
+          //                       ),
+          //                       InkWell(
+          //                         onTap: () {
+          //                           appBottomSheet(
+          //                             context,
+          //                             isNotTabScreen: true,
+          //                             Container(
+          //                               decoration: BoxDecoration(
+          //                                 color: ColorManager.whiteColor,
+          //                                 borderRadius: const BorderRadius.only(
+          //                                   topLeft: Radius.circular(16),
+          //                                   topRight: Radius.circular(16),
+          //                                 ),
+          //                               ),
+          //                               child: Column(
+          //                                 mainAxisSize: MainAxisSize.min,
+          //                                 children: [
+          //                                   Row(
+          //                                     children: [
+          //                                       IconButton(
+          //                                         onPressed: () {
+          //                                           Navigator.pop(context);
+          //                                         },
+          //                                         icon: const Icon(
+          //                                           Icons
+          //                                               .keyboard_backspace_rounded,
+          //                                         ),
+          //                                       ),
+          //                                       const Label(
+          //                                         label: "Select Data Plan",
+          //                                       ),
+          //                                     ],
+          //                                   ),
+          //                                   const Divider(),
+          //                                   Container(
+          //                                     height: 300,
+          //                                     child: SingleChildScrollView(
+          //                                       child: Padding(
+          //                                         padding: const EdgeInsets.all(
+          //                                             12.0),
+          //                                         child: Column(
+          //                                           children: [
+          //                                             ...List.generate(
+          //                                                 dataPlanResponse.data
+          //                                                     .length, (index) {
+          //                                               return InkWell(
+          //                                                 onTap: () {
+          //                                                   vtuProvider.setDataPlan(
+          //                                                       dataPlanResponse
+          //                                                               .data[
+          //                                                           index]);
+          //                                                   Navigator.pop(
+          //                                                       context);
+          //                                                 },
+          //                                                 child: Padding(
+          //                                                   padding:
+          //                                                       const EdgeInsets
+          //                                                           .symmetric(
+          //                                                     horizontal: 10.0,
+          //                                                     vertical: 8,
+          //                                                   ),
+          //                                                   child: Column(
+          //                                                     crossAxisAlignment:
+          //                                                         CrossAxisAlignment
+          //                                                             .start,
+          //                                                     children: [
+          //                                                       Text(
+          //                                                         dataPlanResponse
+          //                                                             .data[
+          //                                                                 index]
+          //                                                             .productName,
+          //                                                         style:
+          //                                                             TextStyle(
+          //                                                           color: Colors
+          //                                                               .black,
+          //                                                           fontSize:
+          //                                                               screenAwareSize(
+          //                                                                   19,
+          //                                                                   context),
+          //                                                           fontWeight:
+          //                                                               FontWeight
+          //                                                                   .w500,
+          //                                                           letterSpacing:
+          //                                                               1.5,
+          //                                                         ),
+          //                                                       ),
+          //                                                       UIHelper
+          //                                                           .verticalSpaceSmall,
+          //                                                       const Divider(),
+          //                                                       UIHelper
+          //                                                           .verticalSpaceSmall,
+          //                                                     ],
+          //                                                   ),
+          //                                                 ),
+          //                                               );
+          //                                             })
+          //                                           ],
+          //                                         ),
+          //                                       ),
+          //                                     ),
+          //                                   ),
+          //                                 ],
+          //                               ),
+          //                             ),
+          //                           );
+          //                         },
+          //                         child: Icon(
+          //                           Icons.arrow_drop_down,
+          //                           color: ColorManager.deepGreyColor,
+          //                           size: 30,
+          //                         ),
+          //                       ),
+          //                     ],
+          //                   ),
+          //                 ),
+          //               ],
+          //             );
+          //           } else {
+          //             return Container(
+          //               padding: const EdgeInsets.symmetric(
+          //                   horizontal: 10, vertical: 0),
+          //               decoration: BoxDecoration(
+          //                 color: ColorManager.greyColor.withOpacity(.4),
+          //                 borderRadius: BorderRadius.circular(10),
+          //               ),
+          //               child: Text(
+          //                 "Loading .....",
+          //                 style:
+          //                     getBoldStyle(color: ColorManager.deepGreyColor),
+          //               ),
+          //             );
+          //           }
+          //         },
+          //       )
+          //     : Container(),
           UIHelper.verticalSpaceMedium,
-          vtuProvider.selectedDataPlan != null ? AppAmountField(
+          vtuProvider.selectedDataPlan != null
+              ? AppAmountField(
                   isEdit: false,
                   title: "Amount",
                   label: vtuProvider.selectedDataPlan!.costPrice.toString(),
-                ) : Container(),
+                )
+              : Container(),
           UIHelper.verticalSpaceMedium,
           Text(
             "Loan",
@@ -1633,13 +1311,12 @@ class DataPage extends StatelessWidget {
             ),
           ),
           UIHelper.verticalSpaceMedium,
-          vtuProvider.loanLimit != null &&
-                  vtuProvider.selectedDataPlan != null
+          vtuProvider.loanLimit != null && vtuProvider.selectedDataPlan != null
               ? AppAmountField(
                   isEdit: false,
                   title: "Loan Repayment",
                   label: calculateLoanRepayment(
-                     "${vtuProvider.selectedDataPlan!.costPrice.toInt()}",
+                      "${vtuProvider.selectedDataPlan!.costPrice.toInt()}",
                       vtuProvider.loanLimit!.percentage),
                   //controller: vtuProvider.amountController,
                 )
@@ -1652,15 +1329,26 @@ class DataPage extends StatelessWidget {
                   buttonText: "Submit",
                   onPressed: () {
                     if (formKey.currentState!.validate()) {
+                      if(vtuProvider.loanLimit != null) {
+
                       _confirmationBottomSheetMenu(
-                        topUp: 2,
-                        amount: calculateLoanRepayment(
-                            vtuProvider.amountController.text.trim(),
-                            vtuProvider.loanLimit!.percentage),
-                        number: vtuProvider.numberController.text,
-                        provider: vtuProvider,
-                        ctx: context,
-                      );
+                          topUp: 2,
+                          plan: vtuProvider.selectedDataPlan!,
+                          amount: calculateLoanRepayment(
+                              "${vtuProvider.selectedDataPlan!.costPrice.toInt()}",
+                              vtuProvider.loanLimit!.percentage),
+                          number: vtuProvider.numberController.text,
+                          provider: vtuProvider,
+                          ctx: context,
+                        );
+                    
+                      }else {
+                        MekNotification().showMessage(
+                          context,
+                          message: "Please select a loan term !!!",
+                        );
+                      }
+                      
                     } else {
                       //Navigator.pop(context);
                       MekNotification().showMessage(
@@ -1691,116 +1379,13 @@ class DataPage extends StatelessWidget {
       ),
     );
   }
-}
 
-class DataPageX extends StatefulWidget {
-  const DataPageX({super.key});
-
-  @override
-  State<DataPageX> createState() => _DataPageXState();
-}
-
-class _DataPageXState extends State<DataPageX>
-    with SingleTickerProviderStateMixin {
-  TabController? _tabController;
-
-  @override
-  void initState() {
-    _tabController = TabController(length: 2, vsync: this);
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    _tabController!.dispose();
-    super.dispose();
-  }
-
-  TextEditingController loanAmount = TextEditingController();
-  TextEditingController phoneNumber = TextEditingController();
-
-  String? _mySelection;
-  String? _selectedPlan;
-  int? _selectedIndex;
-  String selectedLoan = '';
-
-  final List<Map> _myJson = [
-    {
-      'id': '1',
-      'image': 'images/operators/mtn.png',
-      'name': 'MTN',
-    },
-    {
-      'id': '2',
-      'image': 'images/operators/airtel.png',
-      'name': 'AIRTEL',
-    },
-    {
-      'id': '3',
-      'image': 'images/operators/9mobile.png',
-      'name': '9MOBILE',
-    },
-    {
-      'id': '4',
-      'image': 'images/operators/glo.png',
-      'name': 'GLO',
-    },
-  ];
-
-  final List<Map> _dataPlan = [
-    {
-      'id': '1',
-      'image': 'images/operators/mtn.png',
-      'name': '100MB / 1 Day - \u20A6 100',
-    },
-    {
-      'id': '2',
-      'image': 'images/operators/airtel.png',
-      'name': '250MB/7 Days-\u20A6 300',
-    },
-    {
-      'id': '3',
-      'image': 'images/operators/9mobile.png',
-      'name': '200MB/2 Day- \u20A6 200',
-    },
-    {
-      'id': '4',
-      'image': 'images/operators/glo.png',
-      'name': '350MB/7 Days-\u20A6 300',
-    },
-    {
-      'id': '5',
-      'image': 'images/operators/glo.png',
-      'name': '750MB/ 14 Days-\u20A6 500',
-    },
-    {
-      'id': '6',
-      'image': 'images/operators/glo.png',
-      'name': '2GB/30 Days-\u20A6 1,200',
-    },
-    {
-      'id': '7',
-      'image': 'images/operators/glo.png',
-      'name': '1.5GB/30 Days-\u20A6 1,000',
-    },
-    {
-      'id': '8',
-      'image': 'images/operators/glo.png',
-      'name': '1GB/ 1 Day-\u20A6 350',
-    },
-    {
-      'id': '9',
-      'image': 'images/operators/glo.png',
-      'name': '750MB/7 Days-\u20A6 500',
-    },
-  ];
-
-  Widget buidNetworkType() {
+  Widget selectDataCategories(VtuProvider provider, BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          "Data Type",
+          "Data Category",
           style: getBoldStyle(
             color: ColorManager.deepGreyColor,
             fontSize: 14,
@@ -1809,63 +1394,135 @@ class _DataPageXState extends State<DataPageX>
         UIHelper.verticalSpaceSmall,
         Container(
           height: 40,
+          padding: EdgeInsets.symmetric(horizontal: 15, vertical: 8),
           decoration: BoxDecoration(
             color: ColorManager.greyColor.withOpacity(.4),
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(15),
           ),
-          child: Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: DropdownButton<String>(
-              borderRadius: BorderRadius.circular(15),
-              hint: Text(
-                'Select network provider',
-                style: getRegularStyle(
-                  color: ColorManager.deepGreyColor,
-                  fontSize: 13,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                provider.selectedDataCat != null
+                    ? provider.selectedDataCat!.categoryName
+                    : "Select Data Category",
+                // provider.selectedDataCat != null
+                //     ? provider.selectedDataCat!.plan
+                //     : "Select Cable Plan",
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1.5,
+                  fontFamily: "NT",
+                  color: ColorManager.blackColor,
                 ),
               ),
-              value: _mySelection,
-              underline: Container(),
-              isExpanded: true,
-              onChanged: (value) {
-                setState(() {
-                  _mySelection = value;
-                });
-              },
-              items: _myJson.map((option) {
-                return DropdownMenuItem<String>(
-                  value: option['name'],
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Container(
-                        margin: const EdgeInsets.only(left: 10),
-                        child: Text(option['name']),
+              InkWell(
+                onTap: () {
+                  appBottomSheet(
+                    context,
+                    isNotTabScreen: true,
+                    Container(
+                      decoration: BoxDecoration(
+                        color: ColorManager.whiteColor,
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(16),
+                          topRight: Radius.circular(16),
+                        ),
                       ),
-                      // Radio<String>(
-                      //   value: option['name'],
-                      //   groupValue: _mySelection ?? "Select",
-                      //   //label: option['name'],
-                      //   activeColor: ColorManager.primaryColor,
-                      //   onChanged: (value) {
-                      //     setState(() {
-                      //       _mySelection = value;
-                      //       Navigator.pop(context);
-                      //     });
-                      //   },
-                      // ),
-                    ],
-                  ),
-                );
-              }).toList(),
-            ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Row(
+                            children: [
+                              IconButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                icon: const Icon(
+                                  Icons.keyboard_backspace_rounded,
+                                ),
+                              ),
+                              const Label(
+                                label: "Select Data Category",
+                              ),
+                            ],
+                          ),
+                          const Divider(),
+                          Container(
+                            height: 280,
+                            child: SingleChildScrollView(
+                              child: Padding(
+                                padding: const EdgeInsets.all(12.0),
+                                child: Column(
+                                  children: [
+                                    ...List.generate(
+                                        AppConstants.dataCategoryModel!.length,
+                                        (index) {
+                                      return InkWell(
+                                        onTap: () {
+                                          provider.setDataCat(AppConstants
+                                              .dataCategoryModel![index]);
+                                          provider.getDataPlan(
+                                              provider.operatorCode!,
+                                              provider.selectedDataCat!
+                                                  .categoryCode);
+                                          Navigator.pop(context);
+                                        },
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 10.0,
+                                            vertical: 8,
+                                          ),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                AppConstants
+                                                    .dataCategoryModel![index]
+                                                    .categoryName
+                                                    .toString(),
+                                                style: TextStyle(
+                                                  color: Colors.black,
+                                                  fontSize: screenAwareSize(
+                                                      19, context),
+                                                  fontWeight: FontWeight.w500,
+                                                  letterSpacing: 1.5,
+                                                ),
+                                              ),
+                                              UIHelper.verticalSpaceSmall,
+                                              const Divider(),
+                                              UIHelper.verticalSpaceSmall,
+                                            ],
+                                          ),
+                                        ),
+                                      );
+                                    })
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+                child: Icon(
+                  Icons.arrow_drop_down,
+                  color: ColorManager.deepGreyColor,
+                  size: 30,
+                ),
+              ),
+            ],
           ),
-        )
+        ),
       ],
     );
   }
 
-  Widget buidDataPlan() {
+  Widget selectDataPlan(VtuProvider provider, BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -1879,317 +1536,667 @@ class _DataPageXState extends State<DataPageX>
         UIHelper.verticalSpaceSmall,
         Container(
           height: 40,
+          padding: EdgeInsets.symmetric(horizontal: 15, vertical: 8),
           decoration: BoxDecoration(
             color: ColorManager.greyColor.withOpacity(.4),
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(15),
           ),
-          child: Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: DropdownButton<String>(
-              borderRadius: BorderRadius.circular(15),
-              hint: const Text('Select Data Plan'),
-              underline: Container(),
-              value: _selectedPlan,
-              isExpanded: true,
-              onChanged: (value) {
-                setState(() {
-                  _selectedPlan = value;
-                });
-              },
-              items: _dataPlan.map((option) {
-                return DropdownMenuItem<String>(
-                  value: option['name'],
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Container(
-                        margin: const EdgeInsets.only(left: 10),
-                        child: Text(option['name']),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                provider.selectedDataPlan != null
+                    ? "${provider.selectedDataPlan!.operatorCode} ${provider.selectedDataPlan!.productName} | ${provider.selectedDataPlan!.validity}"
+                    : "Select Data Plan",
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1.5,
+                  fontFamily: "NT",
+                  color: ColorManager.blackColor,
+                ),
+              ),
+              InkWell(
+                onTap: () {
+                  appBottomSheet(
+                    context,
+                    isNotTabScreen: true,
+                    Container(
+                      decoration: BoxDecoration(
+                        color: ColorManager.whiteColor,
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(16),
+                          topRight: Radius.circular(16),
+                        ),
                       ),
-                      // Radio<String>(
-                      //   value: option['name'],
-                      //   groupValue: _selectedPlan ?? "Select",
-                      //   activeColor: ColorManager.primaryColor,
-                      //   onChanged: (value) {
-                      //     setState(() {
-                      //       _selectedPlan = value;
-                      //       Navigator.pop(context);
-                      //     });
-                      //   },
-                      // )
-                    ],
-                  ),
-                );
-              }).toList(),
-            ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Row(
+                            children: [
+                              IconButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                icon: const Icon(
+                                  Icons.keyboard_backspace_rounded,
+                                ),
+                              ),
+                              const Label(
+                                label: "Select Data Plan",
+                              ),
+                            ],
+                          ),
+                          const Divider(),
+                          Container(
+                            height: 280,
+                            child: Expanded(
+                              child: SingleChildScrollView(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(12.0),
+                                  child: Column(
+                                    children: [
+                                      ...List.generate(
+                                          AppConstants.dataPlanModel!.length,
+                                          (index) {
+                                        return InkWell(
+                                          onTap: () {
+                                            provider.setDataPlan(AppConstants
+                                                .dataPlanModel![index]);
+                                            Navigator.pop(context);
+                                          },
+                                          child: Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 10.0,
+                                              vertical: 8,
+                                            ),
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  "${AppConstants.dataPlanModel![index].operatorCode} ${AppConstants.dataPlanModel![index].productName} - ${AppConstants.dataPlanModel![index].costPrice} | ${AppConstants.dataPlanModel![index].validity}",
+                                                  // AppConstants
+                                                  //     .dataCategoryModel![index]
+                                                  //     .categoryName
+                                                  //     .toString(),
+                                                  style: TextStyle(
+                                                    color: Colors.black,
+                                                    fontSize: screenAwareSize(
+                                                        19, context),
+                                                    fontWeight: FontWeight.w500,
+                                                    letterSpacing: 1.5,
+                                                  ),
+                                                ),
+                                                UIHelper.verticalSpaceSmall,
+                                                const Divider(),
+                                                UIHelper.verticalSpaceSmall,
+                                              ],
+                                            ),
+                                          ),
+                                        );
+                                      })
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+                child: Icon(
+                  Icons.arrow_drop_down,
+                  color: ColorManager.deepGreyColor,
+                  size: 30,
+                ),
+              ),
+            ],
           ),
-        )
+        ),
       ],
     );
   }
+}
+
+class CheckoutTile extends StatelessWidget {
+  const CheckoutTile({
+    super.key,
+    required this.title,
+    required this.value,
+  });
+
+  final String title, value;
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: const SimpleAppBar(title: "Data"),
-      body: ContainerWidget(
-        content: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            AppTabView(
-              tabController: _tabController,
+    return Padding(
+      padding: const EdgeInsets.only(
+        bottom: 10.0,
+        top: 10.0,
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            title,
+            style: getRegularStyle(
+              color: ColorManager.deepGreyColor,
+              fontSize: 12,
             ),
-            UIHelper.verticalSpaceSmall,
-            AppTabField(
-              tabController: _tabController,
-              contentOne: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: ListView(
-                  children: [
-                    const VtuCountrySelector(),
-                    UIHelper.verticalSpaceMedium,
-                    const AppNumberField(),
-                    UIHelper.verticalSpaceMedium,
-                    buidNetworkType(),
-                    UIHelper.verticalSpaceMedium,
-                    buidDataPlan(),
-                    UIHelper.verticalSpaceMedium,
-                    Text(
-                      "Loan",
-                      style: getBoldStyle(
-                        color: ColorManager.deepGreyColor,
-                        fontSize: 14,
-                      ),
-                    ),
-                    UIHelper.verticalSpaceSmall,
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: List.generate(
-                        loanPeriod.length,
-                        (index) => Expanded(
-                          child: SelectLoanPeriod(
-                            accountType: loanPeriod[index]['name'],
-                            active: _selectedIndex == index ? true : false,
-                            onPressed: () {
-                              setState(() {
-                                if (_selectedIndex == index) {
-                                  _selectedIndex = null;
-                                } else {
-                                  _selectedIndex = index;
-                                }
-                                selectedLoan =
-                                    "${loanPeriod[_selectedIndex!]["name"]}";
-                              });
-                            },
-                          ),
-                        ),
-                      ),
-                    ),
-                    UIHelper.verticalSpaceMedium,
-                    const AppAmountField(
-                      title: "Loan Repayment",
-                    ),
-                    UIHelper.verticalSpaceLarge,
-                    Row(
-                      children: [
-                        Expanded(
-                          child: AppButton(
-                            buttonText: "Submit",
-                            onPressed: () {},
-                            height: 30,
-                          ),
-                        ),
-                        UIHelper.horizontalSpaceSmall,
-                        Expanded(
-                          child: AppButton(
-                            buttonText: "clear",
-                            onPressed: () {},
-                            height: 30,
-                            borderColor: ColorManager.primaryColor,
-                            buttonColor: ColorManager.whiteColor,
-                            buttonTextColor: ColorManager.primaryColor,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              contentTwo: ListView(
-                children: [
-                  const VtuCountrySelector(),
-                  UIHelper.verticalSpaceMedium,
-                  const AppNumberField(),
-                  UIHelper.verticalSpaceMedium,
-                  buidNetworkType(),
-                  UIHelper.verticalSpaceMedium,
-                  buidDataPlan(),
-                  UIHelper.verticalSpaceMedium,
-                  Row(
-                    children: [
-                      Expanded(
-                        child: AppButton(
-                          buttonText: "Submit",
-                          onPressed: () {
-                            _confirmationBottomSheetMenu();
-                          },
-                          height: 30,
-                        ),
-                      ),
-                      UIHelper.horizontalSpaceSmall,
-                      Expanded(
-                        child: AppButton(
-                          buttonText: "clear",
-                          onPressed: () {},
-                          height: 30,
-                          borderColor: ColorManager.primaryColor,
-                          buttonColor: ColorManager.whiteColor,
-                          buttonTextColor: ColorManager.primaryColor,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+          ),
+          Text(
+            value,
+            style: getBoldStyle(
+              color: ColorManager.blackColor,
+              fontSize: 12,
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
-
-  void _confirmationBottomSheetMenu() {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: ColorManager.whiteColor,
-      builder: (builder) {
-        return Container(
-          height: deviceHeight(context) * .5,
-          color: Colors.transparent,
-          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
-          child: Container(
-            decoration: const BoxDecoration(
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(20.0),
-                topRight: Radius.circular(20.0),
-              ),
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  "₦ 2000.00",
-                  style: getBoldStyle(
-                      color: ColorManager.blackColor, fontSize: 16),
-                ),
-                UIHelper.verticalSpaceMedium,
-                Padding(
-                  padding: const EdgeInsets.only(
-                    bottom: 10.0,
-                    top: 10.0,
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Payment Type",
-                        style: getRegularStyle(
-                          color: ColorManager.deepGreyColor,
-                          fontSize: 12,
-                        ),
-                      ),
-                      Row(
-                        children: [
-                          SvgPicture.asset(
-                            ImageAssets.mtn,
-                          ),
-                          Text(
-                            "Data",
-                            style: getBoldStyle(
-                              color: ColorManager.blackColor,
-                              fontSize: 12,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(
-                    bottom: 10.0,
-                    top: 10.0,
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Payment Number",
-                        style: getRegularStyle(
-                          color: ColorManager.deepGreyColor,
-                          fontSize: 12,
-                        ),
-                      ),
-                      Text(
-                        "0806789435",
-                        style: getBoldStyle(
-                          color: ColorManager.blackColor,
-                          fontSize: 12,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                UIHelper.verticalSpaceSmall,
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
-                  decoration: BoxDecoration(
-                      color: ColorManager.greyColor.withOpacity(.5),
-                      borderRadius: BorderRadius.circular(10)),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          Text(
-                            "Loan Balance",
-                            style: getBoldStyle(
-                              color: ColorManager.blackColor,
-                              fontSize: 12,
-                            ),
-                          ),
-                          Text(
-                            "( ₦ 100,000)",
-                            style: getRegularStyle(
-                              color: ColorManager.deepGreyColor,
-                              fontSize: 12,
-                            ),
-                          ),
-                        ],
-                      ),
-                      Icon(
-                        Icons.check,
-                        color: ColorManager.primaryColor,
-                      )
-                    ],
-                  ),
-                ),
-                UIHelper.verticalSpaceMediumPlus,
-                AppButton(
-                  onPressed: () {
-                    NavigateClass().pushNamed(
-                      context: context,
-                      routName: Routes.success,
-                    );
-                  },
-                  buttonText: "Pay",
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
 }
+
+// class DataPageX extends StatefulWidget {
+//   const DataPageX({super.key});
+
+//   @override
+//   State<DataPageX> createState() => _DataPageXState();
+// }
+
+// class _DataPageXState extends State<DataPageX>
+//     with SingleTickerProviderStateMixin {
+//   TabController? _tabController;
+
+//   @override
+//   void initState() {
+//     _tabController = TabController(length: 2, vsync: this);
+//     super.initState();
+//   }
+
+//   @override
+//   void dispose() {
+//     _tabController!.dispose();
+//     super.dispose();
+//   }
+
+//   TextEditingController loanAmount = TextEditingController();
+//   TextEditingController phoneNumber = TextEditingController();
+
+//   String? _mySelection;
+//   String? _selectedPlan;
+//   int? _selectedIndex;
+//   String selectedLoan = '';
+
+//   final List<Map> _myJson = [
+//     {
+//       'id': '1',
+//       'image': 'images/operators/mtn.png',
+//       'name': 'MTN',
+//     },
+//     {
+//       'id': '2',
+//       'image': 'images/operators/airtel.png',
+//       'name': 'AIRTEL',
+//     },
+//     {
+//       'id': '3',
+//       'image': 'images/operators/9mobile.png',
+//       'name': '9MOBILE',
+//     },
+//     {
+//       'id': '4',
+//       'image': 'images/operators/glo.png',
+//       'name': 'GLO',
+//     },
+//   ];
+
+//   final List<Map> _dataPlan = [
+//     {
+//       'id': '1',
+//       'image': 'images/operators/mtn.png',
+//       'name': '100MB / 1 Day - \u20A6 100',
+//     },
+//     {
+//       'id': '2',
+//       'image': 'images/operators/airtel.png',
+//       'name': '250MB/7 Days-\u20A6 300',
+//     },
+//     {
+//       'id': '3',
+//       'image': 'images/operators/9mobile.png',
+//       'name': '200MB/2 Day- \u20A6 200',
+//     },
+//     {
+//       'id': '4',
+//       'image': 'images/operators/glo.png',
+//       'name': '350MB/7 Days-\u20A6 300',
+//     },
+//     {
+//       'id': '5',
+//       'image': 'images/operators/glo.png',
+//       'name': '750MB/ 14 Days-\u20A6 500',
+//     },
+//     {
+//       'id': '6',
+//       'image': 'images/operators/glo.png',
+//       'name': '2GB/30 Days-\u20A6 1,200',
+//     },
+//     {
+//       'id': '7',
+//       'image': 'images/operators/glo.png',
+//       'name': '1.5GB/30 Days-\u20A6 1,000',
+//     },
+//     {
+//       'id': '8',
+//       'image': 'images/operators/glo.png',
+//       'name': '1GB/ 1 Day-\u20A6 350',
+//     },
+//     {
+//       'id': '9',
+//       'image': 'images/operators/glo.png',
+//       'name': '750MB/7 Days-\u20A6 500',
+//     },
+//   ];
+
+//   Widget buidNetworkType() {
+//     return Column(
+//       crossAxisAlignment: CrossAxisAlignment.start,
+//       children: [
+//         Text(
+//           "Data Type",
+//           style: getBoldStyle(
+//             color: ColorManager.deepGreyColor,
+//             fontSize: 14,
+//           ),
+//         ),
+//         UIHelper.verticalSpaceSmall,
+//         Container(
+//           height: 40,
+//           decoration: BoxDecoration(
+//             color: ColorManager.greyColor.withOpacity(.4),
+//             borderRadius: BorderRadius.circular(10),
+//           ),
+//           child: Padding(
+//             padding: const EdgeInsets.all(10.0),
+//             child: DropdownButton<String>(
+//               borderRadius: BorderRadius.circular(15),
+//               hint: Text(
+//                 'Select network provider',
+//                 style: getRegularStyle(
+//                   color: ColorManager.deepGreyColor,
+//                   fontSize: 13,
+//                 ),
+//               ),
+//               value: _mySelection,
+//               underline: Container(),
+//               isExpanded: true,
+//               onChanged: (value) {
+//                 setState(() {
+//                   _mySelection = value;
+//                 });
+//               },
+//               items: _myJson.map((option) {
+//                 return DropdownMenuItem<String>(
+//                   value: option['name'],
+//                   child: Row(
+//                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//                     children: [
+//                       Container(
+//                         margin: const EdgeInsets.only(left: 10),
+//                         child: Text(option['name']),
+//                       ),
+//                       // Radio<String>(
+//                       //   value: option['name'],
+//                       //   groupValue: _mySelection ?? "Select",
+//                       //   //label: option['name'],
+//                       //   activeColor: ColorManager.primaryColor,
+//                       //   onChanged: (value) {
+//                       //     setState(() {
+//                       //       _mySelection = value;
+//                       //       Navigator.pop(context);
+//                       //     });
+//                       //   },
+//                       // ),
+//                     ],
+//                   ),
+//                 );
+//               }).toList(),
+//             ),
+//           ),
+//         )
+//       ],
+//     );
+//   }
+
+//   Widget buidDataPlan() {
+//     return Column(
+//       crossAxisAlignment: CrossAxisAlignment.start,
+//       children: [
+//         Text(
+//           "Data Plan",
+//           style: getBoldStyle(
+//             color: ColorManager.deepGreyColor,
+//             fontSize: 14,
+//           ),
+//         ),
+//         UIHelper.verticalSpaceSmall,
+//         Container(
+//           height: 40,
+//           decoration: BoxDecoration(
+//             color: ColorManager.greyColor.withOpacity(.4),
+//             borderRadius: BorderRadius.circular(10),
+//           ),
+//           child: Padding(
+//             padding: const EdgeInsets.all(10.0),
+//             child: DropdownButton<String>(
+//               borderRadius: BorderRadius.circular(15),
+//               hint: const Text('Select Data Plan'),
+//               underline: Container(),
+//               value: _selectedPlan,
+//               isExpanded: true,
+//               onChanged: (value) {
+//                 setState(() {
+//                   _selectedPlan = value;
+//                 });
+//               },
+//               items: _dataPlan.map((option) {
+//                 return DropdownMenuItem<String>(
+//                   value: option['name'],
+//                   child: Row(
+//                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//                     children: [
+//                       Container(
+//                         margin: const EdgeInsets.only(left: 10),
+//                         child: Text(option['name']),
+//                       ),
+//                       // Radio<String>(
+//                       //   value: option['name'],
+//                       //   groupValue: _selectedPlan ?? "Select",
+//                       //   activeColor: ColorManager.primaryColor,
+//                       //   onChanged: (value) {
+//                       //     setState(() {
+//                       //       _selectedPlan = value;
+//                       //       Navigator.pop(context);
+//                       //     });
+//                       //   },
+//                       // )
+//                     ],
+//                   ),
+//                 );
+//               }).toList(),
+//             ),
+//           ),
+//         )
+//       ],
+//     );
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: const SimpleAppBar(title: "Data"),
+//       body: ContainerWidget(
+//         content: Column(
+//           crossAxisAlignment: CrossAxisAlignment.start,
+//           children: [
+//             AppTabView(
+//               tabController: _tabController,
+//             ),
+//             UIHelper.verticalSpaceSmall,
+//             AppTabField(
+//               tabController: _tabController,
+//               contentOne: Padding(
+//                 padding: const EdgeInsets.all(8.0),
+//                 child: ListView(
+//                   children: [
+//                     const VtuCountrySelector(),
+//                     UIHelper.verticalSpaceMedium,
+//                     const AppNumberField(),
+//                     UIHelper.verticalSpaceMedium,
+//                     buidNetworkType(),
+//                     UIHelper.verticalSpaceMedium,
+//                     buidDataPlan(),
+//                     UIHelper.verticalSpaceMedium,
+//                     Text(
+//                       "Loan",
+//                       style: getBoldStyle(
+//                         color: ColorManager.deepGreyColor,
+//                         fontSize: 14,
+//                       ),
+//                     ),
+//                     UIHelper.verticalSpaceSmall,
+//                     Row(
+//                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+//                       children: List.generate(
+//                         loanPeriod.length,
+//                         (index) => Expanded(
+//                           child: SelectLoanPeriod(
+//                             accountType: loanPeriod[index]['name'],
+//                             active: _selectedIndex == index ? true : false,
+//                             onPressed: () {
+//                               setState(() {
+//                                 if (_selectedIndex == index) {
+//                                   _selectedIndex = null;
+//                                 } else {
+//                                   _selectedIndex = index;
+//                                 }
+//                                 selectedLoan =
+//                                     "${loanPeriod[_selectedIndex!]["name"]}";
+//                               });
+//                             },
+//                           ),
+//                         ),
+//                       ),
+//                     ),
+//                     UIHelper.verticalSpaceMedium,
+//                     const AppAmountField(
+//                       title: "Loan Repayment",
+//                     ),
+//                     UIHelper.verticalSpaceLarge,
+//                     Row(
+//                       children: [
+//                         Expanded(
+//                           child: AppButton(
+//                             buttonText: "Submit",
+//                             onPressed: () {},
+//                             height: 30,
+//                           ),
+//                         ),
+//                         UIHelper.horizontalSpaceSmall,
+//                         Expanded(
+//                           child: AppButton(
+//                             buttonText: "clear",
+//                             onPressed: () {},
+//                             height: 30,
+//                             borderColor: ColorManager.primaryColor,
+//                             buttonColor: ColorManager.whiteColor,
+//                             buttonTextColor: ColorManager.primaryColor,
+//                           ),
+//                         ),
+//                       ],
+//                     ),
+//                   ],
+//                 ),
+//               ),
+//               contentTwo: ListView(
+//                 children: [
+//                   const VtuCountrySelector(),
+//                   UIHelper.verticalSpaceMedium,
+//                   const AppNumberField(),
+//                   UIHelper.verticalSpaceMedium,
+//                   buidNetworkType(),
+//                   UIHelper.verticalSpaceMedium,
+//                   buidDataPlan(),
+//                   UIHelper.verticalSpaceMedium,
+//                   Row(
+//                     children: [
+//                       Expanded(
+//                         child: AppButton(
+//                           buttonText: "Submit",
+//                           onPressed: () {
+//                             _confirmationBottomSheetMenu();
+//                           },
+//                           height: 30,
+//                         ),
+//                       ),
+//                       UIHelper.horizontalSpaceSmall,
+//                       Expanded(
+//                         child: AppButton(
+//                           buttonText: "clear",
+//                           onPressed: () {},
+//                           height: 30,
+//                           borderColor: ColorManager.primaryColor,
+//                           buttonColor: ColorManager.whiteColor,
+//                           buttonTextColor: ColorManager.primaryColor,
+//                         ),
+//                       ),
+//                     ],
+//                   ),
+//                 ],
+//               ),
+//             ),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+
+//   void _confirmationBottomSheetMenu() {
+//     showModalBottomSheet(
+//       context: context,
+//       backgroundColor: ColorManager.whiteColor,
+//       builder: (builder) {
+//         return Container(
+//           height: deviceHeight(context) * .5,
+//           color: Colors.transparent,
+//           padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+//           child: Container(
+//             decoration: const BoxDecoration(
+//               borderRadius: BorderRadius.only(
+//                 topLeft: Radius.circular(20.0),
+//                 topRight: Radius.circular(20.0),
+//               ),
+//             ),
+//             child: Column(
+//               mainAxisAlignment: MainAxisAlignment.center,
+//               children: [
+//                 Text(
+//                   "₦ 2000.00",
+//                   style: getBoldStyle(
+//                       color: ColorManager.blackColor, fontSize: 16),
+//                 ),
+//                 UIHelper.verticalSpaceMedium,
+//                 Padding(
+//                   padding: const EdgeInsets.only(
+//                     bottom: 10.0,
+//                     top: 10.0,
+//                   ),
+//                   child: Row(
+//                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//                     children: [
+//                       Text(
+//                         "Payment Type",
+//                         style: getRegularStyle(
+//                           color: ColorManager.deepGreyColor,
+//                           fontSize: 12,
+//                         ),
+//                       ),
+//                       Row(
+//                         children: [
+//                           SvgPicture.asset(
+//                             ImageAssets.mtn,
+//                           ),
+//                           Text(
+//                             "Data",
+//                             style: getBoldStyle(
+//                               color: ColorManager.blackColor,
+//                               fontSize: 12,
+//                             ),
+//                           ),
+//                         ],
+//                       ),
+//                     ],
+//                   ),
+//                 ),
+//                 Padding(
+//                   padding: const EdgeInsets.only(
+//                     bottom: 10.0,
+//                     top: 10.0,
+//                   ),
+//                   child: Row(
+//                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//                     children: [
+//                       Text(
+//                         "Payment Number",
+//                         style: getRegularStyle(
+//                           color: ColorManager.deepGreyColor,
+//                           fontSize: 12,
+//                         ),
+//                       ),
+//                       Text(
+//                         "0806789435",
+//                         style: getBoldStyle(
+//                           color: ColorManager.blackColor,
+//                           fontSize: 12,
+//                         ),
+//                       ),
+//                     ],
+//                   ),
+//                 ),
+//                 UIHelper.verticalSpaceSmall,
+//                 Container(
+//                   padding:
+//                       const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
+//                   decoration: BoxDecoration(
+//                       color: ColorManager.greyColor.withOpacity(.5),
+//                       borderRadius: BorderRadius.circular(10)),
+//                   child: Row(
+//                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//                     children: [
+//                       Row(
+//                         children: [
+//                           Text(
+//                             "Loan Balance",
+//                             style: getBoldStyle(
+//                               color: ColorManager.blackColor,
+//                               fontSize: 12,
+//                             ),
+//                           ),
+//                           Text(
+//                             "( ₦ 100,000)",
+//                             style: getRegularStyle(
+//                               color: ColorManager.deepGreyColor,
+//                               fontSize: 12,
+//                             ),
+//                           ),
+//                         ],
+//                       ),
+//                       Icon(
+//                         Icons.check,
+//                         color: ColorManager.primaryColor,
+//                       )
+//                     ],
+//                   ),
+//                 ),
+//                 UIHelper.verticalSpaceMediumPlus,
+//                 AppButton(
+//                   onPressed: () {
+//                     NavigateClass().pushNamed(
+//                       context: context,
+//                       routName: Routes.success,
+//                     );
+//                   },
+//                   buttonText: "Pay",
+//                 ),
+//               ],
+//             ),
+//           ),
+//         );
+//       },
+//     );
+//   }
+// }

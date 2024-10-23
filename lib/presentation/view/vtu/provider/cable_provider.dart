@@ -8,6 +8,7 @@ import '../../../../app/app_constants.dart';
 import '../../../../app/functions.dart';
 import '../../../../app/services/api_rep/user_services.dart';
 import '../../../resources/resources.dart';
+import '../../home/model/loan_model.dart';
 import '../model/cable_model.dart';
 import '../model/cable_plan_model.dart';
 import '../model/verify_iuc.dart';
@@ -30,13 +31,45 @@ class CableProvider extends BaseViewModel {
   String? customerName;
   String? customerNumber;
 
+  //!-----
+  int currentPage = 0;
+  bool checkNumber = false;
+  int? selectedLoanIndex;
+  final otpField = TextEditingController();
+  TextEditingController iucNumber = TextEditingController();
+  TextEditingController number = TextEditingController();
+  LoanLimit? loanLimit;
+
+  setIndex(int ind) {
+    currentPage = ind;
+    notifyListeners();
+  }
+
+  setCheckNumber(bool state) {
+    checkNumber = state;
+    notifyListeners();
+  }
+
+  setLoanLimit(LoanLimit limit) {
+    loanLimit = limit;
+    notifyListeners();
+  }
+
+  setLoanIndex(int ind) {
+    if (selectedLoanIndex == ind) {
+      selectedLoanIndex = null;
+    } else {
+      selectedLoanIndex = ind;
+    }
+    notifyListeners();
+  }
+
   setString(String newCode, String newName) {
     cableCode = newCode;
     cableName = newName;
     notifyListeners();
     print("set fields s-----> $cableName ----- $cableCode");
   }
-
 
   setOtp(String newOtp) {
     otp = newOtp;
@@ -134,7 +167,6 @@ class CableProvider extends BaseViewModel {
     print("bode for verify ---> $body");
     try {
       var request = await UserApiServices().verifyIucNumber(body);
-      print("response derrt for verify ---> $request");
       if (request != null) {
         if (request["success"] == true) {
           var iucResponse = VerifyIucData.fromJson(request['data']);
@@ -162,22 +194,26 @@ class CableProvider extends BaseViewModel {
     }
   }
 
-  void purchaseCable(
-      {required BuildContext ctx,
-      required String iuc,
-      }) async {
+  void purchaseCable({
+    required BuildContext ctx,
+    required String iuc,
+    required String amount,
+    int topUp = 1,
+  }) async {
     dismissKeyboard(context);
     changeLoaderStatus(true);
     var body = {
       "cableName": cableName,
       "cablePlan": cablePlan!.plan,
       "cableNumber": iuc,
+      "amount": amount,
+      "top_up": topUp,
       "customerName": customerName,
       "customerPhoneNumber": customerNumber,
-      "pin": otp,
+      "pin": otpField.text.trim(),
     };
 
-    print("object for airtime purchase ---> $body");
+    print("object for cable purchase ---> $body");
     try {
       var request = await UserApiServices().purchaseCable(body);
       changeLoaderStatus(false);
@@ -207,42 +243,46 @@ class CableProvider extends BaseViewModel {
     }
   }
 
-  
   void verifyPin(
       {required BuildContext ctx, required Function onSuccess}) async {
     dismissKeyboard(context);
     changeLoaderStatus(true);
     var body = {
-      "pin": otp,
+      "pin": otpField.text.trim(),
     };
 
     try {
       var request = await UserApiServices().verifyPin(body);
       changeLoaderStatus(false);
+      print("pin verification ---> $request");
       if (request != null) {
         if (request["status"] == true) {
-          onSuccess();
+          await onSuccess();
         } else {
+          Navigator.pop(ctx);
           MekNotification().showMessage(
             ctx,
             message: request['message'].toString(),
           );
+          otpField.clear();
         }
       } else {
+        Navigator.pop(ctx);
         MekNotification().showMessage(
           ctx,
           message: request['message'].toString(),
         );
+        otpField.clear();
       }
     } catch (e) {
-      MekNotification().showMessage(
+      Navigator.pop(ctx);
+     MekNotification().showMessage(
         ctx,
-        message: e.toString(),
+        message: "An error occurred, Please check your internet connection",
       );
+      otpField.clear();
     }
   }
-
-
 
   @override
   FutureOr<void> disposeState() {}

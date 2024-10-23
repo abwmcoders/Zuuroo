@@ -638,7 +638,6 @@ class Airtime extends StatelessWidget {
                           amount: vtuProvider.amountController.text,
                           number: vtuProvider.numberController.text,
                           provider: vtuProvider,
-                          topUp: 2,
                           ctx: context);
                     } else {
                       MekNotification().showMessage(
@@ -1032,6 +1031,7 @@ class Airtime extends StatelessWidget {
     );
   }
 }
+
 
 
 String calculateLoanRepayment(String amount, String perc) {

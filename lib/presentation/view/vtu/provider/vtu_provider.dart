@@ -57,12 +57,19 @@ class VtuProvider extends BaseViewModel {
   final otpField = TextEditingController();
   TextEditingController amountController = TextEditingController(text: "");
   TextEditingController numberController = TextEditingController(text: "");
+  TextEditingController meterNumber = TextEditingController();
   LoanLimit? loanLimit;
   DataCategory? selectedDataCat;
   DataPlan? selectedDataPlan;
+  bool checkNumber = false;
 
   setIndex(int ind) {
     currentPage = ind;
+    notifyListeners();
+  }
+
+  setCheckNumber(bool state) {
+    checkNumber = state;
     notifyListeners();
   }
 
@@ -224,7 +231,6 @@ class VtuProvider extends BaseViewModel {
 
   getBiller() async {
     final response = await UserApiServices().getBillerList();
-    log("billers resp -----> $response");
     if (response != null && response['data'] != null) {
       List<BillerData> _billerResult = AppConstants.billerModel ?? [];
       for (dynamic biller in response['data']) {
@@ -262,11 +268,10 @@ class VtuProvider extends BaseViewModel {
 
   getDataCategory(String code) async {
     final response = await UserApiServices().getDataCatList(code);
-    print("data categories ---> $response");
     if (response != null) {
       List<DataCategory> _operatorsResults = [];
       for (dynamic operator in response['data']) {
-        final operators = OperatorModel.fromJson(operator);
+        final operators = DataCategory.fromJson(operator);
         bool exists = _operatorsResults.any((existingOperator) =>
             existingOperator.operatorCode == operators.operatorCode);
         if (!exists) {
@@ -275,6 +280,28 @@ class VtuProvider extends BaseViewModel {
           );
         }
         AppConstants.dataCategoryModel = _operatorsResults;
+        notifyListeners();
+      }
+    }
+  }
+
+  getDataPlan(String operatorCode, categoryCode) async {
+    final response = await UserApiServices().getDataPlanList({
+      "operator_code": operatorCode,
+      "category_code": categoryCode,
+    });
+    if (response != null) {
+      List<DataPlan> _operatorsResults = [];
+      for (dynamic operator in response['data']) {
+        final operators = DataPlan.fromJson(operator);
+        bool exists = _operatorsResults.any((existingOperator) =>
+            existingOperator.operatorCode == operators.operatorCode);
+        if (!exists) {
+          _operatorsResults.add(
+            DataPlan.fromJson(operator),
+          );
+        }
+        AppConstants.dataPlanModel = _operatorsResults;
         notifyListeners();
       }
     }
@@ -326,21 +353,71 @@ class VtuProvider extends BaseViewModel {
     }
   }
 
+  void purchaseData({
+    required BuildContext ctx,
+    int topUp = 1,
+    required String pin,
+  }) async {
+    dismissKeyboard(context);
+    changeLoaderStatus(true);
+    var body = {
+      "pin": pin,
+      "top_up": topUp,
+      "country": countryCode,
+      "phoneNumber": numberController.text.trim(),
+      "network_operator":
+          operatorCode ?? AppConstants.operatorModel![0].operatorCode,
+      "data_plan": selectedDataPlan!.productCode,
+    };
+
+    print("object for data purchase ---> $body");
+    try {
+      var request = await UserApiServices().purchaseData(body);
+      print("response for data purchase ---> $request");
+      changeLoaderStatus(false);
+      if (request != null) {
+        if (request["status"] == true) {
+          NavigateClass().pushNamed(
+            context: ctx,
+            routName: Routes.success,
+          );
+        } else {
+          MekNotification().showMessage(
+            ctx,
+            message: request['message'].toString(),
+          );
+        }
+      } else {
+        MekNotification().showMessage(
+          ctx,
+          message: "An error occurred, Please check your internet connection",
+        );
+      }
+    } catch (e) {
+      MekNotification().showMessage(
+        ctx,
+        message: "An error occurred, Please try again later",
+      );
+    }
+  }
+
   void purchaseBill(
       {required BuildContext ctx,
       required String meterNumber,
-      String meterType = "prepaid",
+      required String pin,
+      int topUp = 1,
       required String amount}) async {
     dismissKeyboard(context);
     changeLoaderStatus(true);
     var body = {
       "billerName": billerCode,
-      "meterType": meterType,
+      "meterType": metr,
+      "top_up": topUp,
       "meterNumber": meterNumber,
       "amount": amount,
       "customerName": customerName,
-      "customerPhoneNumber": customerNumber,
-      "pin": otp,
+      "customerPhoneNumber": numberController.text.trim(),
+      "pin": pin,
     };
 
     print("object for airtime purchase ---> $body");

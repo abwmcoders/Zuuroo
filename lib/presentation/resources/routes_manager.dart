@@ -97,9 +97,9 @@ class RouteGenerator {
       case Routes.betRoute:
         return MaterialPageRoute(builder: (_) => const Bet());
       case Routes.electRoute:
-        return MaterialPageRoute(builder: (_) => const Bill());
+        return MaterialPageRoute(builder: (_) => Bill());
       case Routes.cableRoute:
-        return MaterialPageRoute(builder: (_) => const Cable());
+        return MaterialPageRoute(builder: (_) => Cable());
       case Routes.success:
         return MaterialPageRoute(builder: (_) => const SuccessScreen());
       case Routes.addMoney:

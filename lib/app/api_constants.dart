@@ -13,6 +13,7 @@ class ApiConstants {
   static const String dataCat = "product/categories-byoperator/";
   static const String cablePlan = "cable-plans/provider/";
   static const String airtime = "airtime/purchase";
+  static const String data = "data/purchase";
   static const String cablePayment = "cable/payment";
   static const String bill = "bill/payment";
   static const String pin = "user/verify-pin";
