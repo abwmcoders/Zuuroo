@@ -144,19 +144,21 @@ class _SupportState extends State<Support> {
                                   .data.length, //_cBeneficiary.data!.length,
                               itemBuilder: (context, index) {
                                 return supportTile(
-                                  _socials.data[index].pageName,
-                                  _socials.data[index].pageName.toLowerCase() ==
+                                  _socials.data[index].pageType,
+                                  _socials.data[index].pageType.toLowerCase() ==
                                           "facebook"
                                       ? "assets/icons/facebook.png"
-                                      : _socials.data[index].pageName
+                                      : _socials.data[index].pageType
                                                   .toLowerCase() ==
                                               "twitter"
                                           ? "assets/icons/twitter.png"
-                                          : _socials.data[index].pageName
+                                          : _socials.data[index].pageType
                                                       .toLowerCase() ==
                                                   "instagram"
                                               ? "assets/icons/instagram.png"
-                                              : "assets/icons/linkedin.png",
+                                              : _socials.data[index].pageType
+                                                      .toLowerCase() ==
+                                                  "whatsapp" ? "assets/icons/whatsapp.png": "assets/icons/linkedin.png",
                                   _socials.data[index].pageLink,
                                   () {
                                     _launchUrl(_socials.data[index].pageLink);
@@ -237,7 +239,6 @@ class _SupportState extends State<Support> {
                           child: FutureBuilder(
                             future: UserApiServices().getFaqs(),
                             builder: (context, snapshot) {
-                              print('faqs beneficiaries ----> ${snapshot.data}');
                               if (snapshot.hasData) {
                                 FaqsResponse _faqs =
                                     FaqsResponse.fromJson(snapshot.data);
@@ -310,8 +311,10 @@ class _SupportState extends State<Support> {
                                           children: [
                                             Padding(
                                               padding: const EdgeInsets.all(8.0),
-                                              child: Text(faqData[index]['answer']!, style: getRegularStyle(color: ColorManager.deepGreyColor),),
+                                              child: Text(
+                                                _faqs.data[index].answer, style: getRegularStyle(color: ColorManager.deepGreyColor),),
                                             ),
+                                          
                                           ],
                                         ),
                                       ),

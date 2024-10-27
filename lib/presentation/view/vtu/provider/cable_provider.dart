@@ -30,6 +30,7 @@ class CableProvider extends BaseViewModel {
   bool planSet = false;
   String? customerName;
   String? customerNumber;
+  IUCData? selectedIucNumber;
 
   //!-----
   int currentPage = 0;
@@ -42,6 +43,11 @@ class CableProvider extends BaseViewModel {
 
   setIndex(int ind) {
     currentPage = ind;
+    notifyListeners();
+  }
+
+  setIucData(IUCData iuc) {
+    selectedIucNumber = iuc;
     notifyListeners();
   }
 
@@ -158,19 +164,21 @@ class CableProvider extends BaseViewModel {
     }
   }
 
-  Future<VerifyIucData?> verifyIucNumber({
+  verifyIucNumber({
     required BuildContext ctx,
     required String iuc,
   }) async {
     dismissKeyboard(context);
-    var body = {"billersCode": iuc, "serviceID": cableName ?? "GoStartime"};
+    changeLoaderStatus(true);
+    var body = {"iucNumber": iuc, "cableName": cableName};
     print("bode for verify ---> $body");
     try {
       var request = await UserApiServices().verifyIucNumber(body);
+      changeLoaderStatus(false);
       if (request != null) {
-        if (request["success"] == true) {
-          var iucResponse = VerifyIucData.fromJson(request['data']);
-          return iucResponse;
+        if (request["status"] == "true") {
+          var iucResponse = IUCData.fromJson(request['data']);
+          setIucData(iucResponse);
         } else {
           MekNotification().showMessage(
             ctx,
@@ -208,8 +216,8 @@ class CableProvider extends BaseViewModel {
       "cableNumber": iuc,
       "amount": amount,
       "top_up": topUp,
-      "customerName": customerName,
-      "customerPhoneNumber": customerNumber,
+      "customerName": selectedIucNumber!.name,
+      "customerPhoneNumber": number.text.trim(),
       "pin": otpField.text.trim(),
     };
 
@@ -276,7 +284,7 @@ class CableProvider extends BaseViewModel {
       }
     } catch (e) {
       Navigator.pop(ctx);
-     MekNotification().showMessage(
+      MekNotification().showMessage(
         ctx,
         message: "An error occurred, Please check your internet connection",
       );

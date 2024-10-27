@@ -642,8 +642,11 @@ class Home extends StatelessWidget {
                                   );
                                 } else {
                                   return ListView.builder(
-                                    itemCount: 5, //_cBeneficiary.data!.length,
+                                    itemCount: 5,
                                     itemBuilder: (context, index) {
+                                      final entry = _history.data.entries
+                                          .elementAt(index);
+                                      HistoryData historyData = entry.value;
                                       return Column(
                                         children: [
                                           Padding(
@@ -655,7 +658,7 @@ class Home extends StatelessWidget {
                                                   context: context,
                                                   routName:
                                                       Routes.transactionDetail,
-                                                  args: _history.data[index],
+                                                  args: historyData,
                                                 );
                                               },
                                               child: Row(
@@ -671,17 +674,19 @@ class Home extends StatelessWidget {
                                                         width: screenAwareSize(
                                                             60, context),
                                                         padding:
-                                                            const EdgeInsets.all(
-                                                                5),
-                                                        decoration: BoxDecoration(
-                                                          shape: BoxShape.circle,
+                                                            const EdgeInsets
+                                                                .all(5),
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          shape:
+                                                              BoxShape.circle,
                                                           color: ColorManager
                                                               .primaryColor
                                                               .withOpacity(.2),
                                                         ),
                                                         child: Center(
                                                             child: Text(
-                                                          _history.data[index]
+                                                          historyData
                                                               .operatorCode
                                                               .substring(0, 2)
                                                               .toUpperCase(),
@@ -701,7 +706,7 @@ class Home extends StatelessWidget {
                                                                 .start,
                                                         children: [
                                                           Text(
-                                                            _history.data[index]
+                                                            historyData
                                                                 .purchase,
                                                             style: getBoldStyle(
                                                               color: ColorManager
@@ -713,8 +718,9 @@ class Home extends StatelessWidget {
                                                               .verticalSpaceSmall,
                                                           Text(
                                                             //"July 12th, 11:45:04",
-                                                            _history.data[index]
-                                                                .completedUtc,
+                                                            historyData
+                                                                .completedUtc
+                                                                .toString(),
                                                             style:
                                                                 getRegularStyle(
                                                               color: ColorManager
@@ -728,54 +734,59 @@ class Home extends StatelessWidget {
                                                   ),
                                                   Column(
                                                     crossAxisAlignment:
-                                                        CrossAxisAlignment.start,
+                                                        CrossAxisAlignment
+                                                            .start,
                                                     children: [
                                                       Text(
                                                         //"₦ 2000.00",
-                                                        "₦ ${_history.data[index].sellingPrice}",
+                                                        "₦ ${historyData.sellingPrice}",
                                                         style: getBoldStyle(
                                                           color: ColorManager
                                                               .blackColor,
                                                           fontSize: 12,
                                                         ),
                                                       ),
-                                                      UIHelper.verticalSpaceSmall,
+                                                      UIHelper
+                                                          .verticalSpaceSmall,
                                                       Container(
-                                                        padding: const EdgeInsets
-                                                            .symmetric(
-                                                            horizontal: 8,
-                                                            vertical: 5),
-                                                        decoration: BoxDecoration(
-                                                          color: _history
-                                                                      .data[index]
-                                                                      .processingState !=
-                                                                  "delivered"
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .symmetric(
+                                                                horizontal: 8,
+                                                                vertical: 5),
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          color: historyData
+                                                                      .processingState
+                                                                      .toLowerCase() ==
+                                                                  "failed"
                                                               ? ColorManager
                                                                   .errorColor
-                                                                  .withOpacity(.1)
+                                                                  .withOpacity(
+                                                                      .1)
                                                               : ColorManager
-                                                                      .activeColor
-                                                                      .withOpacity(
-                                                                          .1),
+                                                                  .activeColor
+                                                                  .withOpacity(
+                                                                      .1),
                                                           borderRadius:
                                                               BorderRadius
                                                                   .circular(10),
                                                         ),
                                                         child: Text(
                                                           //"Successful",
-                                                          _history.data[index]
+                                                          historyData
                                                               .processingState
                                                               .toString(),
-                                                          style: getRegularStyle(
-                                                            color: _history
-                                                                        .data[
-                                                                            index]
-                                                                        .processingState !=
-                                                                    "delivered"
+                                                          style:
+                                                              getRegularStyle(
+                                                            color: historyData
+                                                                        .processingState
+                                                                        .toLowerCase() ==
+                                                                    "failed"
                                                                 ? ColorManager
                                                                     .errorColor
                                                                 : ColorManager
-                                                                        .activeColor,
+                                                                    .activeColor,
                                                             fontSize: 10,
                                                           ),
                                                         ),
@@ -792,6 +803,7 @@ class Home extends StatelessWidget {
                                       );
                                     },
                                   );
+                      
                                 }
                               } else if (snapshot.hasError) {
                                 return Column(

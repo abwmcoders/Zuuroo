@@ -1,63 +1,38 @@
-class VerifyIucResponse {
-  final bool success;
-  final int statusCode;
-  final VerifyIucData data;
+class VerifyIUCResponse {
+  final bool status;
   final String message;
+  final IUCData data;
 
-  VerifyIucResponse({
-    required this.success,
-    required this.statusCode,
-    required this.data,
+  VerifyIUCResponse({
+    required this.status,
     required this.message,
+    required this.data,
   });
 
-  factory VerifyIucResponse.fromJson(Map<String, dynamic> json) {
-    return VerifyIucResponse(
-      success: json['success'],
-      statusCode: json['statusCode'],
-      data: VerifyIucData.fromJson(json['data']),
+  // Factory method to create an instance from JSON
+  factory VerifyIUCResponse.fromJson(Map<String, dynamic> json) {
+    return VerifyIUCResponse(
+      status: json['status'].toString() == 'true', // Convert to boolean
       message: json['message'],
+      data: IUCData.fromJson(json['data']),
     );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'success': success,
-      'statusCode': statusCode,
-      'data': data.toJson(),
-      'message': message,
-    };
   }
 }
 
-class VerifyIucData {
-  final String iucNumber;
-  final String customerName;
-  final String customerNumber;
-  final String serviceID;
+class IUCData {
+  final bool invalid;
+  final String name;
 
-  VerifyIucData({
-    required this.iucNumber,
-    required this.customerName,
-    required this.customerNumber,
-    required this.serviceID,
+  IUCData({
+    required this.invalid,
+    required this.name,
   });
 
-  factory VerifyIucData.fromJson(Map<String, dynamic> json) {
-    return VerifyIucData(
-      iucNumber: json['iucNumber'],
-      customerName: json['customerName'],
-      customerNumber: json['customerNumber'],
-      serviceID: json['serviceID'],
+  // Factory method to create an instance from JSON
+  factory IUCData.fromJson(Map<String, dynamic> json) {
+    return IUCData(
+      invalid: json['invalid'],
+      name: json['name'],
     );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'iucNumber': iucNumber,
-      'customerName': customerName,
-      'customerNumber': customerNumber,
-      'serviceID': serviceID,
-    };
   }
 }

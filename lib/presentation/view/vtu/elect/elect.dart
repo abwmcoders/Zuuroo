@@ -16,7 +16,6 @@ import '../../history/transaction_details.dart';
 import '../airtime/airtime.dart';
 import '../data/data.dart';
 
-
 class Bill extends StatelessWidget {
   Bill({super.key});
 
@@ -37,7 +36,9 @@ class Bill extends StatelessWidget {
 
   Widget _buildScreen(BuildContext context, VtuProvider cableProvider) {
     return Scaffold(
-      appBar: const SimpleAppBar(title: "Electricity",),
+      appBar: const SimpleAppBar(
+        title: "Electricity",
+      ),
       body: ContainerWidget(
         content: Form(
           key: formKey,
@@ -154,7 +155,8 @@ class Bill extends StatelessWidget {
                   padding: const EdgeInsets.all(10.0),
                   child: AppPinField(
                     length: 4,
-                    onCompleted: (_) => provider.verifyPin(
+                    onCompleted: (_) =>
+                    provider.verifyPin(
                       ctx: context,
                       onSuccess: () {
                         Navigator.pop(context);
@@ -165,7 +167,7 @@ class Bill extends StatelessWidget {
                           topUp: topUp,
                           amount: topUp == 2
                               ? calculateLoanRepayment(
-                                  provider.amountController.text.trim(),
+                                  amount.text.trim(),
                                   provider.loanLimit!.percentage)
                               : provider.amountController.text.trim(),
                         );
@@ -254,11 +256,22 @@ class Bill extends StatelessWidget {
                     ],
                   ),
                 ),
-                CheckoutTile(title: "Payment Number", value: number,),
-                CheckoutTile(title: "Biller Name", value: biller.billerName,),
-                CheckoutTile(title: "Biller Code", value: biller.billerCode,),
-                CheckoutTile(title: "Meter Number", value: meterNumber,),
-                CheckoutTile(title: "Meter Type", value: mrterType,),
+                CheckoutTile(
+                  title: "Payment Number",
+                  value: number,
+                ),
+                CheckoutTile(
+                  title: "Biller Name",
+                  value: biller.billerName,
+                ),
+                CheckoutTile(
+                  title: "Meter Number",
+                  value: meterNumber,
+                ),
+                CheckoutTile(
+                  title: "Meter Type",
+                  value: mrterType,
+                ),
                 UIHelper.verticalSpaceSmall,
                 Container(
                   padding:
@@ -272,7 +285,7 @@ class Bill extends StatelessWidget {
                       Row(
                         children: [
                           Text(
-                            "Wallet Balance",
+                            topUp == 2 ? "Loan Balance" : "Wallet Balance",
                             style: getBoldStyle(
                               color: ColorManager.blackColor,
                               fontSize: 12,
@@ -289,20 +302,22 @@ class Bill extends StatelessWidget {
                           ),
                         ],
                       ),
-                    int.parse(AppConstants.homeModel!.data.wallet.balance) >=
-                              int.parse(amount)
-                          ? topUp == 2 ? Icon(
+                      topUp == 2
+                          ? Icon(
                               Icons.check,
                               color: ColorManager.activeColor,
                             )
-                          : Icon(
-                              Icons.close,
-                              color: ColorManager.primaryColor,
-                            )
-                          : Icon(
-                              Icons.close,
-                              color: ColorManager.primaryColor,
-                            )
+                          : int.parse(AppConstants
+                                      .homeModel!.data.wallet.balance) >=
+                                  int.parse(amount)
+                              ? Icon(
+                                  Icons.check,
+                                  color: ColorManager.activeColor,
+                                )
+                              : Icon(
+                                  Icons.close,
+                                  color: ColorManager.primaryColor,
+                                ),
                     ],
                   ),
                 ),
@@ -312,10 +327,10 @@ class Bill extends StatelessWidget {
                     double? balance = double.tryParse(
                         AppConstants.homeModel?.data.wallet.balance ?? '');
                     double? inputAmount = double.tryParse(amount);
-                    if(topUp == 2) {
+                    if (topUp == 2) {
                       Navigator.pop(ctx);
                       _otpInput(provider: provider, topUp: topUp, context: ctx);
-                    }else {
+                    } else {
                       if (balance != null &&
                           inputAmount != null &&
                           balance >= inputAmount) {
@@ -330,9 +345,8 @@ class Bill extends StatelessWidget {
                         );
                       }
                     }
-                    
                   },
-                  buttonText: "Pay",
+                  buttonText: "Continue",
                 ),
               ],
             ),
@@ -342,383 +356,307 @@ class Bill extends StatelessWidget {
     );
   }
 
-  Padding _buyWidget(VtuProvider vtuProvider, BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: ListView(
-        children: [
-          //! Select Biller
-          SelectBiller(
-            vtuProvider: vtuProvider,
-          ),
-          UIHelper.verticalSpaceMedium,
-          //! Select meter type
-          selectMeterType(vtuProvider, context),
-          UIHelper.verticalSpaceMedium,
-          //! amount
-          buildAmount(),
-          UIHelper.verticalSpaceMedium,
-          //! number
-          buildNumber(vtuProvider),
-          UIHelper.verticalSpaceMedium,
-          //! Meter number
-          buildmeterNumber(vtuProvider),
-          UIHelper.verticalSpaceMedium,
-
-          vtuProvider.checkNumber
-              ? FutureBuilder<VerifyMeterNumberData?>(
-                  future: vtuProvider.verifyMeterNumber(
-                    ctx: context,
-                    ctr: vtuProvider.meterNumber.text.trim(),
-                    billerCode: "12334555666",
-                  ),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return CircularProgressIndicator(); // Show loading indicator while waiting
-                    } else if (snapshot.hasError) {
-                      return Text('Error: ${snapshot.error}');
-                    } else if (snapshot.hasData && snapshot.data != null) {
-                      vtuProvider.setCustomerName(snapshot.data!.customerName,
-                          snapshot.data!.customerNumber);
-                      return Text(
-                        'Customer Name: ${snapshot.data!.customerName}',
+  Widget _buyWidget(VtuProvider vtuProvider, BuildContext context) {
+    return GestureDetector(
+      onTap: (){
+        if (vtuProvider.meterNumber.text != '' &&
+            vtuProvider.selectedBiller != null &&
+            vtuProvider.metr != null) {
+          vtuProvider.verifyMeterNumber(
+            ctx: context,
+            ctr: vtuProvider.meterNumber.text.trim(),
+            billerCode: vtuProvider.selectedBiller!.billerName,
+            meterType: vtuProvider.metr!,
+          );
+        } 
+      },
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: ListView(
+          children: [
+            //! Select Biller
+            SelectBiller(
+              vtuProvider: vtuProvider,
+            ),
+            UIHelper.verticalSpaceMedium,
+            //! Select meter type
+            selectMeterType(vtuProvider, context),
+            UIHelper.verticalSpaceMedium,
+            //! amount
+            AmountReUseWidget(
+              controller: amount,
+              showCurrency: true,
+            ),
+            UIHelper.verticalSpaceMedium,
+            //! number
+            AmountReUseWidget(
+              title: "Phone Number",
+              controller: vtuProvider.numberController,
+            ),
+            UIHelper.verticalSpaceMedium,
+             //! Meter number
+           AmountReUseWidget(
+              callFunc: true,
+              title: "Meter Number",
+              controller: vtuProvider.meterNumber,
+              onComplete: () {
+                vtuProvider.verifyMeterNumber(
+                  ctx: context,
+                  ctr: vtuProvider.meterNumber.text.trim(),
+                  billerCode: vtuProvider.selectedBiller!.billerName,
+                  meterType: vtuProvider.metr!,
+                );
+              },
+            ),
+            UIHelper.verticalSpaceMedium,
+            vtuProvider.selectedMeterData != null
+                ? Column(
+                    children: [
+                      Text(
+                        'Customer Name: ${vtuProvider.selectedMeterData!.name}',
                         style: getBoldStyle(
                             color: ColorManager.activeColor, fontSize: 16),
-                      );
-                    } else {
-                      return Text(
-                        'Invalid meter number',
+                      ),
+                      UIHelper.verticalSpaceSmall,
+                      Text(
+                        'Customer Address: ${vtuProvider.selectedMeterData!.address}',
                         style: getBoldStyle(
-                            color: ColorManager.primaryColor, fontSize: 16),
-                      );
-                    }
-                  },
-                )
-              : Container(),
-          UIHelper.verticalSpaceLarge,
-          UIHelper.verticalSpaceLarge,
-          Row(
-            children: [
-              Expanded(
-                child: AppButton(
-                  buttonText: "Submit",
-                  onPressed: () {
-                    if (vtuProvider.customerName != null) {
-                      if (vtuProvider.billerCode != null ||
-                          vtuProvider.billerName != null) {
-                        _confirmationBottomSheetMenu(
-                          meterNumber: vtuProvider.meterNumber.text.trim(),
-                          mrterType: vtuProvider.metr!,
-                          biller: vtuProvider.selectedBiller!,
-                          amount: amount.text.trim(),
-                          number: vtuProvider.numberController.text.trim(),
-                          provider: vtuProvider,
-                          ctx: context,
-                        );
+                            color: ColorManager.activeColor, fontSize: 16),
+                      ),
+                    ],
+                  )
+                : Container(),
+            UIHelper.verticalSpaceLarge,
+            UIHelper.verticalSpaceLarge,
+            Row(
+              children: [
+                Expanded(
+                  child: AppButton(
+                    buttonText: "Submit",
+                    onPressed: () {
+                      if(formKey.currentState!.validate()) {
+                      if (vtuProvider.selectedMeterData != null) {
+                        if (vtuProvider.billerCode != null ||
+                            vtuProvider.billerName != null) {
+                          _confirmationBottomSheetMenu(
+                            meterNumber: vtuProvider.meterNumber.text.trim(),
+                            mrterType: vtuProvider.metr!,
+                            biller: vtuProvider.selectedBiller!,
+                            amount: amount.text.trim(),
+                            number: vtuProvider.numberController.text.trim(),
+                            provider: vtuProvider,
+                            ctx: context,
+                          );
+                        } else {
+                          MekNotification().showMessage(
+                            context,
+                            message: "Please select a biller name and code !!!",
+                          );
+                        }
                       } else {
                         MekNotification().showMessage(
                           context,
-                          message: "Please select a biller name and code !!!",
+                          message: "Unverified Meter number !!!",
                         );
                       }
-                    } else {
-                      MekNotification().showMessage(
-                        context,
-                        message: "Unverified Meter number !!!",
-                      );
-                    }
-                  },
-                  height: 30,
-                ),
-              ),
-              UIHelper.horizontalSpaceSmall,
-              Expanded(
-                child: AppButton(
-                  buttonText: "Back",
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  height: 30,
-                  borderColor: ColorManager.primaryColor,
-                  buttonColor: ColorManager.whiteColor,
-                  buttonTextColor: ColorManager.primaryColor,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Padding _loanWidget(VtuProvider vtuProvider, BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: ListView(
-        children: [
-          //! Select Biller
-          SelectBiller(
-            vtuProvider: vtuProvider,
-          ),
-          UIHelper.verticalSpaceMedium,
-          //! Select meter type
-          selectMeterType(vtuProvider, context),
-          UIHelper.verticalSpaceMedium,
-          //! amount
-          buildAmount(),
-          UIHelper.verticalSpaceMedium,
-          //! number
-          buildNumber(vtuProvider),
-          UIHelper.verticalSpaceMedium,
-          //! Meter number
-          buildmeterNumber(vtuProvider),
-          UIHelper.verticalSpaceMedium,
-          vtuProvider.checkNumber
-              ? FutureBuilder<VerifyMeterNumberData?>(
-                  future: vtuProvider.verifyMeterNumber(
-                    ctx: context,
-                    ctr: vtuProvider.meterNumber.text.trim(),
-                    billerCode: vtuProvider.selectedBiller!.billerCode,
+                      } else {
+                        MekNotification().showMessage(
+                          context,
+                          message: "Please fill out all fields!!!",
+                        );
+                      }
+                    },
+                    height: 30,
                   ),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
-                    decoration: BoxDecoration(
-                      color: ColorManager.greyColor.withOpacity(.4),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Text(
-                      "Loading .....",
-                      style: getBoldStyle(color: ColorManager.deepGreyColor),
-                    ),
-                  ); // Show loading indicator while waiting
-                    } else if (snapshot.hasError) {
-                      return Text('Error: ${snapshot.error}');
-                    } else if (snapshot.hasData && snapshot.data != null) {
-                      vtuProvider.setCustomerName(snapshot.data!.customerName,
-                          snapshot.data!.customerNumber);
-                      return Text(
-                        'Customer Name: ${snapshot.data!.customerName}',
-                        style: getBoldStyle(
-                            color: ColorManager.activeColor, fontSize: 16),
-                      );
-                    } else {
-                      return Text(
-                        'Invalid meter number',
-                        style: getBoldStyle(
-                            color: ColorManager.primaryColor, fontSize: 16),
-                      );
-                    }
-                  },
-                )
-              : Container(),
-          UIHelper.verticalSpaceMedium,
-
-          //! LOAN ---------
-          Text(
-            "Loan",
-            style: getBoldStyle(
-              color: ColorManager.deepGreyColor,
-              fontSize: 14,
+                ),
+                UIHelper.horizontalSpaceSmall,
+                Expanded(
+                  child: AppButton(
+                    buttonText: "Back",
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    height: 30,
+                    borderColor: ColorManager.primaryColor,
+                    buttonColor: ColorManager.whiteColor,
+                    buttonTextColor: ColorManager.primaryColor,
+                  ),
+                ),
+              ],
             ),
-          ),
-          UIHelper.verticalSpaceSmall,
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: List.generate(
-              AppConstants.loanModel!.length,
-              (index) => Expanded(
-                child: SelectLoanPeriod(
-                  accountType:
-                      "${AppConstants.loanModel![index].labelName} Days",
-                  active: vtuProvider.selectedLoanIndex == index ? true : false,
-                  onPressed: () {
-                    vtuProvider.setLoanIndex(index);
-                    vtuProvider.setLoanLimit(AppConstants.loanModel![index]);
-                  },
-                ),
-              ),
-            ),
-          ),
-          UIHelper.verticalSpaceMedium,
-
-          vtuProvider.loanLimit != null && amount.text != ""
-              ? AppAmountField(
-                  isEdit: false,
-                  title: "Loan Repayment",
-                  label: calculateLoanRepayment(
-                      amount.text, vtuProvider.loanLimit!.percentage),
-                )
-              : Container(),
-          UIHelper.verticalSpaceLarge,
-          Row(
-            children: [
-              Expanded(
-                child: AppButton(
-                  buttonText: "Submit",
-                  onPressed: () {
-                    if (formKey.currentState!.validate()) {
-                      _confirmationBottomSheetMenu(
-                        meterNumber: vtuProvider.meterNumber.text.trim(),
-                        mrterType: vtuProvider.metr!,
-                        biller: vtuProvider.selectedBiller!,
-                        ctx: context,
-                        topUp: 2,
-                        amount: calculateLoanRepayment(
-                            amount.text, vtuProvider.loanLimit!.percentage),
-                        number: vtuProvider.numberController.text.trim(),
-                        provider: vtuProvider,
-                      );
-                    } else {
-                      //Navigator.pop(context);
-                      MekNotification().showMessage(
-                        context,
-                        message: "Please fill out all fields!!!",
-                      );
-                    }
-                  },
-                  height: 30,
-                ),
-              ),
-              UIHelper.horizontalSpaceSmall,
-              Expanded(
-                child: AppButton(
-                  buttonText: "Back",
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  height: 30,
-                  borderColor: ColorManager.primaryColor,
-                  buttonColor: ColorManager.whiteColor,
-                  buttonTextColor: ColorManager.primaryColor,
-                ),
-              ),
-            ],
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
-  Widget buildAmount() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          "Amount",
-          style: getBoldStyle(
-            color: ColorManager.deepGreyColor,
-            fontSize: 14,
-          ),
-        ),
-        UIHelper.verticalSpaceSmall,
-        Container(
-          alignment: Alignment.centerLeft,
-          decoration: BoxDecoration(
-            color: ColorManager.greyColor.withOpacity(.4),
-            borderRadius: BorderRadius.circular(10),
-          ),
-          height: 40,
-          child: Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: TextField(
-              keyboardType: TextInputType.number,
+  Widget _loanWidget(VtuProvider vtuProvider, BuildContext context) {
+    return GestureDetector(
+      onTap: (){
+        if(vtuProvider.meterNumber.text != '' && vtuProvider.selectedBiller != null && vtuProvider.metr != null){
+          vtuProvider.verifyMeterNumber(
+            ctx: context,
+            ctr: vtuProvider.meterNumber.text.trim(),
+            billerCode: vtuProvider.selectedBiller!.billerName,
+            meterType: vtuProvider.metr!,
+          );
+        } 
+      },
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: ListView(
+          children: [
+            //! Select Biller
+            SelectBiller(
+              vtuProvider: vtuProvider,
+            ),
+            UIHelper.verticalSpaceMedium,
+            //! Select meter type
+            selectMeterType(vtuProvider, context),
+            UIHelper.verticalSpaceMedium,
+            //! amount
+            AmountReUseWidget(
               controller: amount,
-              style: const TextStyle(color: Colors.black87),
-              decoration: const InputDecoration(
-                  border: InputBorder.none,
-                  enabledBorder: InputBorder.none,
-                  focusedBorder: InputBorder.none,
-                  hintText: 'Enter amount',
-                  hintStyle: TextStyle(color: Colors.black38)),
+              showCurrency: true,
             ),
-          ),
-        )
-      ],
-    );
-  }
-
-  Widget buildNumber(VtuProvider vtuProvider) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          "Phone Number",
-          style: getBoldStyle(
-            color: ColorManager.deepGreyColor,
-            fontSize: 14,
-          ),
-        ),
-        UIHelper.verticalSpaceSmall,
-        Container(
-          alignment: Alignment.centerLeft,
-          decoration: BoxDecoration(
-            color: ColorManager.greyColor.withOpacity(.4),
-            borderRadius: BorderRadius.circular(10),
-          ),
-          height: 40,
-          child: Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: TextField(
-              keyboardType: TextInputType.number,
+            UIHelper.verticalSpaceMedium,
+            //! number
+            AmountReUseWidget(
+              title: "Phone Number",
               controller: vtuProvider.numberController,
-              style: const TextStyle(color: Colors.black87),
-              decoration: const InputDecoration(
-                  border: InputBorder.none,
-                  enabledBorder: InputBorder.none,
-                  focusedBorder: InputBorder.none,
-                  hintText: 'Enter amount',
-                  hintStyle: TextStyle(color: Colors.black38)),
             ),
-          ),
-        )
-      ],
-    );
-  }
-
-  Widget buildmeterNumber(VtuProvider vtuProvider) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          "Meter number",
-          style: getBoldStyle(
-            color: ColorManager.deepGreyColor,
-            fontSize: 14,
-          ),
-        ),
-        UIHelper.verticalSpaceSmall,
-        Container(
-          alignment: Alignment.centerLeft,
-          decoration: BoxDecoration(
-            color: ColorManager.greyColor.withOpacity(.4),
-            borderRadius: BorderRadius.circular(10),
-          ),
-          height: 40,
-          child: Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: TextFormField(
-              keyboardType: TextInputType.number,
+            UIHelper.verticalSpaceMedium,
+            //! Meter number
+            AmountReUseWidget(
+              callFunc: true,
+              title: "Meter Number",
               controller: vtuProvider.meterNumber,
-              style: const TextStyle(color: Colors.black87),
-              decoration: const InputDecoration(
-                border: InputBorder.none,
-                enabledBorder: InputBorder.none,
-                focusedBorder: InputBorder.none,
-                hintText: 'Enter meter number',
-                hintStyle: TextStyle(
-                  color: Colors.black38,
-                ),
-              ),
-              onEditingComplete: () {
-                vtuProvider.setCheckNumber(true);
+              onComplete: () {
+                vtuProvider.verifyMeterNumber(
+                  ctx: context,
+                  ctr: vtuProvider.meterNumber.text.trim(),
+                  billerCode: vtuProvider.selectedBiller!.billerName,
+                  meterType: vtuProvider.metr!,
+                );
               },
             ),
-          ),
+            UIHelper.verticalSpaceMedium,
+            vtuProvider.selectedMeterData != null ?  Column(
+                          children: [
+                            Text(
+                              'Customer Name: ${vtuProvider.selectedMeterData!.name}',
+                              style: getBoldStyle(
+                                  color: ColorManager.activeColor, fontSize: 16),
+                            ),
+                            UIHelper.verticalSpaceSmall,
+                            Text(
+                              'Customer Address: ${vtuProvider.selectedMeterData!.address}',
+                              style: getBoldStyle(
+                                  color: ColorManager.activeColor, fontSize: 16),
+                            ),
+                          ],
+                        )
+                      : Container(),
+            UIHelper.verticalSpaceMedium,
+            //! LOAN ---------
+            Text(
+              "Loan",
+              style: getBoldStyle(
+                color: ColorManager.deepGreyColor,
+                fontSize: 14,
+              ),
+            ),
+            UIHelper.verticalSpaceSmall,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: List.generate(
+                AppConstants.loanModel!.length,
+                (index) => Expanded(
+                  child: SelectLoanPeriod(
+                    accountType:
+                        "${AppConstants.loanModel![index].labelName} Days",
+                    active: vtuProvider.selectedLoanIndex == index ? true : false,
+                    onPressed: () {
+                      vtuProvider.setLoanIndex(index);
+                      vtuProvider.setLoanLimit(AppConstants.loanModel![index]);
+                    },
+                  ),
+                ),
+              ),
+            ),
+            UIHelper.verticalSpaceMedium,
+      
+            vtuProvider.loanLimit != null && amount.text != ""
+                ? AmountReUseWidget(
+                    isEdit: false,
+                    title: "Loan Repayment",
+                    label: calculateLoanRepayment(
+                        amount.text, vtuProvider.loanLimit!.percentage),
+                  )
+                : Container(),
+            UIHelper.verticalSpaceLarge,
+            Row(
+              children: [
+                Expanded(
+                  child: AppButton(
+                    buttonText: "Submit",
+                    onPressed: () {
+                      if (formKey.currentState!.validate()) {
+                        if (vtuProvider.selectedMeterData != null) {
+                          if (vtuProvider.billerCode != null ||
+                              vtuProvider.billerName != null) {
+                             _confirmationBottomSheetMenu(
+                              meterNumber: vtuProvider.meterNumber.text.trim(),
+                              mrterType: vtuProvider.metr!,
+                              biller: vtuProvider.selectedBiller!,
+                              ctx: context,
+                              topUp: 2,
+                              amount: calculateLoanRepayment(
+                                  amount.text, vtuProvider.loanLimit!.percentage),
+                              number: vtuProvider.numberController.text.trim(),
+                              provider: vtuProvider,
+                            );
+                          } else {
+                            MekNotification().showMessage(
+                              context,
+                              message: "Please select a biller name and code !!!",
+                            );
+                          }
+                        } else {
+                          MekNotification().showMessage(
+                            context,
+                            message: "Unverified Meter number !!!",
+                          );
+                        }
+                       
+                      } else {
+                        MekNotification().showMessage(
+                          context,
+                          message: "Please fill out all fields!!!",
+                        );
+                      }
+                    },
+                    height: 30,
+                  ),
+                ),
+                UIHelper.horizontalSpaceSmall,
+                Expanded(
+                  child: AppButton(
+                    buttonText: "Back",
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    height: 30,
+                    borderColor: ColorManager.primaryColor,
+                    buttonColor: ColorManager.whiteColor,
+                    buttonTextColor: ColorManager.primaryColor,
+                  ),
+                ),
+              ],
+            ),
+          ],
         ),
-      ],
+      ),
     );
   }
 
@@ -794,8 +732,7 @@ class Bill extends StatelessWidget {
                                 child: Column(
                                   children: [
                                     ...List.generate(
-                                        vtuProvider.meterType.length,
-                                        (index) {
+                                        vtuProvider.meterType.length, (index) {
                                       return InkWell(
                                         onTap: () {
                                           vtuProvider.setMeter(vtuProvider
@@ -1144,4 +1081,3 @@ class SelectLoanPeriod extends StatelessWidget {
     );
   }
 }
-

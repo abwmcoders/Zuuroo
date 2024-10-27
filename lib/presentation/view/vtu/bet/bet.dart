@@ -292,7 +292,7 @@ class _BetState extends State<Bet>  with SingleTickerProviderStateMixin{
                       ),
                     ),
                     UIHelper.verticalSpaceMedium,
-                    const AppAmountField(
+                    const AmountReUseWidget(
                       title: "Loan Repayment",
                     ),
                     UIHelper.verticalSpaceLarge,
@@ -567,7 +567,7 @@ class _BetState extends State<Bet>  with SingleTickerProviderStateMixin{
                       routName: Routes.success,
                     );
                   },
-                  buttonText: "Pay",
+                  buttonText: "Continue",
                 ),
               ],
             ),

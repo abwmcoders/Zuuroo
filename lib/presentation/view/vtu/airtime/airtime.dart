@@ -53,7 +53,7 @@ class Airtime extends StatelessWidget {
                       onTap: () {
                         _pageController.animateToPage(
                           index,
-                          duration: Duration(milliseconds: 300),
+                          duration: const Duration(milliseconds: 300),
                           curve: Curves.easeInOut,
                         );
                       },
@@ -77,16 +77,16 @@ class Airtime extends StatelessWidget {
                               ),
                             ),
                           ),
-                          SizedBox(height: 5),
+                          const SizedBox(height: 5),
                           // Active indicator
                           vtuProvider.currentPage == index
                               ? Container(
                                   height: 4,
                                   width: 50,
-                                  margin: EdgeInsets.only(right: 20),
+                                  margin: const EdgeInsets.only(right: 20),
                                   color: ColorManager.primaryColor,
                                 )
-                              : SizedBox(height: 4),
+                              : const SizedBox(height: 4),
                         ],
                       ),
                     );
@@ -97,7 +97,7 @@ class Airtime extends StatelessWidget {
                 child: PageView.builder(
                   controller: _pageController,
                   itemCount: _titles.length,
-                  physics: NeverScrollableScrollPhysics(),
+                  physics: const NeverScrollableScrollPhysics(),
                   onPageChanged: (index) {
                     vtuProvider.setIndex(index);
                   },
@@ -156,23 +156,22 @@ class Airtime extends StatelessWidget {
                   child: AppPinField(
                     length: 4,
                     onCompleted: (_) => provider.verifyPin(
-                      ctx: context,
-                      onSuccess: () {
-                        Navigator.pop(context);
-                        provider.purchaseAirtime(
-                          ctx: context,
-                          topUp: topUp,
-                          amount: topUp == 2
-                              ? calculateLoanRepayment(
-                                  provider.amountController.text.trim(),
-                                  provider.loanLimit!.percentage)
-                              : provider.amountController.text.trim(),
-                        );
-                      },
-                      onError: (){
+                        ctx: context,
+                        onSuccess: () {
                           Navigator.pop(context);
-                      }
-                    ),
+                          provider.purchaseAirtime(
+                            ctx: context,
+                            topUp: topUp,
+                            amount: topUp == 2
+                                ? calculateLoanRepayment(
+                                    provider.amountController.text.trim(),
+                                    provider.loanLimit!.percentage)
+                                : provider.amountController.text.trim(),
+                          );
+                        },
+                        onError: () {
+                          Navigator.pop(context);
+                        }),
                     controller: provider.otpField,
                     obscure: true,
                     validator: (v) => FieldValidator().validateRequiredLength(
@@ -291,7 +290,7 @@ class Airtime extends StatelessWidget {
                       Row(
                         children: [
                           Text(
-                            "Wallet Balance",
+                            topUp == 2 ? "Loan Balance" : "Wallet Balance",
                             style: getBoldStyle(
                               color: ColorManager.blackColor,
                               fontSize: 12,
@@ -308,16 +307,22 @@ class Airtime extends StatelessWidget {
                           ),
                         ],
                       ),
-                      int.parse(AppConstants.homeModel!.data.wallet.balance) >=
-                              int.parse(amount)
+                      topUp == 2
                           ? Icon(
                               Icons.check,
                               color: ColorManager.activeColor,
                             )
-                          : Icon(
-                              Icons.close,
-                              color: ColorManager.primaryColor,
-                            )
+                          : int.parse(AppConstants
+                                      .homeModel!.data.wallet.balance) >=
+                                  int.parse(amount)
+                              ? Icon(
+                                  Icons.check,
+                                  color: ColorManager.activeColor,
+                                )
+                              : Icon(
+                                  Icons.close,
+                                  color: ColorManager.primaryColor,
+                                )
                     ],
                   ),
                 ),
@@ -327,20 +332,26 @@ class Airtime extends StatelessWidget {
                     double? balance = double.tryParse(
                         AppConstants.homeModel?.data.wallet.balance ?? '');
                     double? inputAmount = double.tryParse(amount);
-                    if (balance != null &&
-                        inputAmount != null &&
-                        balance >= inputAmount) {
+                    if (topUp == 2) {
                       Navigator.pop(ctx);
                       _otpInput(provider: provider, topUp: topUp, context: ctx);
                     } else {
-                      Navigator.pop(ctx);
-                      MekNotification().showMessage(
-                        ctx,
-                        message: "Insufficient fund !!!",
-                      );
+                      if (balance != null &&
+                          inputAmount != null &&
+                          balance >= inputAmount) {
+                        Navigator.pop(ctx);
+                        _otpInput(
+                            provider: provider, topUp: topUp, context: ctx);
+                      } else {
+                        Navigator.pop(ctx);
+                        MekNotification().showMessage(
+                          ctx,
+                          message: "Insufficient fund !!!",
+                        );
+                      }
                     }
                   },
-                  buttonText: "Pay",
+                  buttonText: "Continue",
                 ),
               ],
             ),
@@ -741,8 +752,9 @@ class Airtime extends StatelessWidget {
               // ),
               Text(
                 vtuProvider.operatorSet == true
-                    ? vtuProvider.operatorCode ??
-                        AppConstants.operatorModel!.first.operatorCode
+                    ? vtuProvider.operatorCode != null
+                        ? vtuProvider.operatorCode!.toUpperCase()
+                        : AppConstants.operatorModel!.first.operatorCode
                             .toUpperCase()
                     : "",
                 style: getBoldStyle(
@@ -900,49 +912,9 @@ class Airtime extends StatelessWidget {
             ],
           ),
           UIHelper.verticalSpaceMedium,
-          Text(
-            "Amount",
-            style: getBoldStyle(
-              color: ColorManager.deepGreyColor,
-              fontSize: 14,
-            ),
-          ),
-          UIHelper.verticalSpaceSmall,
-          Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 10,
-            ),
-            decoration: BoxDecoration(
-              color: ColorManager.greyColor.withOpacity(.4),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: TextFormField(
-              keyboardType: const TextInputType.numberWithOptions(),
-              inputFormatters: [
-                FilteringTextInputFormatter.digitsOnly,
-              ],
-              controller: vtuProvider.amountController,
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 1.5,
-                fontFamily: "NT",
-                color: ColorManager.blackColor,
-              ),
-              decoration: InputDecoration(
-                border: InputBorder.none,
-                prefix: Text(
-                  AppConstants.currencySymbol,
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 1.5,
-                    fontFamily: "NT",
-                    color: ColorManager.blackColor,
-                  ),
-                ),
-              ),
-            ),
+          AmountReUseWidget(
+            controller: vtuProvider.amountController,
+            showCurrency: true,
           ),
           UIHelper.verticalSpaceMedium,
           Text(
@@ -971,11 +943,11 @@ class Airtime extends StatelessWidget {
             ),
           ),
           UIHelper.verticalSpaceMedium,
-
           vtuProvider.loanLimit != null &&
                   vtuProvider.amountController.text != ''
-              ? AppAmountField(
+              ? AmountReUseWidget(
                   isEdit: false,
+                  showCurrency: true,
                   title: "Loan Repayment",
                   label: calculateLoanRepayment(
                       vtuProvider.amountController.text.trim(),
@@ -1032,27 +1004,25 @@ class Airtime extends StatelessWidget {
   }
 }
 
-
-
-String calculateLoanRepayment(String amount, String perc) {
-  double result = (int.parse(perc) / 100) * int.parse(amount);
-  result += int.parse(amount);
-  return "${result.toInt()}";
-}
-
-class AppAmountField extends StatelessWidget {
-  const AppAmountField({
+class AmountReUseWidget extends StatelessWidget {
+  const AmountReUseWidget({
     super.key,
-    this.title,
     this.controller,
-    this.isEdit = true,
+    this.title,
     this.label,
+    this.isEdit = true,
+    this.showCurrency = false,
+    this.onComplete,
+    this.callFunc = false,
   });
 
+  final TextEditingController? controller;
   final String? title;
   final String? label;
-  final TextEditingController? controller;
   final bool isEdit;
+  final bool showCurrency;
+  final Function()? onComplete;
+  final bool callFunc;
 
   @override
   Widget build(BuildContext context) {
@@ -1078,10 +1048,14 @@ class AppAmountField extends StatelessWidget {
           child: TextFormField(
             enabled: isEdit,
             keyboardType: const TextInputType.numberWithOptions(),
+            onEditingComplete: onComplete,
             inputFormatters: [
               FilteringTextInputFormatter.digitsOnly,
             ],
             controller: controller,
+            onFieldSubmitted: (value) {
+              callFunc ? onComplete : null;
+            },
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
@@ -1091,16 +1065,8 @@ class AppAmountField extends StatelessWidget {
             ),
             decoration: InputDecoration(
               border: InputBorder.none,
-              label: Text(label ?? ""),
-              labelStyle: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 1.5,
-                fontFamily: "NT",
-                color: ColorManager.blackColor,
-              ),
-              prefix: Text(
-                AppConstants.currencySymbol,
+              label: Text(
+                label ?? "",
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
@@ -1109,12 +1075,32 @@ class AppAmountField extends StatelessWidget {
                   color: ColorManager.blackColor,
                 ),
               ),
+              prefix: showCurrency
+                  ? Text(
+                      AppConstants.currencySymbol,
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 1.5,
+                        fontFamily: "NT",
+                        color: ColorManager.blackColor,
+                      ),
+                    )
+                  : const SizedBox(
+                      width: double.minPositive,
+                    ),
             ),
           ),
         ),
       ],
     );
   }
+}
+
+String calculateLoanRepayment(String amount, String perc) {
+  double result = (int.parse(perc) / 100) * int.parse(amount);
+  result += int.parse(amount);
+  return "${result.toInt()}";
 }
 
 class AppNumberField extends StatelessWidget {

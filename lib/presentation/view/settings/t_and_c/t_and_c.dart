@@ -42,9 +42,11 @@ class TAndC extends StatelessWidget {
                             //     "assets/images/noRTransaction.png"),
                           ),
                           Text(
-                            "You have no transaction history",
+                            "There is no terms and condition policy",
+                            textAlign: TextAlign.center,
                             style: getBoldStyle(
                               color: ColorManager.blackColor,
+                              fontSize: 20,
                             ),
                           ),
                         ],

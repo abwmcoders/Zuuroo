@@ -4,7 +4,8 @@ import 'package:zuuro/presentation/resources/resources.dart';
 
 class WidgetListLoaderShimmer extends StatelessWidget {
   final int? listCount;
-  WidgetListLoaderShimmer({this.listCount = 20});
+  final bool show;
+  WidgetListLoaderShimmer({this.listCount = 20, this.show = false});
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -33,7 +34,7 @@ class WidgetListLoaderShimmer extends StatelessWidget {
                     ),
                   ),
                   subtitle: SizedBox(
-                    width: deviceWidth(context),  //20,
+                    width: deviceWidth(context), //20,
                     child: Shimmer.fromColors(
                       baseColor: Color(0xff949599).withOpacity(0.5),
                       highlightColor: Color(0xffF0F1F5).withOpacity(0.5),

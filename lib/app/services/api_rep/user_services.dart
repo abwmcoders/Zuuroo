@@ -61,7 +61,6 @@ class UserApiServices extends BaseServices {
 
   Future getCableList() async {
     var rm;
-    String token = await getUserToken();
     try {
       await getUserToken().then(
         (value) {

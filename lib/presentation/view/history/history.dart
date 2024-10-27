@@ -167,10 +167,10 @@ class _TransactionHistoryState extends State<TransactionHistory> {
                                     }
                                     selectedCat =
                                         "${categories[_selectedIndexCat!]["name"]}";
-                                    fetchHistoryData = UserApiServices()
-                                        .getHistories(
-                                            params: selectedCat,
-                                          );
+                                    fetchHistoryData =
+                                        UserApiServices().getHistories(
+                                      params: selectedCat,
+                                    );
                                   });
                                 },
                               );
@@ -234,6 +234,7 @@ class _TransactionHistoryState extends State<TransactionHistory> {
                   future: fetchHistoryData,
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
+                      print("history data true");
                       HistoryResponse _history =
                           HistoryResponse.fromJson(snapshot.data);
                       if (_history.data.length == 0) {
@@ -267,10 +268,14 @@ class _TransactionHistoryState extends State<TransactionHistory> {
                           ],
                         );
                       } else {
+                        
                         return ListView.builder(
                           itemCount: _history
                               .data.length, //_cBeneficiary.data!.length,
                           itemBuilder: (context, index) {
+                            final entry =
+                                _history.data.entries.elementAt(index);
+                            HistoryData historyData = entry.value;
                             return Column(
                               children: [
                                 Padding(
@@ -281,7 +286,7 @@ class _TransactionHistoryState extends State<TransactionHistory> {
                                       NavigateClass().pushNamed(
                                         context: context,
                                         routName: Routes.transactionDetail,
-                                        args: _history.data[index],
+                                        args: historyData,
                                       );
                                     },
                                     child: Row(
@@ -303,8 +308,7 @@ class _TransactionHistoryState extends State<TransactionHistory> {
                                               ),
                                               child: Center(
                                                   child: Text(
-                                                _history
-                                                    .data[index].operatorCode
+                                                historyData.operatorCode
                                                     .substring(0, 2)
                                                     .toUpperCase(),
                                                 style: getBoldStyle(
@@ -321,7 +325,7 @@ class _TransactionHistoryState extends State<TransactionHistory> {
                                                   CrossAxisAlignment.start,
                                               children: [
                                                 Text(
-                                                  _history.data[index].purchase,
+                                                  historyData.purchase,
                                                   style: getBoldStyle(
                                                     color:
                                                         ColorManager.blackColor,
@@ -331,8 +335,8 @@ class _TransactionHistoryState extends State<TransactionHistory> {
                                                 UIHelper.verticalSpaceSmall,
                                                 Text(
                                                   //"July 12th, 11:45:04",
-                                                  _history
-                                                      .data[index].completedUtc,
+                                                  historyData.completedUtc
+                                                      .toString(),
                                                   style: getRegularStyle(
                                                     color:
                                                         ColorManager.blackColor,
@@ -349,7 +353,7 @@ class _TransactionHistoryState extends State<TransactionHistory> {
                                           children: [
                                             Text(
                                               //"₦ 2000.00",
-                                              "₦ ${_history.data[index].sellingPrice}",
+                                              "₦ ${historyData.sellingPrice}",
                                               style: getBoldStyle(
                                                 color: ColorManager.blackColor,
                                                 fontSize: 12,
@@ -362,29 +366,27 @@ class _TransactionHistoryState extends State<TransactionHistory> {
                                                       horizontal: 8,
                                                       vertical: 5),
                                               decoration: BoxDecoration(
-                                                color: _history.data[index]
-                                                            .processingState !=
-                                                        "delivered"
+                                                color: historyData
+                                                            .processingState.toLowerCase() ==
+                                                        "failed"
                                                     ? ColorManager.errorColor
                                                         .withOpacity(.1)
-                                                    :  ColorManager
-                                                            .activeColor
-                                                            .withOpacity(.1),
+                                                    : ColorManager.activeColor
+                                                        .withOpacity(.1),
                                                 borderRadius:
                                                     BorderRadius.circular(10),
                                               ),
                                               child: Text(
                                                 //"Successful",
-                                                _history
-                                                    .data[index].processingState
+                                                historyData.processingState
                                                     .toString(),
                                                 style: getRegularStyle(
-                                                  color: _history.data[index]
-                                                              .processingState !=
-                                                          "delivered"
+                                                  color: historyData
+                                                              .processingState.toLowerCase() ==
+                                                          "failed"
                                                       ? ColorManager.errorColor
                                                       : ColorManager
-                                                              .activeColor,
+                                                          .activeColor,
                                                   fontSize: 10,
                                                 ),
                                               ),
@@ -401,6 +403,7 @@ class _TransactionHistoryState extends State<TransactionHistory> {
                             );
                           },
                         );
+                      
                       }
                     } else if (snapshot.hasError) {
                       return Column(
@@ -440,7 +443,6 @@ class _TransactionHistoryState extends State<TransactionHistory> {
                       return WidgetListLoaderShimmer();
                     }
                   }),
-            
             ),
           ],
         ),

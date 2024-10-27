@@ -78,11 +78,11 @@ class PersonalInfo extends StatelessWidget {
               alignment: Alignment.bottomRight,
               child: InkWell(
                 onTap: (){
-                  NavigateClass().pushNamed(
-                    context: context,
-                    args: user,
-                    routName: Routes.editProfile,
-                  );
+                  // NavigateClass().pushNamed(
+                  //   context: context,
+                  //   args: user,
+                  //   routName: Routes.editProfile,
+                  // );
                 },
                 child: Container(
                     padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),

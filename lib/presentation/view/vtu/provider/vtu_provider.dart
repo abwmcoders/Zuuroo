@@ -62,6 +62,7 @@ class VtuProvider extends BaseViewModel {
   DataCategory? selectedDataCat;
   DataPlan? selectedDataPlan;
   bool checkNumber = false;
+  MeterData? selectedMeterData;
 
   setIndex(int ind) {
     currentPage = ind;
@@ -75,6 +76,11 @@ class VtuProvider extends BaseViewModel {
 
   setDataCat(DataCategory cat) {
     selectedDataCat = cat;
+    notifyListeners();
+  }
+
+  setMeterData(MeterData data) {
+    selectedMeterData = data;
     notifyListeners();
   }
 
@@ -212,6 +218,7 @@ class VtuProvider extends BaseViewModel {
 
   getData() async {
     final response = await UserApiServices().getCountryList();
+    print("countries ---> $response");
     if (response != null && response['data'] != null) {
       List<CountryModel> _countryResult = AppConstants.countryModel ?? [];
       for (dynamic country in response['data']) {
@@ -248,8 +255,9 @@ class VtuProvider extends BaseViewModel {
 
   getOperator(String code) async {
     final response = await UserApiServices().getOperatorList(code);
+    print("operator fr country ---> $response");
     if (response != null) {
-      List<OperatorModel> _operatorsResults = AppConstants.operatorModel ?? [];
+      List<OperatorModel> _operatorsResults = [];
       for (dynamic operator in response['data']) {
         final operators = OperatorModel.fromJson(operator);
         bool exists = _operatorsResults.any((existingOperator) =>
@@ -268,6 +276,7 @@ class VtuProvider extends BaseViewModel {
 
   getDataCategory(String code) async {
     final response = await UserApiServices().getDataCatList(code);
+    print("data category ---> $response");
     if (response != null) {
       List<DataCategory> _operatorsResults = [];
       for (dynamic operator in response['data']) {
@@ -290,6 +299,7 @@ class VtuProvider extends BaseViewModel {
       "operator_code": operatorCode,
       "category_code": categoryCode,
     });
+    print("data plan ---> $response");
     if (response != null) {
       List<DataPlan> _operatorsResults = [];
       for (dynamic operator in response['data']) {
@@ -314,7 +324,7 @@ class VtuProvider extends BaseViewModel {
     dismissKeyboard(context);
     changeLoaderStatus(true);
     var body = {
-      "pin": otp,
+      "pin": otpField.text.trim(),
       "top_up": topUp,
       "country": countryCode,
       "phoneNumber": numberController.text.trim(),
@@ -407,23 +417,25 @@ class VtuProvider extends BaseViewModel {
       required String pin,
       int topUp = 1,
       required String amount}) async {
+    print("called purchase bill");
     dismissKeyboard(context);
     changeLoaderStatus(true);
     var body = {
-      "billerName": billerCode,
-      "meterType": metr,
+      "billerName": selectedBiller!.billerName,
+      "meterType": metr!.toLowerCase(),
       "top_up": topUp,
       "meterNumber": meterNumber,
       "amount": amount,
-      "customerName": customerName,
+      "customerName": selectedMeterData!.name,
       "customerPhoneNumber": numberController.text.trim(),
       "pin": pin,
     };
 
-    print("object for airtime purchase ---> $body");
+    print("body for bill purchase ---> $body");
     try {
       var request = await UserApiServices().purchaseBill(body);
       changeLoaderStatus(false);
+      print("body for res bill purchase ---> $request");
       if (request != null) {
         if (request["status"] == true) {
           NavigateClass().pushNamed(
@@ -461,21 +473,12 @@ class VtuProvider extends BaseViewModel {
       "pin": otpField.text.trim(),
     };
 
-    try {
-      var request = await UserApiServices().verifyPin(body);
-      changeLoaderStatus(false);
-      print("pin verification ---> $request");
-      if (request != null) {
-        if (request["status"] == true) {
-          await onSuccess();
-        } else {
-          Navigator.pop(ctx);
-          MekNotification().showMessage(
-            ctx,
-            message: request['message'].toString(),
-          );
-          otpField.clear();
-        }
+    var request = await UserApiServices().verifyPin(body);
+    changeLoaderStatus(false);
+    print("pin verification ---> $request");
+    if (request != null) {
+      if (request["status"] == true) {
+        onSuccess();
       } else {
         Navigator.pop(ctx);
         MekNotification().showMessage(
@@ -484,7 +487,7 @@ class VtuProvider extends BaseViewModel {
         );
         otpField.clear();
       }
-    } catch (e) {
+    } else {
       Navigator.pop(ctx);
       MekNotification().showMessage(
         ctx,
@@ -494,46 +497,46 @@ class VtuProvider extends BaseViewModel {
     }
   }
 
-  Future<VerifyMeterNumberData?> verifyMeterNumber({
+  verifyMeterNumber({
     required BuildContext ctx,
     required String ctr,
     required String billerCode,
     String meterType = "prepaid",
   }) async {
     dismissKeyboard(context);
+    changeLoaderStatus(true);
     var body = {
-      "serviceID": ctr,
-      "billersCode": billerCode,
+      "meterNumber": ctr,
+      "discoName": billerCode,
       "meterType": meterType,
     };
+    print("verify meter body ---> $body");
 
     try {
       var request = await UserApiServices().verifyMeterNumber(body);
+      changeLoaderStatus(false);
+      print("verify meter response ---> $request");
       if (request != null) {
-        if (request["success"] == true) {
-          var verifyMeterResponse =
-              VerifyMeterNumberData.fromJson(request['data']);
-          return verifyMeterResponse;
+        if (request["status"] == "true") {
+          var verifyMeterResponse = MeterData.fromJson(request['data']);
+          setMeterData(verifyMeterResponse);
         } else {
           MekNotification().showMessage(
             ctx,
             message: request['message'].toString(),
           );
-          return null;
         }
       } else {
         MekNotification().showMessage(
           ctx,
           message: request['message'].toString(),
         );
-        return null;
       }
     } catch (e) {
       MekNotification().showMessage(
         ctx,
         message: e.toString(),
       );
-      return null;
     }
   }
 

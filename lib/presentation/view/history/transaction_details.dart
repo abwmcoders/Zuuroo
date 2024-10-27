@@ -68,12 +68,12 @@ class TransactionDetails extends StatelessWidget {
                           //padding: EdgeInsets.all(8),
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: history.processingState != "delivered"
+                            color: history.processingState == "failed"
                                 ? ColorManager.errorColor
                                 : ColorManager.activeColor,
                           ),
                           child: Icon(
-                            history.processingState != "delivered" ? Icons.close : Icons.check,
+                            history.processingState == "failed" ? Icons.close : Icons.check,
                             color: ColorManager.whiteColor,
                             size: 20,
                           ),
@@ -82,7 +82,7 @@ class TransactionDetails extends StatelessWidget {
                         Text(
                           history.processingState.toUpperCase(),
                           style: getBoldStyle(
-                            color: history.processingState != "delivered"
+                            color: history.processingState == "failed"
                                     ? ColorManager.errorColor
                                     : ColorManager.activeColor,
                             fontSize: 13,
@@ -132,7 +132,7 @@ class TransactionDetails extends StatelessWidget {
                     ),
                      DeatilsTile(
                       value: "Transaction Date",
-                      detail: history.completedUtc,
+                      detail: history.completedUtc.toString(),
                     ),
                   ],
                 ),

@@ -1478,7 +1478,7 @@ class Cable extends StatelessWidget {
                 CheckoutTile(title: "Cable Plan", value: plan.plan,),
                 CheckoutTile(title: "Provider Code", value: plan.providerCode,),
                 CheckoutTile(title: "Iuc Number", value: provider.iucNumber.text.trim(),),
-                CheckoutTile(title: "Customer Name", value: provider.customerName!),
+                CheckoutTile(title: "Customer Name", value: provider.selectedIucNumber!.name),
                 UIHelper.verticalSpaceSmall,
                 Container(
                   padding:
@@ -1492,7 +1492,7 @@ class Cable extends StatelessWidget {
                       Row(
                         children: [
                           Text(
-                            "Wallet Balance",
+                           topUp == 2 ? "Loan Wallet" :  "Wallet Balance",
                             style: getBoldStyle(
                               color: ColorManager.blackColor,
                               fontSize: 12,
@@ -1509,7 +1509,11 @@ class Cable extends StatelessWidget {
                           ),
                         ],
                       ),
-                      int.parse(AppConstants.homeModel!.data.wallet.balance) >=
+                      topUp == 2 ? Icon(
+                              Icons.check,
+                              color: ColorManager.activeColor,
+                            )
+                          : int.parse(AppConstants.homeModel!.data.wallet.balance) >=
                               int.parse(amount)
                           ? Icon(
                               Icons.check,
@@ -1528,20 +1532,27 @@ class Cable extends StatelessWidget {
                     double? balance = double.tryParse(
                         AppConstants.homeModel?.data.wallet.balance ?? '');
                     double? inputAmount = double.tryParse(amount);
-                    if (balance != null &&
-                        inputAmount != null &&
-                        balance >= inputAmount) {
+                    if(topUp == 2) {
                       Navigator.pop(ctx);
                       _otpInput(provider: provider, topUp: topUp, context: ctx);
-                    } else {
-                      Navigator.pop(ctx);
-                      MekNotification().showMessage(
-                        ctx,
-                        message: "Insufficient fund !!!",
-                      );
+                    }else {
+                      if (balance != null &&
+                          inputAmount != null &&
+                          balance >= inputAmount) {
+                        Navigator.pop(ctx);
+                        _otpInput(
+                            provider: provider, topUp: topUp, context: ctx);
+                      } else {
+                        Navigator.pop(ctx);
+                        MekNotification().showMessage(
+                          ctx,
+                          message: "Insufficient fund !!!",
+                        );
+                      }
                     }
+                    
                   },
-                  buttonText: "Pay",
+                  buttonText: "Continue",
                 ),
               ],
             ),
@@ -1551,349 +1562,264 @@ class Cable extends StatelessWidget {
     );
   }
 
-  Padding _buyWidget(CableProvider cableProvider, BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: ListView(
-        children: [
-           //!const VtuCountrySelector(),
-          SelectCable(
-            cableProvider: cableProvider,
-          ),
-          UIHelper.verticalSpaceMedium,
-          selectCableCategories(cableProvider, context),
-          UIHelper.verticalSpaceMedium,
-          //! number
-          buildNumber(cableProvider),
-          UIHelper.verticalSpaceMedium,
-          //! IUC number
-          buildIucNumber(cableProvider),
-          UIHelper.verticalSpaceMedium,
-          cableProvider.checkNumber
-              ? FutureBuilder<VerifyIucData?>(
-                  future: cableProvider.verifyIucNumber(
-                    ctx: context,
-                    iuc: cableProvider.iucNumber.text.trim(),
-                  ),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 0),
-                        decoration: BoxDecoration(
-                          color: ColorManager.greyColor.withOpacity(.4),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Text(
-                          "Loading .....",
-                          style:
-                              getBoldStyle(color: ColorManager.deepGreyColor),
-                        ),
-                      );
-                    } else if (snapshot.hasError) {
-                      return Text('Error: ${snapshot.error}');
-                    } else if (snapshot.hasData && snapshot.data != null) {
-                      cableProvider.setCustomerName(snapshot.data!.customerName,
-                          snapshot.data!.customerNumber);
-                      return Text(
-                        'Customer Name: ${snapshot.data!.customerName}',
-                        style: getBoldStyle(
-                            color: ColorManager.activeColor, fontSize: 16),
-                      );
-                    } else {
-                      return Text(
-                        'Invalid iuc number',
-                        style: getBoldStyle(
-                            color: ColorManager.primaryColor, fontSize: 16),
-                      );
-                    }
-                  },
-                )
-              : Container(),
-          UIHelper.verticalSpaceMedium,
-          UIHelper.verticalSpaceMedium,
-          Row(
-            children: [
-              Expanded(
-                child: AppButton(
-                  buttonText: "Submit",
-                  onPressed: () {
-                    //_confirmationBottomSheetMenu(amount: "", );
-                    if (cableProvider.customerName != null) {
-                      if (cableProvider.cableName != null ||
-                          cableProvider.cableCode != null) {
-                        _confirmationBottomSheetMenu(
-                          ctx: context,
-                          plan: cableProvider.cablePlan!,
-                          amount: cableProvider.cablePlan!.price,
-                          number: cableProvider.number.text.trim(),
-                          provider: cableProvider,
-                        );
+  Widget _buyWidget(CableProvider cableProvider, BuildContext context) {
+    return GestureDetector(
+      onTap: (){
+        if(cableProvider.selectedCable != null && cableProvider.iucNumber.text != "") {
+          cableProvider.verifyIucNumber(
+            ctx: context,
+            iuc: cableProvider.iucNumber.text.trim(),
+          );
+        }
+      },
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: ListView(
+          children: [
+             //!const VtuCountrySelector(),
+            SelectCable(
+              cableProvider: cableProvider,
+            ),
+            UIHelper.verticalSpaceMedium,
+            selectCableCategories(cableProvider, context),
+            UIHelper.verticalSpaceMedium,
+            //! number
+            AmountReUseWidget(
+              title: "Phone Number",
+              controller: cableProvider.number,
+            ),
+            UIHelper.verticalSpaceMedium,
+            //! Meter number
+            AmountReUseWidget(
+              callFunc: true,
+              title: "IUC Number",
+              controller: cableProvider.iucNumber,
+              onComplete: () {
+                cableProvider.verifyIucNumber(
+                  ctx: context,
+                  iuc: cableProvider.iucNumber.text.trim(),
+                );
+              },
+            ),
+            UIHelper.verticalSpaceMedium,
+            cableProvider.selectedIucNumber != null
+                ? Text(
+                    'Customer Name: ${cableProvider.selectedIucNumber!.name}',
+                    style: getBoldStyle(
+                        color: ColorManager.activeColor, fontSize: 16),
+                  )
+                : Container(),
+            UIHelper.verticalSpaceMedium,
+            UIHelper.verticalSpaceMedium,
+            Row(
+              children: [
+                Expanded(
+                  child: AppButton(
+                    buttonText: "Submit",
+                    onPressed: () {
+                      if(formKey.currentState!.validate()){
+                      if (cableProvider.selectedIucNumber != null) {
+                        if (cableProvider.cableName != null ||
+                            cableProvider.cableCode != null) {
+                          _confirmationBottomSheetMenu(
+                            ctx: context,
+                            plan: cableProvider.cablePlan!,
+                            amount: cableProvider.cablePlan!.price,
+                            number: cableProvider.number.text.trim(),
+                            provider: cableProvider,
+                          );
+                        } else {
+                          MekNotification().showMessage(
+                            context,
+                            message: "Please select a cable tv and plan !!!",
+                          );
+                        }
                       } else {
                         MekNotification().showMessage(
                           context,
-                          message: "Please select a cable tv and plan !!!",
+                          message: "Unverified iuc number !!!",
                         );
                       }
-                    } else {
-                      MekNotification().showMessage(
-                        context,
-                        message: "Unverified iuc number !!!",
-                      );
-                    }
-                  },
-                  height: 30,
-                ),
-              ),
-              UIHelper.horizontalSpaceSmall,
-              Expanded(
-                child: AppButton(
-                  buttonText: "Back",
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  height: 30,
-                  borderColor: ColorManager.primaryColor,
-                  buttonColor: ColorManager.whiteColor,
-                  buttonTextColor: ColorManager.primaryColor,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Padding _loanWidget(CableProvider cableProvider, BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: ListView(
-        children: [
-          //!const VtuCountrySelector(),
-          SelectCable(
-            cableProvider: cableProvider,
-          ),
-          UIHelper.verticalSpaceMedium,
-          selectCableCategories(cableProvider, context),
-          UIHelper.verticalSpaceMedium,
-          //! number
-          buildNumber(cableProvider),
-          UIHelper.verticalSpaceMedium,
-          //! IUC number
-          buildIucNumber(cableProvider),
-          UIHelper.verticalSpaceMedium,
-          cableProvider.checkNumber
-              ? FutureBuilder<VerifyIucData?>(
-                  future: cableProvider.verifyIucNumber(
-                    ctx: context,
-                    iuc: cableProvider.iucNumber.text.trim(),
+                      } else {
+                        //Navigator.pop(context);
+                        MekNotification().showMessage(
+                          context,
+                          message: "Please fill out all fields!!!",
+                        );
+                      }
+                    },
+                    height: 30,
                   ),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 0),
-                        decoration: BoxDecoration(
-                          color: ColorManager.greyColor.withOpacity(.4),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Text(
-                          "Loading .....",
-                          style:
-                              getBoldStyle(color: ColorManager.deepGreyColor),
-                        ),
-                      );
-                    } else if (snapshot.hasError) {
-                      return Text('Error: ${snapshot.error}');
-                    } else if (snapshot.hasData && snapshot.data != null) {
-                      cableProvider.setCustomerName(snapshot.data!.customerName,
-                          snapshot.data!.customerNumber);
-                      return Text(
-                        'Customer Name: ${snapshot.data!.customerName}',
-                        style: getBoldStyle(
-                            color: ColorManager.activeColor, fontSize: 16),
-                      );
-                    } else {
-                      return Text(
-                        'Invalid iuc number',
-                        style: getBoldStyle(
-                            color: ColorManager.primaryColor, fontSize: 16),
-                      );
-                    }
-                  },
-                )
-              : Container(),
-          UIHelper.verticalSpaceMedium,
-          //! LOAN ---------
-          Text(
-            "Loan",
-            style: getBoldStyle(
-              color: ColorManager.deepGreyColor,
-              fontSize: 14,
+                ),
+                UIHelper.horizontalSpaceSmall,
+                Expanded(
+                  child: AppButton(
+                    buttonText: "Back",
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    height: 30,
+                    borderColor: ColorManager.primaryColor,
+                    buttonColor: ColorManager.whiteColor,
+                    buttonTextColor: ColorManager.primaryColor,
+                  ),
+                ),
+              ],
             ),
-          ),
-          UIHelper.verticalSpaceSmall,
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: List.generate(
-              AppConstants.loanModel!.length,
-              (index) => Expanded(
-                child: SelectLoanPeriod(
-                  accountType:
-                      "${AppConstants.loanModel![index].labelName} Days",
-                  active:
-                      cableProvider.selectedLoanIndex == index ? true : false,
-                  onPressed: () {
-                    cableProvider.setLoanIndex(index);
-                    cableProvider.setLoanLimit(AppConstants.loanModel![index]);
-                  },
-                ),
-              ),
-            ),
-          ),
-          UIHelper.verticalSpaceMedium,
-
-          cableProvider.loanLimit != null && cableProvider.cablePlan != null
-              ? AppAmountField(
-                  isEdit: false,
-                  title: "Loan Repayment",
-                  label: calculateLoanRepayment(cableProvider.cablePlan!.price,
-                      cableProvider.loanLimit!.percentage),
-                  //controller: vtuProvider.amountController,
-                )
-              : Container(),
-          UIHelper.verticalSpaceLarge,
-          Row(
-            children: [
-              Expanded(
-                child: AppButton(
-                  buttonText: "Submit",
-                  onPressed: () {
-                    if (formKey.currentState!.validate()) {
-                      _confirmationBottomSheetMenu(
-                        ctx: context,
-                        plan: cableProvider.cablePlan!,
-                        topUp: 2,
-                        amount: calculateLoanRepayment(
-                            cableProvider.cablePlan!.price,
-                            cableProvider.loanLimit!.percentage),
-                        number: cableProvider.number.text.trim(),
-                        provider: cableProvider,
-                      );
-                    } else {
-                      //Navigator.pop(context);
-                      MekNotification().showMessage(
-                        context,
-                        message: "Please fill out all fields!!!",
-                      );
-                    }
-                  },
-                  height: 30,
-                ),
-              ),
-              UIHelper.horizontalSpaceSmall,
-              Expanded(
-                child: AppButton(
-                  buttonText: "Back",
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  height: 30,
-                  borderColor: ColorManager.primaryColor,
-                  buttonColor: ColorManager.whiteColor,
-                  buttonTextColor: ColorManager.primaryColor,
-                ),
-              ),
-            ],
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
-  Widget buildIucNumber(CableProvider cableProvider) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          "IUC number",
-          style: getBoldStyle(
-            color: ColorManager.deepGreyColor,
-            fontSize: 14,
-          ),
-        ),
-        UIHelper.verticalSpaceSmall,
-        Container(
-          alignment: Alignment.centerLeft,
-          decoration: BoxDecoration(
-            color: ColorManager.greyColor.withOpacity(.4),
-            borderRadius: BorderRadius.circular(10),
-          ),
-          height: 40,
-          child: Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: TextFormField(
-              keyboardType: TextInputType.number,
+  Widget _loanWidget(CableProvider cableProvider, BuildContext context) {
+    return GestureDetector(
+       onTap: () {
+        if (cableProvider.cableName != null &&
+            cableProvider.iucNumber.text != "") {
+          cableProvider.verifyIucNumber(
+            ctx: context,
+            iuc: cableProvider.iucNumber.text.trim(),
+          );
+        }
+      },
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: ListView(
+          children: [
+            //!const VtuCountrySelector(),
+            SelectCable(
+              cableProvider: cableProvider,
+            ),
+            UIHelper.verticalSpaceMedium,
+            selectCableCategories(cableProvider, context),
+            UIHelper.verticalSpaceMedium,
+            //! number
+            AmountReUseWidget(
+              title: "Phone Number",
+              controller: cableProvider.number,
+            ),
+            UIHelper.verticalSpaceMedium,
+            //! Meter number
+            AmountReUseWidget(
+              callFunc: true,
+              title: "IUC Number",
               controller: cableProvider.iucNumber,
-              style: const TextStyle(color: Colors.black87),
-              decoration: const InputDecoration(
-                border: InputBorder.none,
-                enabledBorder: InputBorder.none,
-                focusedBorder: InputBorder.none,
-                hintText: 'Enter Iuc number',
-                hintStyle: TextStyle(
-                  color: Colors.black38,
-                ),
-              ),
-              onEditingComplete: () {
-                cableProvider.setCheckNumber(true);
+              onComplete: () {
+                cableProvider.verifyIucNumber(
+                  ctx: context,
+                  iuc: cableProvider.iucNumber.text.trim(),
+                );
               },
             ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget buildNumber(CableProvider cableProvider) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          "Phone Number",
-          style: getBoldStyle(
-            color: ColorManager.deepGreyColor,
-            fontSize: 14,
-          ),
-        ),
-        UIHelper.verticalSpaceSmall,
-        Container(
-          alignment: Alignment.centerLeft,
-          decoration: BoxDecoration(
-            color: ColorManager.greyColor.withOpacity(.4),
-            borderRadius: BorderRadius.circular(10),
-          ),
-          height: 40,
-          child: Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: TextFormField(
-              keyboardType: TextInputType.number,
-              controller: cableProvider.number,
-              style: const TextStyle(color: Colors.black87),
-              decoration: const InputDecoration(
-                border: InputBorder.none,
-                enabledBorder: InputBorder.none,
-                focusedBorder: InputBorder.none,
-                hintText: 'Enter phone number',
-                hintStyle: TextStyle(
-                  color: Colors.black38,
+            UIHelper.verticalSpaceMedium,
+            cableProvider.selectedIucNumber != null
+                ? Text(
+                  'Customer Name: ${cableProvider.selectedIucNumber!.name}',
+                  style: getBoldStyle(
+                      color: ColorManager.activeColor, fontSize: 16),
+                )
+                : Container(),
+            UIHelper.verticalSpaceMedium,
+            //! LOAN ---------
+            Text(
+              "Loan",
+              style: getBoldStyle(
+                color: ColorManager.deepGreyColor,
+                fontSize: 14,
+              ),
+            ),
+            UIHelper.verticalSpaceSmall,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: List.generate(
+                AppConstants.loanModel!.length,
+                (index) => Expanded(
+                  child: SelectLoanPeriod(
+                    accountType:
+                        "${AppConstants.loanModel![index].labelName} Days",
+                    active:
+                        cableProvider.selectedLoanIndex == index ? true : false,
+                    onPressed: () {
+                      cableProvider.setLoanIndex(index);
+                      cableProvider.setLoanLimit(AppConstants.loanModel![index]);
+                    },
+                  ),
                 ),
               ),
             ),
-          ),
+            UIHelper.verticalSpaceMedium,
+            cableProvider.loanLimit != null && cableProvider.cablePlan != null
+                ? AmountReUseWidget(
+                    isEdit: false,
+                    title: "Loan Repayment",
+                    label: calculateLoanRepayment(cableProvider.cablePlan!.price,
+                        cableProvider.loanLimit!.percentage),
+                    //controller: vtuProvider.amountController,
+                  )
+                : Container(),
+            UIHelper.verticalSpaceLarge,
+            Row(
+              children: [
+                Expanded(
+                  child: AppButton(
+                    buttonText: "Submit",
+                    onPressed: () {
+                      if (formKey.currentState!.validate()) {
+                        if (cableProvider.selectedIucNumber != null) {
+                          if (cableProvider.cableName != null ||
+                              cableProvider.cableCode != null) {
+                           _confirmationBottomSheetMenu(
+                              ctx: context,
+                              plan: cableProvider.cablePlan!,
+                              topUp: 2,
+                              amount: calculateLoanRepayment(
+                                  cableProvider.cablePlan!.price,
+                                  cableProvider.loanLimit!.percentage),
+                              number: cableProvider.number.text.trim(),
+                              provider: cableProvider,
+                            );
+                          } else {
+                            MekNotification().showMessage(
+                              context,
+                              message: "Please select a cable tv and plan !!!",
+                            );
+                          }
+                        } else {
+                          MekNotification().showMessage(
+                            context,
+                            message: "Unverified iuc number !!!",
+                          );
+                        }                      
+                      } else {
+                        //Navigator.pop(context);
+                        MekNotification().showMessage(
+                          context,
+                          message: "Please fill out all fields!!!",
+                        );
+                      }
+                    },
+                    height: 30,
+                  ),
+                ),
+                UIHelper.horizontalSpaceSmall,
+                Expanded(
+                  child: AppButton(
+                    buttonText: "Back",
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    height: 30,
+                    borderColor: ColorManager.primaryColor,
+                    buttonColor: ColorManager.whiteColor,
+                    buttonTextColor: ColorManager.primaryColor,
+                  ),
+                ),
+              ],
+            ),
+          ],
         ),
-      ],
+      ),
     );
   }
 
@@ -1924,6 +1850,7 @@ class Cable extends StatelessWidget {
                 cableProvider.cablePlan != null
                     ? "${cableProvider.cablePlan!.providerCode} - ${cableProvider.cablePlan!.plan} | ${AppConstants.currencySymbol} ${cableProvider.cablePlan!.price}"
                     : "Select Cable Plan",
+                    overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
@@ -2102,7 +2029,7 @@ class SelectCable extends StatelessWidget {
               child: Center(
                 child: Text(
                   cableProvider.cableCode != null
-                      ? cableProvider.cableCode!.toUpperCase().substring(0, 2)
+                      ? cableProvider.cableName!.toUpperCase().substring(0, 2)
                       : "..",
                   style: getBoldStyle(
                     color: ColorManager.blackColor,

@@ -165,7 +165,7 @@ class DataPage extends StatelessWidget {
                           provider.purchaseData(
                             ctx: context,
                             topUp: topUp,
-                            pin:  provider.otpField.text,
+                            pin: provider.otpField.text,
                             // amount: topUp == 2
                             //     ? calculateLoanRepayment(
                             //         provider.amountController.text.trim(),
@@ -304,16 +304,16 @@ class DataPage extends StatelessWidget {
                         ],
                       ),
                       int.parse(AppConstants.homeModel!.data.wallet.balance) >=
-                              int.parse(amount) 
-                          ? topUp == 2 ?
-                           Icon(
-                              Icons.check,
-                              color: ColorManager.activeColor,
-                            )
-                          : Icon(
-                              Icons.close,
-                              color: ColorManager.primaryColor,
-                            )
+                              int.parse(amount)
+                          ? topUp == 2
+                              ? Icon(
+                                  Icons.check,
+                                  color: ColorManager.activeColor,
+                                )
+                              : Icon(
+                                  Icons.close,
+                                  color: ColorManager.primaryColor,
+                                )
                           : Icon(
                               Icons.close,
                               color: ColorManager.primaryColor,
@@ -327,10 +327,10 @@ class DataPage extends StatelessWidget {
                     double? balance = double.tryParse(
                         AppConstants.homeModel?.data.wallet.balance ?? '');
                     double? inputAmount = double.tryParse(amount);
-                    if(topUp == 2){
+                    if (topUp == 2) {
                       Navigator.pop(ctx);
                       _otpInput(provider: provider, topUp: topUp, context: ctx);
-                    }else {
+                    } else {
                       if (balance != null &&
                           inputAmount != null &&
                           balance >= inputAmount) {
@@ -345,9 +345,8 @@ class DataPage extends StatelessWidget {
                         );
                       }
                     }
-                    
                   },
-                  buttonText: "Pay",
+                  buttonText: "Continue",
                 ),
               ],
             ),
@@ -407,13 +406,12 @@ class DataPage extends StatelessWidget {
                             await vtuProvider.getOperator(
                               newValue.countryCode,
                             );
-                            await vtuProvider.getDataCategory(
-                                AppConstants.operatorModel!.first.operatorCode);
-                            await vtuProvider.getDataPlan(
-                              AppConstants.operatorModel!.first.operatorCode,
-                              AppConstants
-                                  .dataCategoryModel!.first.categoryCode,
-                            );
+
+                            // await vtuProvider.getDataPlan(
+                            //   AppConstants.operatorModel!.first.operatorCode,
+                            //   AppConstants.dataCategoryModel!.first.categoryCode,
+                            // );
+
                             vtuProvider.isOpSet();
                           },
                           items: vtuProvider
@@ -488,12 +486,19 @@ class DataPage extends StatelessWidget {
                                         AppConstants.operatorModel!.length,
                                         (index) {
                                       return InkWell(
-                                        onTap: () {
+                                        onTap: () async {
                                           vtuProvider.setOperatorCode(
                                               AppConstants.operatorModel![index]
                                                   .operatorCode);
                                           vtuProvider.getDataCategory(
                                               vtuProvider.operatorCode!);
+                                          vtuProvider.getDataPlan(
+                                              vtuProvider.operatorCode!,
+                                              vtuProvider.selectedDataCat !=
+                                                      null
+                                                  ? vtuProvider.selectedDataCat!
+                                                      .categoryCode
+                                                  : '');
                                           Navigator.pop(context);
                                         },
                                         child: Padding(
@@ -596,7 +601,7 @@ class DataPage extends StatelessWidget {
             ],
           ),
           UIHelper.verticalSpaceMedium,
-          vtuProvider.operatorSet == true
+          vtuProvider.operatorCode != null
               ? selectDataCategories(vtuProvider, context)
               : Container(),
           UIHelper.verticalSpaceMedium,
@@ -605,13 +610,12 @@ class DataPage extends StatelessWidget {
               : Container(),
           UIHelper.verticalSpaceMedium,
           vtuProvider.selectedDataPlan != null
-              ? AppAmountField(
+              ? AmountReUseWidget(
                   isEdit: false,
                   title: "Amount",
-                  label: vtuProvider.selectedDataPlan!.costPrice.toString(),
+                  label: vtuProvider.selectedDataPlan!.productPrice.toString(),
                 )
               : Container(),
-          UIHelper.verticalSpaceMedium,
           UIHelper.verticalSpaceMedium,
           UIHelper.verticalSpaceLarge,
           Row(
@@ -709,13 +713,12 @@ class DataPage extends StatelessWidget {
                             await vtuProvider.getOperator(
                               newValue.countryCode,
                             );
-                            await vtuProvider.getDataCategory(
-                                AppConstants.operatorModel!.first.operatorCode);
-                            await vtuProvider.getDataPlan(
-                              AppConstants.operatorModel!.first.operatorCode,
-                              AppConstants
-                                  .dataCategoryModel!.first.categoryCode,
-                            );
+
+                            // await vtuProvider.getDataPlan(
+                            //   AppConstants.operatorModel!.first.operatorCode,
+                            //   AppConstants.dataCategoryModel!.first.categoryCode,
+                            // );
+
                             vtuProvider.isOpSet();
                           },
                           items: vtuProvider
@@ -737,7 +740,8 @@ class DataPage extends StatelessWidget {
               // ),
               Text(
                 vtuProvider.operatorSet == true
-                    ? vtuProvider.operatorCode ??
+                    ? vtuProvider.operatorCode
+                    ??
                         AppConstants.operatorModel!.first.operatorCode
                             .toUpperCase()
                     : "",
@@ -790,12 +794,16 @@ class DataPage extends StatelessWidget {
                                         AppConstants.operatorModel!.length,
                                         (index) {
                                       return InkWell(
-                                        onTap: () {
+                                        onTap: () async {
                                           vtuProvider.setOperatorCode(
                                               AppConstants.operatorModel![index]
                                                   .operatorCode);
                                           vtuProvider.getDataCategory(
                                               vtuProvider.operatorCode!);
+                                          vtuProvider.getDataPlan(
+                                              vtuProvider.operatorCode!,
+                                             vtuProvider.selectedDataCat != null ? vtuProvider.selectedDataCat!
+                                                  .categoryCode : '');
                                           Navigator.pop(context);
                                         },
                                         child: Padding(
@@ -898,390 +906,19 @@ class DataPage extends StatelessWidget {
             ],
           ),
           UIHelper.verticalSpaceMedium,
-          vtuProvider.operatorSet == true
+          vtuProvider.operatorCode != null
               ? selectDataCategories(vtuProvider, context)
               : Container(),
-          // vtuProvider.operatorSet == true
-          //     ? FutureBuilder(
-          //         future: UserApiServices().getDataCatList(
-          //             vtuProvider.operatorCode ??
-          //                 AppConstants.operatorModel!.first.operatorCode),
-          //         builder: (context, snapshot) {
-          //           print("categories response ----> $snapshot");
-          //           if (snapshot.hasData) {
-          //             DataCategoryResponse dataCategoryResponse =
-          //                 DataCategoryResponse.fromJson(snapshot.data);
-          //             return Column(
-          //               crossAxisAlignment: CrossAxisAlignment.start,
-          //               children: [
-          //                 Text(
-          //                   "Data Category",
-          //                   style: getBoldStyle(
-          //                     color: ColorManager.deepGreyColor,
-          //                     fontSize: 14,
-          //                   ),
-          //                 ),
-          //                 UIHelper.verticalSpaceSmall,
-          //                 Container(
-          //                   height: 50,
-          //                   padding: EdgeInsets.symmetric(
-          //                       horizontal: 15, vertical: 8),
-          //                   decoration: BoxDecoration(
-          //                     color: ColorManager.greyColor.withOpacity(.4),
-          //                     borderRadius: BorderRadius.circular(15),
-          //                   ),
-          //                   child: Row(
-          //                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          //                     children: [
-          //                       Text(
-          //                         dataCategoryResponse.data.isNotEmpty
-          //                             ? vtuProvider.selectedDataCat != null
-          //                                 ? vtuProvider
-          //                                     .selectedDataCat!.categoryName
-          //                                 : dataCategoryResponse
-          //                                     .data.first.categoryName
-          //                             : "Select Data Category",
-          //                         style: TextStyle(
-          //                           fontSize: 14,
-          //                           fontWeight: FontWeight.bold,
-          //                           letterSpacing: 1.5,
-          //                           fontFamily: "NT",
-          //                           color: ColorManager.blackColor,
-          //                         ),
-          //                       ),
-          //                       InkWell(
-          //                         onTap: () {
-          //                           appBottomSheet(
-          //                             context,
-          //                             isNotTabScreen: true,
-          //                             Container(
-          //                               decoration: BoxDecoration(
-          //                                 color: ColorManager.whiteColor,
-          //                                 borderRadius: const BorderRadius.only(
-          //                                   topLeft: Radius.circular(16),
-          //                                   topRight: Radius.circular(16),
-          //                                 ),
-          //                               ),
-          //                               child: Column(
-          //                                 mainAxisSize: MainAxisSize.min,
-          //                                 children: [
-          //                                   Row(
-          //                                     children: [
-          //                                       IconButton(
-          //                                         onPressed: () {
-          //                                           Navigator.pop(context);
-          //                                         },
-          //                                         icon: const Icon(
-          //                                           Icons
-          //                                               .keyboard_backspace_rounded,
-          //                                         ),
-          //                                       ),
-          //                                       const Label(
-          //                                         label:
-          //                                             "Select Data Categpory",
-          //                                       ),
-          //                                     ],
-          //                                   ),
-          //                                   const Divider(),
-          //                                   Container(
-          //                                     height: 300,
-          //                                     child: SingleChildScrollView(
-          //                                       child: Padding(
-          //                                         padding: const EdgeInsets.all(
-          //                                             12.0),
-          //                                         child: Column(
-          //                                           children: [
-          //                                             ...List.generate(
-          //                                                 dataCategoryResponse
-          //                                                     .data
-          //                                                     .length, (index) {
-          //                                               return InkWell(
-          //                                                 onTap: () {
-          //                                                   vtuProvider.setDataCat(
-          //                                                       dataCategoryResponse
-          //                                                               .data[
-          //                                                           index]);
-          //                                                   Navigator.pop(
-          //                                                       context);
-          //                                                 },
-          //                                                 child: Padding(
-          //                                                   padding:
-          //                                                       const EdgeInsets
-          //                                                           .symmetric(
-          //                                                     horizontal: 10.0,
-          //                                                     vertical: 8,
-          //                                                   ),
-          //                                                   child: Column(
-          //                                                     crossAxisAlignment:
-          //                                                         CrossAxisAlignment
-          //                                                             .start,
-          //                                                     children: [
-          //                                                       Text(
-          //                                                         dataCategoryResponse
-          //                                                             .data[
-          //                                                                 index]
-          //                                                             .categoryName,
-          //                                                         style:
-          //                                                             TextStyle(
-          //                                                           color: Colors
-          //                                                               .black,
-          //                                                           fontSize:
-          //                                                               screenAwareSize(
-          //                                                                   19,
-          //                                                                   context),
-          //                                                           fontWeight:
-          //                                                               FontWeight
-          //                                                                   .w500,
-          //                                                           letterSpacing:
-          //                                                               1.5,
-          //                                                         ),
-          //                                                       ),
-          //                                                       UIHelper
-          //                                                           .verticalSpaceSmall,
-          //                                                       const Divider(),
-          //                                                       UIHelper
-          //                                                           .verticalSpaceSmall,
-          //                                                     ],
-          //                                                   ),
-          //                                                 ),
-          //                                               );
-          //                                             })
-          //                                           ],
-          //                                         ),
-          //                                       ),
-          //                                     ),
-          //                                   ),
-          //                                 ],
-          //                               ),
-          //                             ),
-          //                           );
-          //                         },
-          //                         child: Icon(
-          //                           Icons.arrow_drop_down,
-          //                           color: ColorManager.deepGreyColor,
-          //                           size: 30,
-          //                         ),
-          //                       ),
-          //                     ],
-          //                   ),
-          //                 ),
-          //               ],
-          //             );
-          //           } else {
-          //             return Container(
-          //               padding: const EdgeInsets.symmetric(
-          //                   horizontal: 10, vertical: 0),
-          //               decoration: BoxDecoration(
-          //                 color: ColorManager.greyColor.withOpacity(.4),
-          //                 borderRadius: BorderRadius.circular(10),
-          //               ),
-          //               child: Text(
-          //                 "Loading .....",
-          //                 style:
-          //                     getBoldStyle(color: ColorManager.deepGreyColor),
-          //               ),
-          //             );
-          //           }
-          //         },
-          //       )
-          //     : Container(),
           UIHelper.verticalSpaceMedium,
           vtuProvider.operatorSet == true || vtuProvider.selectedDataCat != null
               ? selectDataPlan(vtuProvider, context)
               : Container(),
-          // vtuProvider.operatorSet == true || vtuProvider.selectedDataCat != null
-          //     ? FutureBuilder(
-          //         future: UserApiServices().getDataPlanList({
-          //           "operator_code": vtuProvider.operatorCode ??
-          //               AppConstants.operatorModel!.first.operatorCode,
-          //           "category_code": vtuProvider.selectedDataCat != null
-          //               ? vtuProvider.selectedDataCat!.categoryCode
-          //               : "",
-          //         }),
-          //         builder: (context, snapshot) {
-          //           if (snapshot.hasData) {
-          //             DataPlanResponse dataPlanResponse =
-          //                 DataPlanResponse.fromJson(snapshot.data);
-          //             WidgetsBinding.instance.addPostFrameCallback((_) {
-          //               vtuProvider.setDataPlan(dataPlanResponse.data.first);
-          //             });
-          //             return Column(
-          //               crossAxisAlignment: CrossAxisAlignment.start,
-          //               children: [
-          //                 Text(
-          //                   "Data Plan",
-          //                   style: getBoldStyle(
-          //                     color: ColorManager.deepGreyColor,
-          //                     fontSize: 14,
-          //                   ),
-          //                 ),
-          //                 UIHelper.verticalSpaceSmall,
-          //                 Container(
-          //                   height: 50,
-          //                   padding: EdgeInsets.symmetric(
-          //                       horizontal: 15, vertical: 8),
-          //                   decoration: BoxDecoration(
-          //                     color: ColorManager.greyColor.withOpacity(.4),
-          //                     borderRadius: BorderRadius.circular(15),
-          //                   ),
-          //                   child: Row(
-          //                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          //                     children: [
-          //                       Text(
-          //                         dataPlanResponse.data.isNotEmpty
-          //                             ? vtuProvider.selectedDataPlan != null
-          //                                 ? "${vtuProvider.selectedDataPlan!.operatorCode} ${vtuProvider.selectedDataPlan!.productName} | ${vtuProvider.selectedDataPlan!.validity}"
-          //                                 : "${dataPlanResponse.data.first.operatorCode} ${dataPlanResponse.data.first.productName} | ${dataPlanResponse.data.first.validity}"
-          //                             : "Select Data Plan",
-          //                         overflow: TextOverflow.ellipsis,
-          //                         style: TextStyle(
-          //                           fontSize: 14,
-          //                           fontWeight: FontWeight.bold,
-          //                           letterSpacing: 1.5,
-          //                           fontFamily: "NT",
-          //                           color: ColorManager.blackColor,
-          //                         ),
-          //                       ),
-          //                       InkWell(
-          //                         onTap: () {
-          //                           appBottomSheet(
-          //                             context,
-          //                             isNotTabScreen: true,
-          //                             Container(
-          //                               decoration: BoxDecoration(
-          //                                 color: ColorManager.whiteColor,
-          //                                 borderRadius: const BorderRadius.only(
-          //                                   topLeft: Radius.circular(16),
-          //                                   topRight: Radius.circular(16),
-          //                                 ),
-          //                               ),
-          //                               child: Column(
-          //                                 mainAxisSize: MainAxisSize.min,
-          //                                 children: [
-          //                                   Row(
-          //                                     children: [
-          //                                       IconButton(
-          //                                         onPressed: () {
-          //                                           Navigator.pop(context);
-          //                                         },
-          //                                         icon: const Icon(
-          //                                           Icons
-          //                                               .keyboard_backspace_rounded,
-          //                                         ),
-          //                                       ),
-          //                                       const Label(
-          //                                         label: "Select Data Plan",
-          //                                       ),
-          //                                     ],
-          //                                   ),
-          //                                   const Divider(),
-          //                                   Container(
-          //                                     height: 300,
-          //                                     child: SingleChildScrollView(
-          //                                       child: Padding(
-          //                                         padding: const EdgeInsets.all(
-          //                                             12.0),
-          //                                         child: Column(
-          //                                           children: [
-          //                                             ...List.generate(
-          //                                                 dataPlanResponse.data
-          //                                                     .length, (index) {
-          //                                               return InkWell(
-          //                                                 onTap: () {
-          //                                                   vtuProvider.setDataPlan(
-          //                                                       dataPlanResponse
-          //                                                               .data[
-          //                                                           index]);
-          //                                                   Navigator.pop(
-          //                                                       context);
-          //                                                 },
-          //                                                 child: Padding(
-          //                                                   padding:
-          //                                                       const EdgeInsets
-          //                                                           .symmetric(
-          //                                                     horizontal: 10.0,
-          //                                                     vertical: 8,
-          //                                                   ),
-          //                                                   child: Column(
-          //                                                     crossAxisAlignment:
-          //                                                         CrossAxisAlignment
-          //                                                             .start,
-          //                                                     children: [
-          //                                                       Text(
-          //                                                         dataPlanResponse
-          //                                                             .data[
-          //                                                                 index]
-          //                                                             .productName,
-          //                                                         style:
-          //                                                             TextStyle(
-          //                                                           color: Colors
-          //                                                               .black,
-          //                                                           fontSize:
-          //                                                               screenAwareSize(
-          //                                                                   19,
-          //                                                                   context),
-          //                                                           fontWeight:
-          //                                                               FontWeight
-          //                                                                   .w500,
-          //                                                           letterSpacing:
-          //                                                               1.5,
-          //                                                         ),
-          //                                                       ),
-          //                                                       UIHelper
-          //                                                           .verticalSpaceSmall,
-          //                                                       const Divider(),
-          //                                                       UIHelper
-          //                                                           .verticalSpaceSmall,
-          //                                                     ],
-          //                                                   ),
-          //                                                 ),
-          //                                               );
-          //                                             })
-          //                                           ],
-          //                                         ),
-          //                                       ),
-          //                                     ),
-          //                                   ),
-          //                                 ],
-          //                               ),
-          //                             ),
-          //                           );
-          //                         },
-          //                         child: Icon(
-          //                           Icons.arrow_drop_down,
-          //                           color: ColorManager.deepGreyColor,
-          //                           size: 30,
-          //                         ),
-          //                       ),
-          //                     ],
-          //                   ),
-          //                 ),
-          //               ],
-          //             );
-          //           } else {
-          //             return Container(
-          //               padding: const EdgeInsets.symmetric(
-          //                   horizontal: 10, vertical: 0),
-          //               decoration: BoxDecoration(
-          //                 color: ColorManager.greyColor.withOpacity(.4),
-          //                 borderRadius: BorderRadius.circular(10),
-          //               ),
-          //               child: Text(
-          //                 "Loading .....",
-          //                 style:
-          //                     getBoldStyle(color: ColorManager.deepGreyColor),
-          //               ),
-          //             );
-          //           }
-          //         },
-          //       )
-          //     : Container(),
           UIHelper.verticalSpaceMedium,
           vtuProvider.selectedDataPlan != null
-              ? AppAmountField(
+              ? AmountReUseWidget(
                   isEdit: false,
                   title: "Amount",
-                  label: vtuProvider.selectedDataPlan!.costPrice.toString(),
+                  label: vtuProvider.selectedDataPlan!.productPrice.toString(),
                 )
               : Container(),
           UIHelper.verticalSpaceMedium,
@@ -1312,11 +949,11 @@ class DataPage extends StatelessWidget {
           ),
           UIHelper.verticalSpaceMedium,
           vtuProvider.loanLimit != null && vtuProvider.selectedDataPlan != null
-              ? AppAmountField(
+              ? AmountReUseWidget(
                   isEdit: false,
                   title: "Loan Repayment",
                   label: calculateLoanRepayment(
-                      "${vtuProvider.selectedDataPlan!.costPrice.toInt()}",
+                      "${vtuProvider.selectedDataPlan!.productPrice}",
                       vtuProvider.loanLimit!.percentage),
                   //controller: vtuProvider.amountController,
                 )
@@ -1329,9 +966,8 @@ class DataPage extends StatelessWidget {
                   buttonText: "Submit",
                   onPressed: () {
                     if (formKey.currentState!.validate()) {
-                      if(vtuProvider.loanLimit != null) {
-
-                      _confirmationBottomSheetMenu(
+                      if (vtuProvider.loanLimit != null) {
+                        _confirmationBottomSheetMenu(
                           topUp: 2,
                           plan: vtuProvider.selectedDataPlan!,
                           amount: calculateLoanRepayment(
@@ -1341,14 +977,12 @@ class DataPage extends StatelessWidget {
                           provider: vtuProvider,
                           ctx: context,
                         );
-                    
-                      }else {
+                      } else {
                         MekNotification().showMessage(
                           context,
                           message: "Please select a loan term !!!",
                         );
                       }
-                      
                     } else {
                       //Navigator.pop(context);
                       MekNotification().showMessage(
@@ -1394,7 +1028,7 @@ class DataPage extends StatelessWidget {
         UIHelper.verticalSpaceSmall,
         Container(
           height: 40,
-          padding: EdgeInsets.symmetric(horizontal: 15, vertical: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
           decoration: BoxDecoration(
             color: ColorManager.greyColor.withOpacity(.4),
             borderRadius: BorderRadius.circular(15),
@@ -1406,9 +1040,6 @@ class DataPage extends StatelessWidget {
                 provider.selectedDataCat != null
                     ? provider.selectedDataCat!.categoryName
                     : "Select Data Category",
-                // provider.selectedDataCat != null
-                //     ? provider.selectedDataCat!.plan
-                //     : "Select Cable Plan",
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
@@ -1536,7 +1167,7 @@ class DataPage extends StatelessWidget {
         UIHelper.verticalSpaceSmall,
         Container(
           height: 40,
-          padding: EdgeInsets.symmetric(horizontal: 15, vertical: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
           decoration: BoxDecoration(
             color: ColorManager.greyColor.withOpacity(.4),
             borderRadius: BorderRadius.circular(15),
@@ -1544,16 +1175,19 @@ class DataPage extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                provider.selectedDataPlan != null
-                    ? "${provider.selectedDataPlan!.operatorCode} ${provider.selectedDataPlan!.productName} | ${provider.selectedDataPlan!.validity}"
-                    : "Select Data Plan",
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 1.5,
-                  fontFamily: "NT",
-                  color: ColorManager.blackColor,
+              Expanded(
+                child: Text(
+                  provider.selectedDataPlan != null
+                      ? "${provider.selectedDataPlan!.operatorCode} ${provider.selectedDataPlan!.productName} | ${provider.selectedDataPlan!.validity}"
+                      : "Select Data Plan",
+                      overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1.5,
+                    fontFamily: "NT",
+                    color: ColorManager.blackColor,
+                  ),
                 ),
               ),
               InkWell(
@@ -1589,55 +1223,53 @@ class DataPage extends StatelessWidget {
                           ),
                           const Divider(),
                           Container(
-                            height: 280,
-                            child: Expanded(
-                              child: SingleChildScrollView(
-                                child: Padding(
-                                  padding: const EdgeInsets.all(12.0),
-                                  child: Column(
-                                    children: [
-                                      ...List.generate(
-                                          AppConstants.dataPlanModel!.length,
-                                          (index) {
-                                        return InkWell(
-                                          onTap: () {
-                                            provider.setDataPlan(AppConstants
-                                                .dataPlanModel![index]);
-                                            Navigator.pop(context);
-                                          },
-                                          child: Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                              horizontal: 10.0,
-                                              vertical: 8,
-                                            ),
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  "${AppConstants.dataPlanModel![index].operatorCode} ${AppConstants.dataPlanModel![index].productName} - ${AppConstants.dataPlanModel![index].costPrice} | ${AppConstants.dataPlanModel![index].validity}",
-                                                  // AppConstants
-                                                  //     .dataCategoryModel![index]
-                                                  //     .categoryName
-                                                  //     .toString(),
-                                                  style: TextStyle(
-                                                    color: Colors.black,
-                                                    fontSize: screenAwareSize(
-                                                        19, context),
-                                                    fontWeight: FontWeight.w500,
-                                                    letterSpacing: 1.5,
-                                                  ),
-                                                ),
-                                                UIHelper.verticalSpaceSmall,
-                                                const Divider(),
-                                                UIHelper.verticalSpaceSmall,
-                                              ],
-                                            ),
+                            height: 300,
+                            child: SingleChildScrollView(
+                              child: Padding(
+                                padding: const EdgeInsets.all(12.0),
+                                child: Column(
+                                  children: [
+                                    ...List.generate(
+                                        AppConstants.dataPlanModel!.length,
+                                        (index) {
+                                      return InkWell(
+                                        onTap: () {
+                                          provider.setDataPlan(AppConstants
+                                              .dataPlanModel![index]);
+                                          Navigator.pop(context);
+                                        },
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 10.0,
+                                            vertical: 8,
                                           ),
-                                        );
-                                      })
-                                    ],
-                                  ),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                "${AppConstants.dataPlanModel![index].operatorCode} ${AppConstants.dataPlanModel![index].productName} - ${AppConstants.dataPlanModel![index].costPrice} | ${AppConstants.dataPlanModel![index].validity}",
+                                                // AppConstants
+                                                //     .dataCategoryModel![index]
+                                                //     .categoryName
+                                                //     .toString(),
+                                                style: TextStyle(
+                                                  color: Colors.black,
+                                                  fontSize: screenAwareSize(
+                                                      19, context),
+                                                  fontWeight: FontWeight.w500,
+                                                  letterSpacing: 1.5,
+                                                ),
+                                              ),
+                                              UIHelper.verticalSpaceSmall,
+                                              const Divider(),
+                                              UIHelper.verticalSpaceSmall,
+                                            ],
+                                          ),
+                                        ),
+                                      );
+                                    })
+                                  ],
                                 ),
                               ),
                             ),

@@ -1,63 +1,56 @@
-class VerifyMeterNumberResponse {
-  final bool success;
-  final int statusCode;
-  final VerifyMeterNumberData data;
-  final String message;
 
-  VerifyMeterNumberResponse({
-    required this.success,
-    required this.statusCode,
-    required this.data,
+class VerifyMeterResponse {
+  final String status;
+  final String message;
+  final MeterData data;
+
+  VerifyMeterResponse({
+    required this.status,
     required this.message,
+    required this.data,
   });
 
-  factory VerifyMeterNumberResponse.fromJson(Map<String, dynamic> json) {
-    return VerifyMeterNumberResponse(
-      success: json['success'],
-      statusCode: json['statusCode'],
-      data: VerifyMeterNumberData.fromJson(json['data']),
+  factory VerifyMeterResponse.fromJson(Map<String, dynamic> json) {
+    return VerifyMeterResponse(
+      status: json['status'],
       message: json['message'],
+      data: MeterData.fromJson(json['data']),
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'success': success,
-      'statusCode': statusCode,
-      'data': data.toJson(),
+      'status': status,
       'message': message,
+      'data': data.toJson(),
     };
   }
 }
 
-class VerifyMeterNumberData {
-  final String meterNumber;
-  final String customerName;
-  final String customerNumber;
-  final String meterType;
+class MeterData {
+  final bool invalid;
+  final String name;
+  final String address;
 
-  VerifyMeterNumberData({
-    required this.meterNumber,
-    required this.customerName,
-    required this.customerNumber,
-    required this.meterType,
+  MeterData({
+    required this.invalid,
+    required this.name,
+    required this.address,
   });
 
-  factory VerifyMeterNumberData.fromJson(Map<String, dynamic> json) {
-    return VerifyMeterNumberData(
-      meterNumber: json['meterNumber'],
-      customerName: json['customerName'],
-      customerNumber: json['customerNumber'],
-      meterType: json['meterType'],
+  factory MeterData.fromJson(Map<String, dynamic> json) {
+    return MeterData(
+      invalid: json['invalid'],
+      name: json['name'],
+      address: json['address'],
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'meterNumber': meterNumber,
-      'customerName': customerName,
-      'customerNumber': customerNumber,
-      'meterType': meterType,
+      'invalid': invalid,
+      'name': name,
+      'address': address,
     };
   }
 }
