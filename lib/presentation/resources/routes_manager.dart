@@ -115,7 +115,7 @@ class RouteGenerator {
       case Routes.bankTransfer:
         return MaterialPageRoute(builder: (_) => const BankTransfer());
       case Routes.cardFunding:
-        return MaterialPageRoute(builder: (_) => const CardFunding());
+        return MaterialPageRoute(builder: (_) => CardFunding());
       case Routes.terms:
         return MaterialPageRoute(builder: (_) => const TAndC());
       case Routes.about:

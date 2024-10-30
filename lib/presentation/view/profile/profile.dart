@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:pay_with_paystack/pay_with_paystack.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:zuuro/app/cache/storage.dart';
 import 'package:zuuro/app/services/api_rep/user_services.dart';
 import 'package:zuuro/presentation/resources/resources.dart';
@@ -15,6 +18,60 @@ import 'model/logout_model.dart';
 class Profile extends StatelessWidget {
   Profile({super.key});
 
+  Future<void> initialize(BuildContext ctx) async {
+    try {
+      var response = await UserApiServices().initializePayment({});
+      if (response.statusCode == 200) {
+        var data = jsonDecode(response.body);
+        String paymentUrl = data['payment_url'];
+        String reference = data['reference'];
+
+        // Proceed to open Paystack WebView
+        PayWithPayStack().now(
+            callbackUrl: paymentUrl,
+            context: ctx,
+            secretKey: "sk_test_52fdad00c5f938381b29d16a6e4c516bea328ff5",
+            customerEmail: "popekabu@gmail.com",
+            reference: reference,
+            currency: "NGN",
+            amount: 50,
+            transactionCompleted: () {
+              MekNotification().showMessage(
+                ctx,
+                color: ColorManager.activeColor,
+                message: "Payment successful",
+              );
+            },
+            transactionNotCompleted: () {
+              MekNotification().showMessage(
+                ctx,
+                message: "Payment Failed",
+              );
+            });
+      } else {
+        MekNotification().showMessage(
+          ctx,
+          message: "An error occurred, Please check your internet connection",
+        );
+        print('Error: ${response.body}');
+      }
+    } catch (e) {
+      MekNotification().showMessage(
+        ctx,
+        message: "An error occurred, Please try again later",
+      );
+      print('Exception: $e');
+    }
+  }
+  
+  Future<void> _launchUrl(String url) async {
+    if (await canLaunchUrl(Uri.parse(url))) {
+      await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+    } else {
+      throw 'Could not launch $Uri.parse(url)';
+    }
+  }
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -113,29 +170,7 @@ class Profile extends StatelessWidget {
                                 subTitle: "1 linked card/account",
                                 icon: Icons.group,
                                 onPressed: () {
-                                  final uniqueTransRef =
-                                      PayWithPayStack().generateUuidV4();
-
-                                  PayWithPayStack().now(
-                                      callbackUrl:
-                                          'https://api.paystack.co/transaction/initialize',
-                                      context: context,
-                                      secretKey:
-                                          "sk_test_52fdad00c5f938381b29d16a6e4c516bea328ff5",
-                                      customerEmail: "popekabu@gmail.com",
-                                      reference: uniqueTransRef,
-                                      currency: "NGN",
-                                      amount: 50,
-                                      transactionCompleted: () {
-                                        print("Transaction Successful");
-                                      },
-                                      transactionNotCompleted: () {
-                                        print("Transaction Not Successful!");
-                                      });
-                                  // NavigateClass().pushNamed(
-                                  //   context: context,
-                                  //   routName: Routes.bank,
-                                  // );
+                                  initialize(context);
                                 },
                                 isLast: true,
                               ),
@@ -237,10 +272,11 @@ class Profile extends StatelessWidget {
                                 subTitle: "See our website.",
                                 icon: Icons.web,
                                 onPressed: () {
-                                  NavigateClass().pushNamed(
-                                    context: context,
-                                    routName: Routes.website,
-                                  );
+                                    _launchUrl("https://www.zuuroo.com/");
+                                  // NavigateClass().pushNamed(
+                                  //   context: context,
+                                  //   routName: Routes.website,
+                                  // );
                                 },
                               ),
                               ProfileTile(

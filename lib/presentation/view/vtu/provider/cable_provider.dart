@@ -148,7 +148,7 @@ class CableProvider extends BaseViewModel {
     print("Operator resoonse ---> $response");
     if (response != null) {
       List<CablePlan> _cablePlanResults = AppConstants.cablePlanModel ?? [];
-      for (dynamic plan in response['data']) {
+      for (dynamic plan in response) {
         final cablePl = CablePlan.fromJson(plan);
         bool exists = _cablePlanResults
             .any((existingPlan) => existingPlan.plan == cablePl.plan);

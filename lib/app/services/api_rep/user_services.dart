@@ -174,7 +174,7 @@ class UserApiServices extends BaseServices {
     try {
       await getUserToken().then((value) {
         rm = tokenizedGetRequest(
-            token: value, url: "${ApiConstants.operator}" + "$countryCode");
+            token: value, url: ApiConstants.operator + countryCode);
       });
       return rm;
     } catch (e) {
@@ -187,7 +187,7 @@ class UserApiServices extends BaseServices {
     try {
       await getUserToken().then((value) {
         rm = tokenizedGetRequest(
-            token: value, url: "${ApiConstants.dataCat}" + "$operatorCode");
+            token: value, url: ApiConstants.dataCat + operatorCode);
       });
       return rm;
     } catch (e) {
@@ -210,11 +210,11 @@ class UserApiServices extends BaseServices {
 
   Future getCablePlan(String code) async {
     var rm;
-    String token = await getUserToken();
     try {
       await getUserToken().then((value) {
         rm = tokenizedGetRequest(
             token: value, url: "${ApiConstants.cablePlan}$code");
+            //token: value, url: ApiConstants.cablePlan);
       });
       return rm;
     } catch (e) {
@@ -293,6 +293,19 @@ class UserApiServices extends BaseServices {
       await getUserToken().then((token) {
         rm = tokenizedPostRequest(
             token: token, url: ApiConstants.bill, data: data);
+      });
+      return rm;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Future initializePayment(dynamic data) async {
+    var rm;
+    try {
+      await getUserToken().then((token) {
+        rm = tokenizedPostRequest(
+            token: token, url: ApiConstants.initialize, data: data);
       });
       return rm;
     } catch (e) {

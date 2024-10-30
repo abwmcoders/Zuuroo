@@ -1417,9 +1417,9 @@ class Cable extends StatelessWidget {
                           topUp: topUp,
                           amount: topUp == 2
                               ? calculateLoanRepayment(
-                                  provider.cablePlan!.price,
+                                  provider.cablePlan!.price.toString(),
                                   provider.loanLimit!.percentage)
-                              : provider.cablePlan!.price,
+                              : provider.cablePlan!.price.toString(),
                         );
                       },
                     ),
@@ -1475,8 +1475,7 @@ class Cable extends StatelessWidget {
                 UIHelper.verticalSpaceMedium,
                 CheckoutTile(title: "Product Type", value: type!,),
                 CheckoutTile(title: "Phone Number", value: number,),
-                CheckoutTile(title: "Cable Plan", value: plan.plan,),
-                CheckoutTile(title: "Provider Code", value: plan.providerCode,),
+                CheckoutTile(title: "Cable Plan", value: plan.plan!,),
                 CheckoutTile(title: "Iuc Number", value: provider.iucNumber.text.trim(),),
                 CheckoutTile(title: "Customer Name", value: provider.selectedIucNumber!.name),
                 UIHelper.verticalSpaceSmall,
@@ -1624,7 +1623,7 @@ class Cable extends StatelessWidget {
                           _confirmationBottomSheetMenu(
                             ctx: context,
                             plan: cableProvider.cablePlan!,
-                            amount: cableProvider.cablePlan!.price,
+                            amount: cableProvider.cablePlan!.price.toString(),
                             number: cableProvider.number.text.trim(),
                             provider: cableProvider,
                           );
@@ -1753,7 +1752,7 @@ class Cable extends StatelessWidget {
                 ? AmountReUseWidget(
                     isEdit: false,
                     title: "Loan Repayment",
-                    label: calculateLoanRepayment(cableProvider.cablePlan!.price,
+                    label: calculateLoanRepayment(cableProvider.cablePlan!.price.toString(),
                         cableProvider.loanLimit!.percentage),
                     //controller: vtuProvider.amountController,
                   )
@@ -1774,7 +1773,7 @@ class Cable extends StatelessWidget {
                               plan: cableProvider.cablePlan!,
                               topUp: 2,
                               amount: calculateLoanRepayment(
-                                  cableProvider.cablePlan!.price,
+                                  cableProvider.cablePlan!.price.toString(),
                                   cableProvider.loanLimit!.percentage),
                               number: cableProvider.number.text.trim(),
                               provider: cableProvider,
@@ -1848,7 +1847,7 @@ class Cable extends StatelessWidget {
             children: [
               Text(
                 cableProvider.cablePlan != null
-                    ? "${cableProvider.cablePlan!.providerCode} - ${cableProvider.cablePlan!.plan} | ${AppConstants.currencySymbol} ${cableProvider.cablePlan!.price}"
+                    ? "${cableProvider.cablePlan!.plan} | ${AppConstants.currencySymbol} ${cableProvider.cablePlan!.price}"
                     : "Select Cable Plan",
                     overflow: TextOverflow.ellipsis,
                 style: TextStyle(
@@ -1918,10 +1917,10 @@ class Cable extends StatelessWidget {
                                                 CrossAxisAlignment.start,
                                             children: [
                                               Text(
-                                               "${AppConstants.cablePlanModel![index].providerCode} - ${AppConstants
+                                               "${AppConstants
                                                         .cablePlanModel![
                                                             index]
-                                                        .plan} | ${AppConstants.currencySymbol} ${AppConstants.cablePlanModel![index].price}",
+                                                        .plan} | ${AppConstants.currencySymbol} ${AppConstants.cablePlanModel![index].price.toString()}",
                                                 style: TextStyle(
                                                   color: Colors.black,
                                                   fontSize: screenAwareSize(
@@ -1985,7 +1984,7 @@ class BuildAmount extends StatelessWidget {
         children: [
           Text(
             cableProvider.cablePlan != null
-                ? cableProvider.cablePlan!.price
+                ? cableProvider.cablePlan!.price.toString()
                 : "Loading...",
             style: TextStyle(
               fontSize: 14,

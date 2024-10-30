@@ -33,45 +33,38 @@ class CablePlanResponse {
 }
 
 class CablePlan {
-  final int id;
-  final String plan;
-  final String price;
-  final List<String> channels;
-  final String providerCode;
-  final String createdAt;
-  final String updatedAt;
+  int? id;
+  String? plan;
+  String? price;
+  String? providerCode;
+  String? createdAt;
+  String? updatedAt;
 
-  CablePlan({
-    required this.id,
-    required this.plan,
-    required this.price,
-    required this.channels,
-    required this.providerCode,
-    required this.createdAt,
-    required this.updatedAt,
-  });
+  CablePlan(
+      {this.id,
+      this.plan,
+      this.price,
+      this.providerCode,
+      this.createdAt,
+      this.updatedAt});
 
-  factory CablePlan.fromJson(Map<String, dynamic> json) {
-    return CablePlan(
-      id: json['id'],
-      plan: json['plan'],
-      price: json['price'],
-      channels: List<String>.from(json['channels']),
-      providerCode: json['provider_code'],
-      createdAt: json['created_at'],
-      updatedAt: json['updated_at'],
-    );
+  CablePlan.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    plan = json['plan'];
+    price = json['price'];
+    providerCode = json['provider_code'];
+    createdAt = json['created_at'];
+    updatedAt = json['updated_at'];
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'plan': plan,
-      'price': price,
-      'channels': channels,
-      'provider_code': providerCode,
-      'created_at': createdAt,
-      'updated_at': updatedAt,
-    };
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['id'] = this.id;
+    data['plan'] = this.plan;
+    data['price'] = this.price;
+    data['provider_code'] = this.providerCode;
+    data['created_at'] = this.createdAt;
+    data['updated_at'] = this.updatedAt;
+    return data;
   }
 }

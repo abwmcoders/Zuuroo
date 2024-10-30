@@ -21,8 +21,11 @@ class BaseServices {
   }
 
   //get request
-  Future tokenizedGetRequest(
-      {String? token, dynamic data, required String url, Map<String, String>? queryParams,
+  Future tokenizedGetRequest({
+    String? token,
+    dynamic data,
+    required String url,
+    Map<String, String>? queryParams,
   }) async {
     final String url0 = baseUrl;
     var headers = {
@@ -31,7 +34,9 @@ class BaseServices {
       'Authorization': 'Bearer $token',
     };
     try {
-      final response = await http.get(Uri.parse(url0 + url).replace(queryParameters: queryParams), headers: headers);
+      final response = await http.get(
+          Uri.parse(url0 + url).replace(queryParameters: queryParams),
+          headers: headers);
       final result = jsonDecode(response.body);
       if (response.statusCode == 200) {
         return result;

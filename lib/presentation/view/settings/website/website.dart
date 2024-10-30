@@ -32,6 +32,11 @@ class _WebsiteState extends State<Website> {
           initialUrlRequest: URLRequest(
             url: WebUri("https://www.zuuroo.com/"),
           ),
+           initialSettings: InAppWebViewSettings(
+            javaScriptEnabled: true,
+            clearCache: true,
+            supportZoom: false,
+          ),
           onWebViewCreated: (controller) {
             _webViewController = controller;
           },
@@ -40,6 +45,9 @@ class _WebsiteState extends State<Website> {
           },
           onLoadStop: (controller, url) async {
             print("Finished loading: $url");
+          },
+           onLoadError: (controller, url, code, message) {
+            print("Error loading: $message");
           },
         ),
       ),
