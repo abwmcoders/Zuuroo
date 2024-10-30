@@ -73,7 +73,7 @@ class Login extends StatelessWidget {
                             padding: const EdgeInsets.all(12.0),
                           ),
                           fieldController: loginProvider.mekMail,
-                          keyboardType: TextInputType.emailAddress,
+                          keyboardType: TextInputType.name,
                           validator: (String? val) =>
                               FieldValidator().validateEmail(val!),
                         ),
