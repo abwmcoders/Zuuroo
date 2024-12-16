@@ -1581,18 +1581,40 @@ class Cable extends StatelessWidget {
             ),
             UIHelper.verticalSpaceMedium,
             selectCableCategories(cableProvider, context),
-            UIHelper.verticalSpaceMedium,
+           UIHelper.verticalSpaceMedium,
             //! number
             AmountReUseWidget(
               title: "Phone Number",
               controller: cableProvider.number,
+              digitsCount: 11,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter a phone number';
+                }
+                final regex = RegExp(r'^(?:\+234|0)(7|8|9)(0|1)\d{8}$');
+                if (!regex.hasMatch(value)) {
+                  return 'Please enter a valid Nigerian phone number';
+                }
+                return null;
+              },
             ),
             UIHelper.verticalSpaceMedium,
-            //! Meter number
+            //! IUC number
             AmountReUseWidget(
               callFunc: true,
               title: "IUC Number",
+              digitsCount: 11,
               controller: cableProvider.iucNumber,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter an IUC number';
+                }
+                final regex = RegExp(r'^\d{10,11}$');
+                if (!regex.hasMatch(value)) {
+                  return 'Please enter a valid 10 or 11 digit IUC number';
+                }
+                return null;
+              },
               onComplete: () {
                 cableProvider.verifyIucNumber(
                   ctx: context,
@@ -1620,13 +1642,22 @@ class Cable extends StatelessWidget {
                       if (cableProvider.selectedIucNumber != null) {
                         if (cableProvider.cableName != null ||
                             cableProvider.cableCode != null) {
-                          _confirmationBottomSheetMenu(
-                            ctx: context,
-                            plan: cableProvider.cablePlan!,
-                            amount: cableProvider.cablePlan!.price.toString(),
-                            number: cableProvider.number.text.trim(),
-                            provider: cableProvider,
-                          );
+                              if (AppConstants.homeModel != null) {
+                              _confirmationBottomSheetMenu(
+                                ctx: context,
+                                plan: cableProvider.cablePlan!,
+                                amount:
+                                    cableProvider.cablePlan!.price.toString(),
+                                number: cableProvider.number.text.trim(),
+                                provider: cableProvider,
+                              );
+                            } else {
+                              MekNotification().showMessage(
+                                context,
+                                message:
+                                    "Please refresh your home screen, your data is missing!!!",
+                              );
+                            }
                         } else {
                           MekNotification().showMessage(
                             context,
@@ -1697,13 +1728,35 @@ class Cable extends StatelessWidget {
             AmountReUseWidget(
               title: "Phone Number",
               controller: cableProvider.number,
+              digitsCount: 11,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter a phone number';
+                }
+                final regex = RegExp(r'^(?:\+234|0)(7|8|9)(0|1)\d{8}$');
+                if (!regex.hasMatch(value)) {
+                  return 'Please enter a valid Nigerian phone number';
+                }
+                return null;
+              },
             ),
             UIHelper.verticalSpaceMedium,
-            //! Meter number
+            //! IUC number
             AmountReUseWidget(
               callFunc: true,
               title: "IUC Number",
+              digitsCount: 11,
               controller: cableProvider.iucNumber,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter an IUC number';
+                }
+                final regex = RegExp(r'^\d{10,11}$');
+                if (!regex.hasMatch(value)) {
+                  return 'Please enter a valid 10 or 11 digit IUC number';
+                }
+                return null;
+              },
               onComplete: () {
                 cableProvider.verifyIucNumber(
                   ctx: context,
@@ -1768,16 +1821,25 @@ class Cable extends StatelessWidget {
                         if (cableProvider.selectedIucNumber != null) {
                           if (cableProvider.cableName != null ||
                               cableProvider.cableCode != null) {
-                           _confirmationBottomSheetMenu(
-                              ctx: context,
-                              plan: cableProvider.cablePlan!,
-                              topUp: 2,
-                              amount: calculateLoanRepayment(
-                                  cableProvider.cablePlan!.price.toString(),
-                                  cableProvider.loanLimit!.percentage),
-                              number: cableProvider.number.text.trim(),
-                              provider: cableProvider,
-                            );
+                                if (AppConstants.homeModel != null) {
+                              _confirmationBottomSheetMenu(
+                                ctx: context,
+                                plan: cableProvider.cablePlan!,
+                                topUp: 2,
+                                amount: calculateLoanRepayment(
+                                    cableProvider.cablePlan!.price.toString(),
+                                    cableProvider.loanLimit!.percentage),
+                                number: cableProvider.number.text.trim(),
+                                provider: cableProvider,
+                              );
+                            } else {
+                              MekNotification().showMessage(
+                                context,
+                                message:
+                                    "Please refresh your home screen, your data is missing!!!",
+                              );
+                            }
+                     
                           } else {
                             MekNotification().showMessage(
                               context,

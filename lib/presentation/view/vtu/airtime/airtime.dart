@@ -421,7 +421,18 @@ class Airtime extends StatelessWidget {
                       ),
                     ],
                   )
-                : Container(),
+                : Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+                    decoration: BoxDecoration(
+                      color: ColorManager.greyColor.withOpacity(.4),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Text(
+                      "Loading .....",
+                      style: getBoldStyle(color: ColorManager.deepGreyColor),
+                    ),
+                  ),
           ),
           UIHelper.verticalSpaceMedium,
           //! operator and number field
@@ -560,7 +571,7 @@ class Airtime extends StatelessWidget {
                           keyboardType: const TextInputType.numberWithOptions(),
                           inputFormatters: [
                             FilteringTextInputFormatter.digitsOnly,
-                            LengthLimitingTextInputFormatter(10),
+                            LengthLimitingTextInputFormatter(14),
                           ],
                           controller: vtuProvider.numberController,
                           style: TextStyle(
@@ -571,14 +582,15 @@ class Airtime extends StatelessWidget {
                               color: ColorManager.blackColor),
                           decoration: const InputDecoration(
                             border: InputBorder.none,
-                            hintText: 'Enter 10 digits',
+                            hintText: 'Enter number',
                           ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return 'Please enter a value';
+                              return 'Please enter a phone number';
                             }
-                            if (value.length != 10) {
-                              return 'Please enter exactly 10 digits';
+                            final regex = RegExp(r'^[1-9]\d{6,14}$');
+                            if (!regex.hasMatch(value)) {
+                              return 'Invalid phone number format';
                             }
                             return null;
                           },
@@ -635,7 +647,6 @@ class Airtime extends StatelessWidget {
               ),
             ),
           ),
-
           UIHelper.verticalSpaceMedium,
           UIHelper.verticalSpaceLarge,
           Row(
@@ -645,11 +656,20 @@ class Airtime extends StatelessWidget {
                   buttonText: "Submit",
                   onPressed: () {
                     if (formKey.currentState!.validate()) {
-                      _confirmationBottomSheetMenu(
-                          amount: vtuProvider.amountController.text,
-                          number: vtuProvider.numberController.text,
-                          provider: vtuProvider,
-                          ctx: context);
+                      if(AppConstants.homeModel != null) {
+                         _confirmationBottomSheetMenu(
+                            amount: vtuProvider.amountController.text,
+                            number: vtuProvider.numberController.text,
+                            provider: vtuProvider,
+                            ctx: context);
+                      } else {
+                        MekNotification().showMessage(
+                          context,
+                          message:
+                              "Please refresh your home screen, your data is missing!!!",
+                        );
+                      }
+                     
                     } else {
                       MekNotification().showMessage(
                         context,
@@ -699,13 +719,13 @@ class Airtime extends StatelessWidget {
               color: ColorManager.greyColor.withOpacity(.4),
               borderRadius: BorderRadius.circular(10),
             ),
-            child: AppConstants.countryModel != null &&
-                    AppConstants.countryModel!.isNotEmpty
+            child: AppConstants.countryLoanModel != null &&
+                    AppConstants.countryLoanModel!.isNotEmpty
                 ? Row(
                     children: [
                       Text(
-                        vtuProvider.countryCode != null
-                            ? vtuProvider.countryCode!.toUpperCase()
+                        vtuProvider.loanCountryCode != null
+                            ? vtuProvider.loanCountryCode!.toUpperCase()
                             : "",
                         style: getBoldStyle(
                           color: ColorManager.blackColor,
@@ -719,10 +739,10 @@ class Airtime extends StatelessWidget {
                             border: InputBorder.none,
                             enabledBorder: InputBorder.none,
                           ),
-                          value: vtuProvider.selectedCountry,
+                          value: vtuProvider.selectedLoanCountry,
                           onChanged: (CountryModel? newValue) async {
-                            vtuProvider.setSelectedCountry(newValue!);
-                            vtuProvider.setCountryCode(
+                            vtuProvider.setSelectedLoanCountry(newValue!);
+                            vtuProvider.setLoanCountryCode(
                               newValue.countryCode,
                               newValue.phoneCode,
                             );
@@ -734,12 +754,23 @@ class Airtime extends StatelessWidget {
                             vtuProvider.isOpSet();
                           },
                           items: vtuProvider
-                              .countryList(AppConstants.countryModel!),
+                              .countryList(AppConstants.countryLoanModel!),
                         ),
                       ),
                     ],
                   )
-                : Container(),
+                : Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+                    decoration: BoxDecoration(
+                      color: ColorManager.greyColor.withOpacity(.4),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Text(
+                      "Loading .....",
+                      style: getBoldStyle(color: ColorManager.deepGreyColor),
+                    ),
+                  ),
           ),
           UIHelper.verticalSpaceMedium,
           //! operator and number field
@@ -869,7 +900,7 @@ class Airtime extends StatelessWidget {
                   child: Row(
                     children: [
                       Text(
-                        "${vtuProvider.phoneCode ?? ""}  |",
+                        "${vtuProvider.loanPhoneCode ?? ""}  |",
                         style: getBoldStyle(
                           color: ColorManager.blackColor,
                           fontSize: 16,
@@ -881,7 +912,7 @@ class Airtime extends StatelessWidget {
                           keyboardType: const TextInputType.numberWithOptions(),
                           inputFormatters: [
                             FilteringTextInputFormatter.digitsOnly,
-                            LengthLimitingTextInputFormatter(10),
+                            LengthLimitingTextInputFormatter(14),
                           ],
                           controller: vtuProvider.numberController,
                           style: TextStyle(
@@ -892,14 +923,15 @@ class Airtime extends StatelessWidget {
                               color: ColorManager.blackColor),
                           decoration: const InputDecoration(
                             border: InputBorder.none,
-                            hintText: 'Enter 10 digits',
+                            hintText: 'Enter number',
                           ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return 'Please enter a value';
+                              return 'Please enter a phone number';
                             }
-                            if (value.length != 10) {
-                              return 'Please enter exactly 10 digits';
+                            final regex = RegExp(r'^[1-9]\d{6,14}$');
+                            if (!regex.hasMatch(value)) {
+                              return 'Invalid phone number format';
                             }
                             return null;
                           },
@@ -963,15 +995,24 @@ class Airtime extends StatelessWidget {
                   buttonText: "Submit",
                   onPressed: () {
                     if (formKey.currentState!.validate()) {
-                      _confirmationBottomSheetMenu(
-                        topUp: 2,
-                        amount: calculateLoanRepayment(
-                            vtuProvider.amountController.text.trim(),
-                            vtuProvider.loanLimit!.percentage),
-                        number: vtuProvider.numberController.text,
-                        provider: vtuProvider,
-                        ctx: context,
-                      );
+                      if (AppConstants.homeModel != null) {
+                        _confirmationBottomSheetMenu(
+                          topUp: 2,
+                          amount: calculateLoanRepayment(
+                              vtuProvider.amountController.text.trim(),
+                              vtuProvider.loanLimit!.percentage),
+                          number: vtuProvider.numberController.text,
+                          provider: vtuProvider,
+                          ctx: context,
+                        );
+                      } else {
+                        MekNotification().showMessage(
+                          context,
+                          message:
+                              "Please refresh your home screen, your data is missing!!!",
+                        );
+                      }
+                     
                     } else {
                       //Navigator.pop(context);
                       MekNotification().showMessage(
@@ -1014,6 +1055,8 @@ class AmountReUseWidget extends StatelessWidget {
     this.showCurrency = false,
     this.onComplete,
     this.callFunc = false,
+    this.validator,
+    this.digitsCount = 10,
   });
 
   final TextEditingController? controller;
@@ -1023,6 +1066,8 @@ class AmountReUseWidget extends StatelessWidget {
   final bool showCurrency;
   final Function()? onComplete;
   final bool callFunc;
+  final String? Function(String?)? validator;
+  final int digitsCount;
 
   @override
   Widget build(BuildContext context) {
@@ -1051,7 +1096,9 @@ class AmountReUseWidget extends StatelessWidget {
             onEditingComplete: onComplete,
             inputFormatters: [
               FilteringTextInputFormatter.digitsOnly,
+              LengthLimitingTextInputFormatter(digitsCount),
             ],
+            validator: validator,
             controller: controller,
             onFieldSubmitted: (value) {
               callFunc ? onComplete : null;

@@ -51,6 +51,8 @@ class Routes {
   static const String transactionDetail = "/transaction-details";
   static const String changePassword = "/change-password";
   static const String changePin = "/change-pin";
+  static const String requestPinChange = "/request-change-pin";
+  static const String verifyPinChange = "/verify-change-pin";
   static const String personalInfo = "/personal-information";
   static const String bankTransfer = "/bank-transfer";
   static const String cardFunding = "/card-funding";
@@ -61,7 +63,6 @@ class Routes {
   static const String kyc = "/kyc";
   static const String editProfile = "/kedit-profileyc";
   static const String profile = "/${AppStrings.profile}";
-
 }
 
 
@@ -101,7 +102,8 @@ class RouteGenerator {
       case Routes.cableRoute:
         return MaterialPageRoute(builder: (_) => Cable());
       case Routes.success:
-        return MaterialPageRoute(builder: (_) => const SuccessScreen());
+      final String args = routeSettings.arguments as String;
+        return MaterialPageRoute(builder: (_) => SuccessScreen(amount: args,));
       case Routes.addMoney:
         return MaterialPageRoute(builder: (_) => const AddMoney());
       case Routes.profile:
@@ -110,6 +112,10 @@ class RouteGenerator {
         return MaterialPageRoute(builder: (_) => ChangePassword());
       case Routes.changePin:
         return MaterialPageRoute(builder: (_) => const ChangePin());
+      case Routes.requestPinChange:
+        return MaterialPageRoute(builder: (_) => ChangePinEmail());
+      case Routes.verifyPinChange:
+        return MaterialPageRoute(builder: (_) => VerifyChangePinOtp());
       case Routes.personalInfo:
         return MaterialPageRoute(builder: (_) => PersonalInfo());
       case Routes.bankTransfer:

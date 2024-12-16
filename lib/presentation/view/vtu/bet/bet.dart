@@ -564,6 +564,7 @@ class _BetState extends State<Bet>  with SingleTickerProviderStateMixin{
                   onPressed: () {
                     NavigateClass().pushNamed(
                       context: context,
+                      args: "200",
                       routName: Routes.success,
                     );
                   },

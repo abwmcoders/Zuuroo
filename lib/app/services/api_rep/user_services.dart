@@ -6,6 +6,7 @@ import 'package:zuuro/app/app_constants.dart';
 import '../base_services.dart';
 
 class UserApiServices extends BaseServices {
+  //! --------- ---------------
   Future getUserRecords() async {
     var rm;
     String token = await getUserToken();
@@ -26,6 +27,21 @@ class UserApiServices extends BaseServices {
       await getUserToken().then(
         (value) {
           rm = tokenizedGetRequest(token: value, url: ApiConstants.country);
+        },
+      );
+      return rm;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Future getLoanCountryList() async {
+    var rm;
+    String token = await getUserToken();
+    try {
+      await getUserToken().then(
+        (value) {
+          rm = tokenizedGetRequest(token: value, url: ApiConstants.countryLoan);
         },
       );
       return rm;
@@ -326,6 +342,32 @@ class UserApiServices extends BaseServices {
     }
   }
 
+  Future verifyOtp(dynamic data) async {
+    var rm;
+    try {
+      await getUserToken().then((token) {
+        rm = tokenizedPostRequest(
+            token: token, url: ApiConstants.otpVerify, data: data);
+      });
+      return rm;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Future requestChangePin(dynamic data) async {
+    var rm;
+    try {
+      await getUserToken().then((token) {
+        rm = tokenizedPostRequest(
+            token: token, url: ApiConstants.requestPinChange, data: data);
+      });
+      return rm;
+    } catch (e) {
+      return null;
+    }
+  }
+
   Future verifyMeterNumber(dynamic data) async {
     var rm;
     try {
@@ -363,4 +405,5 @@ class UserApiServices extends BaseServices {
       return null;
     }
   }
+
 }

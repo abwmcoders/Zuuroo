@@ -6,7 +6,10 @@ import '../../../../app/animation/navigator.dart';
 import '../../../../app/functions.dart';
 import '../../../../app/validator.dart';
 import '../../../resources/resources.dart';
+import '../../auth/verify/component/otp_field.dart';
+import '../../history/transaction_details.dart';
 import '../../onboarding/onboarding.dart';
+import '../../vtu/airtime/airtime.dart';
 
 class ChangePin extends StatefulWidget {
   const ChangePin({super.key});
@@ -502,3 +505,156 @@ class _ChangePinState extends State<ChangePin> {
     );
   }
 }
+
+
+class ChangePinEmail extends StatelessWidget {
+  ChangePinEmail({
+    super.key,
+  });
+
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      resizeToAvoidBottomInset: false,
+      appBar: const SimpleAppBar(title: "Change Pin"),
+      body: BaseView(
+        vmBuilder: (context) => SettingsProvider(context: context),
+        builder: _buildScreen,
+      ),
+    );
+  }
+
+  Widget _buildScreen(BuildContext context, SettingsProvider provider) {
+    return Form(
+      key: _formKey,
+      child: ContainerWidget(
+       // color: ColorManager.whiteColor.withOpacity(.5),
+        content: Column(
+          children: [
+            UIHelper.verticalSpaceMedium,
+            Expanded(
+              flex: 8,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    UIHelper.verticalSpaceSmall,
+                    Text(
+                      "Confirm your email and a 6 digit code will be sent.",
+                      style: getRegularStyle(
+                          color: ColorManager.deepGreyColor, fontSize: 14),
+                    ),
+                    UIHelper.verticalSpaceMedium,
+                    AppFormField(
+                      shouldBeWhite: false,
+                      hintText: "Email",
+                      fieldController: provider.requestPinChange,
+                      keyboardType: TextInputType.emailAddress,
+                      validator: (String? val) =>
+                          FieldValidator().validateEmail(val!),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+             
+            Expanded(
+              flex: 1,
+              child: Center(
+                child: AppButton(
+                  onPressed: () {
+                    if (_formKey.currentState!.validate()) {
+                        provider.requestOtp();
+                    }
+                  },
+                  buttonText: "Next",
+                ),
+              ),
+            ),
+               
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class VerifyChangePinOtp extends StatelessWidget {
+  VerifyChangePinOtp({super.key});
+
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+  @override
+  Widget build(BuildContext context) {
+    return BaseView(
+      vmBuilder: (context) => SettingsProvider(context: context,),
+      builder: _buildScreen,
+    );
+  }
+
+  Widget _buildScreen(BuildContext context, SettingsProvider provider) {
+    return Scaffold(
+      resizeToAvoidBottomInset: false,
+      appBar: const SimpleAppBar(title: "Change Pin"),
+      body: SafeArea(
+        child: ContainerWidget(
+          content: Form(
+            key: _formKey,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10),
+              child: Column(
+                children: [
+                  const Text(
+                    "Enter otp",
+                    style: TextStyle(
+                      fontFamily: "AT",
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  UIHelper.verticalSpaceSmall,
+                  Text.rich(
+                    TextSpan(
+                        text: 'Enter the OTP code sent to ',
+                        style: getBoldStyle(color: ColorManager.blackColor),
+                        children: [
+                          TextSpan(
+                            text: provider.requestPinChange.text.isNotEmpty ? provider.requestPinChange.text : "Your email",
+                            style: const TextStyle(fontWeight: FontWeight.w600),
+                          ),
+                        ],),
+                    textAlign: TextAlign.center,
+                  ),
+                  UIHelper.verticalSpaceLarge,
+                  UIHelper.verticalSpaceLarge,
+                  AppPinField(
+                    length: 6,
+                    onCompleted: (_) => provider.verifyChangeOtp(),
+                    controller: provider.otpField,
+                    obscure: false,
+                    validator: (v) => FieldValidator().validateRequiredLength(
+                      v,
+                      6,
+                    ),
+                  ),
+                  UIHelper.verticalSpaceMediumPlus,
+                  AppButton(
+                    onPressed: () {
+                      provider.verifyChangeOtp();
+                    },
+                    buttonText: "Verify",
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+

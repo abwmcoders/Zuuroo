@@ -384,7 +384,7 @@ class Bill extends StatelessWidget {
             UIHelper.verticalSpaceMedium,
             //! amount
             AmountReUseWidget(
-              controller: amount,
+              controller: vtuProvider.amountController,
               showCurrency: true,
             ),
             UIHelper.verticalSpaceMedium,
@@ -392,6 +392,17 @@ class Bill extends StatelessWidget {
             AmountReUseWidget(
               title: "Phone Number",
               controller: vtuProvider.numberController,
+              digitsCount: 11,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter a phone number';
+                }
+                final regex = RegExp(r'^(?:\+234|0)(7|8|9)(0|1)\d{8}$');
+                if (!regex.hasMatch(value)) {
+                  return 'Please enter a valid Nigerian phone number';
+                }
+                return null;
+              },
             ),
             UIHelper.verticalSpaceMedium,
              //! Meter number
@@ -399,6 +410,17 @@ class Bill extends StatelessWidget {
               callFunc: true,
               title: "Meter Number",
               controller: vtuProvider.meterNumber,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter an meter number';
+                }
+                final regex = RegExp(r'^\d{10,13}$');
+                if (!regex.hasMatch(value)) {
+                  return 'Please enter a valid 13 digit meter number';
+                }
+                return null;
+              },
+              digitsCount: 13,
               onComplete: () {
                 vtuProvider.verifyMeterNumber(
                   ctx: context,
@@ -438,15 +460,28 @@ class Bill extends StatelessWidget {
                       if (vtuProvider.selectedMeterData != null) {
                         if (vtuProvider.billerCode != null ||
                             vtuProvider.billerName != null) {
-                          _confirmationBottomSheetMenu(
-                            meterNumber: vtuProvider.meterNumber.text.trim(),
-                            mrterType: vtuProvider.metr!,
-                            biller: vtuProvider.selectedBiller!,
-                            amount: amount.text.trim(),
-                            number: vtuProvider.numberController.text.trim(),
-                            provider: vtuProvider,
-                            ctx: context,
-                          );
+                              if (AppConstants.homeModel != null) {
+                             
+                              _confirmationBottomSheetMenu(
+                                meterNumber:
+                                    vtuProvider.meterNumber.text.trim(),
+                                mrterType: vtuProvider.metr!,
+                                biller: vtuProvider.selectedBiller!,
+                                amount:
+                                    vtuProvider.amountController.text.trim(),
+                                number:
+                                    vtuProvider.numberController.text.trim(),
+                                provider: vtuProvider,
+                                ctx: context,
+                              );
+                            } else {
+                              MekNotification().showMessage(
+                                context,
+                                message:
+                                    "Please refresh your home screen, your data is missing!!!",
+                              );
+                            }
+                     
                         } else {
                           MekNotification().showMessage(
                             context,
@@ -516,7 +551,7 @@ class Bill extends StatelessWidget {
             UIHelper.verticalSpaceMedium,
             //! amount
             AmountReUseWidget(
-              controller: amount,
+              controller: vtuProvider.amountController,
               showCurrency: true,
             ),
             UIHelper.verticalSpaceMedium,
@@ -524,6 +559,17 @@ class Bill extends StatelessWidget {
             AmountReUseWidget(
               title: "Phone Number",
               controller: vtuProvider.numberController,
+              digitsCount: 11,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter a phone number';
+                }
+                final regex = RegExp(r'^(?:\+234|0)(7|8|9)(0|1)\d{8}$');
+                if (!regex.hasMatch(value)) {
+                  return 'Please enter a valid Nigerian phone number';
+                }
+                return null;
+              },
             ),
             UIHelper.verticalSpaceMedium,
             //! Meter number
@@ -531,6 +577,17 @@ class Bill extends StatelessWidget {
               callFunc: true,
               title: "Meter Number",
               controller: vtuProvider.meterNumber,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter an meter number';
+                }
+                final regex = RegExp(r'^\d{10,13}$');
+                if (!regex.hasMatch(value)) {
+                  return 'Please enter a valid 13 digit meter number';
+                }
+                return null;
+              },
+              digitsCount: 13,
               onComplete: () {
                 vtuProvider.verifyMeterNumber(
                   ctx: context,
@@ -605,17 +662,30 @@ class Bill extends StatelessWidget {
                         if (vtuProvider.selectedMeterData != null) {
                           if (vtuProvider.billerCode != null ||
                               vtuProvider.billerName != null) {
-                             _confirmationBottomSheetMenu(
-                              meterNumber: vtuProvider.meterNumber.text.trim(),
-                              mrterType: vtuProvider.metr!,
-                              biller: vtuProvider.selectedBiller!,
-                              ctx: context,
-                              topUp: 2,
-                              amount: calculateLoanRepayment(
-                                  amount.text, vtuProvider.loanLimit!.percentage),
-                              number: vtuProvider.numberController.text.trim(),
-                              provider: vtuProvider,
-                            );
+                                if (AppConstants.homeModel != null) {
+                              _confirmationBottomSheetMenu(
+                                meterNumber:
+                                    vtuProvider.meterNumber.text.trim(),
+                                mrterType: vtuProvider.metr!,
+                                biller: vtuProvider.selectedBiller!,
+                                ctx: context,
+                                topUp: 2,
+                                amount: calculateLoanRepayment(
+                                    vtuProvider.amountController.text,
+                                    vtuProvider.loanLimit!.percentage),
+                                number:
+                                    vtuProvider.numberController.text.trim(),
+                                provider: vtuProvider,
+                              );
+                            } else {
+                              MekNotification().showMessage(
+                                context,
+                                message:
+                                    "Please refresh your home screen, your data is missing!!!",
+                              );
+                            }
+                     
+                             
                           } else {
                             MekNotification().showMessage(
                               context,

@@ -12,6 +12,7 @@ import '../presentation/view/vtu/model/data_plan_model.dart';
 class AppConstants {
   static HomeModel? homeModel;
   static List<CountryModel>? countryModel = [];
+  static List<CountryModel>? countryLoanModel = [];
   static List<LoanLimit>? loanModel = [];
   static List<CableData>? cableModel = [];
   static List<BillerData>? billerModel = [];

@@ -15,7 +15,7 @@ class AppFormField extends StatelessWidget {
     this.onEditingComplete,
     this.hintTextStyle,
     this.validator,
-    this.shouldBeWhite,
+    this.shouldBeWhite =  true,
     this.letterSpacing = 1.5,
     this.suffixWidget,
     this.obscure,
@@ -33,7 +33,7 @@ class AppFormField extends StatelessWidget {
   final VoidCallback? onEditingComplete;
   final TextStyle? hintTextStyle;
   final String? Function(String?)? validator;
-  final bool? shouldBeWhite;
+  final bool shouldBeWhite;
   final double? letterSpacing;
   final Widget? suffixWidget;
   final bool? obscure;
@@ -75,7 +75,7 @@ class AppFormField extends StatelessWidget {
         onSaved: onSaved,
         decoration: InputDecoration(
           contentPadding: EdgeInsets.symmetric(horizontal: 15, vertical: 0),
-          fillColor: ColorManager.whiteColor.withOpacity(.6),
+          fillColor: shouldBeWhite ? ColorManager.whiteColor.withOpacity(.6) : ColorManager.greyColor,
           filled: true,
           border: OutlineInputBorder(
             gapPadding: 1.0,

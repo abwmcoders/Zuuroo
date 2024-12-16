@@ -25,6 +25,7 @@ class VtuProvider extends BaseViewModel {
   List<CountryModel>? countries;
   dynamic operators;
   CountryModel? selectedCountry;
+  CountryModel? selectedLoanCountry;
   BillerData? selectedBiller;
   bool shouldCallInit = false;
   bool callBiller = false;
@@ -34,6 +35,7 @@ class VtuProvider extends BaseViewModel {
     this.countries,
     this.operators,
     this.selectedCountry,
+    this.selectedLoanCountry,
     this.shouldCallInit = true,
     this.callBiller = false,
   });
@@ -42,11 +44,13 @@ class VtuProvider extends BaseViewModel {
   // TextEditingController numberController = TextEditingController();
 
   String? countryCode;
+  String? loanCountryCode;
   String? billerCode;
   String? customerName;
   String? customerNumber;
   String? billerName;
   String? phoneCode;
+  String? loanPhoneCode;
   String? operatorCode;
   bool operatorSet = false;
   String? otp;
@@ -122,6 +126,12 @@ class VtuProvider extends BaseViewModel {
   setCountryCode(String newCode, String newPhoneCode) {
     countryCode = newCode;
     phoneCode = newPhoneCode;
+    notifyListeners();
+  }
+
+  setLoanCountryCode(String newCode, String newPhoneCode) {
+    loanCountryCode = newCode;
+    loanPhoneCode = newPhoneCode;
     notifyListeners();
   }
 
@@ -236,6 +246,26 @@ class VtuProvider extends BaseViewModel {
     }
   }
 
+  getLoanCountry() async {
+    final response = await UserApiServices().getLoanCountryList();
+    print("countries ---> $response");
+    if (response != null && response['data'] != null) {
+      List<CountryModel> _countryResult = AppConstants.countryLoanModel ?? [];
+      for (dynamic country in response['data']) {
+        final countryModel = CountryModel.fromJson(country);
+        bool exists = _countryResult.any((existingCountry) =>
+            existingCountry.countryCode == countryModel.countryCode);
+
+        if (!exists) {
+          _countryResult.add(countryModel);
+        }
+
+        AppConstants.countryLoanModel = _countryResult;
+        notifyListeners();
+      }
+    }
+  }
+
   getBiller() async {
     final response = await UserApiServices().getBillerList();
     if (response != null && response['data'] != null) {
@@ -280,14 +310,14 @@ class VtuProvider extends BaseViewModel {
     if (response != null) {
       List<DataCategory> _operatorsResults = [];
       for (dynamic operator in response['data']) {
-        final operators = DataCategory.fromJson(operator);
-        bool exists = _operatorsResults.any((existingOperator) =>
-            existingOperator.operatorCode == operators.operatorCode);
-        if (!exists) {
-          _operatorsResults.add(
-            DataCategory.fromJson(operator),
-          );
-        }
+        // final operators = DataCategory.fromJson(operator);
+        // bool exists = _operatorsResults.any((existingOperator) =>
+        //     existingOperator.operatorCode == operators.operatorCode);
+        // if (!exists) {
+        _operatorsResults.add(
+          DataCategory.fromJson(operator),
+        );
+        // }
         AppConstants.dataCategoryModel = _operatorsResults;
         notifyListeners();
       }
@@ -303,14 +333,14 @@ class VtuProvider extends BaseViewModel {
     if (response != null) {
       List<DataPlan> _operatorsResults = [];
       for (dynamic operator in response['data']) {
-        final operators = DataPlan.fromJson(operator);
-        bool exists = _operatorsResults.any((existingOperator) =>
-            existingOperator.operatorCode == operators.operatorCode);
-        if (!exists) {
-          _operatorsResults.add(
-            DataPlan.fromJson(operator),
-          );
-        }
+        // final operators = DataPlan.fromJson(operator);
+        // bool exists = _operatorsResults.any((existingOperator) =>
+        //     existingOperator.operatorCode == operators.operatorCode);
+        //if (!exists) {
+        _operatorsResults.add(
+          DataPlan.fromJson(operator),
+        );
+        //}
         AppConstants.dataPlanModel = _operatorsResults;
         notifyListeners();
       }
@@ -326,7 +356,7 @@ class VtuProvider extends BaseViewModel {
     var body = {
       "pin": otpField.text.trim(),
       "top_up": topUp,
-      "country": countryCode,
+      "country": topUp == 2 ? loanCountryCode : countryCode,
       "phoneNumber": numberController.text.trim(),
       "network_operator":
           operatorCode ?? AppConstants.operatorModel![0].operatorCode,
@@ -337,10 +367,12 @@ class VtuProvider extends BaseViewModel {
     try {
       var request = await UserApiServices().purchaseAirtime(body);
       changeLoaderStatus(false);
+      print("response for purchase ---> $request");
       if (request != null) {
         if (request["status"] == true) {
           NavigateClass().pushNamed(
             context: ctx,
+            args: amount,
             routName: Routes.success,
           );
         } else {
@@ -373,7 +405,7 @@ class VtuProvider extends BaseViewModel {
     var body = {
       "pin": pin,
       "top_up": topUp,
-      "country": countryCode,
+      "country": topUp == 2 ? loanCountryCode : countryCode,
       "phoneNumber": numberController.text.trim(),
       "network_operator":
           operatorCode ?? AppConstants.operatorModel![0].operatorCode,
@@ -381,32 +413,28 @@ class VtuProvider extends BaseViewModel {
     };
 
     print("object for data purchase ---> $body");
-    try {
-      var request = await UserApiServices().purchaseData(body);
-      print("response for data purchase ---> $request");
-      changeLoaderStatus(false);
-      if (request != null) {
-        if (request["status"] == true) {
-          NavigateClass().pushNamed(
-            context: ctx,
-            routName: Routes.success,
-          );
-        } else {
-          MekNotification().showMessage(
-            ctx,
-            message: request['message'].toString(),
-          );
-        }
+    var request = await UserApiServices().purchaseData(body);
+    print("response for data purchase ---> $request");
+    changeLoaderStatus(false);
+    if (request != null) {
+      if (request["status"] == true) {
+        NavigateClass().pushNamed(
+          context: ctx,
+          args: topUp == 1
+              ? selectedDataPlan!.costPrice.toString()
+              : selectedDataPlan!.loanPrice.toString(),
+          routName: Routes.success,
+        );
       } else {
         MekNotification().showMessage(
           ctx,
-          message: "An error occurred, Please check your internet connection",
+          message: request['message'].toString(),
         );
       }
-    } catch (e) {
+    } else {
       MekNotification().showMessage(
         ctx,
-        message: "An error occurred, Please try again later",
+        message: "An error occurred, Please check your internet connection",
       );
     }
   }
@@ -421,8 +449,8 @@ class VtuProvider extends BaseViewModel {
     dismissKeyboard(context);
     changeLoaderStatus(true);
     var body = {
-      "billerName": selectedBiller!.billerName,
-      "meterType": metr!.toLowerCase(),
+      "billerName": selectedBiller!.billerCode.toString(),
+      "meterType": metr!.toLowerCase() == "prepaid" ? 1 : 2,
       "top_up": topUp,
       "meterNumber": meterNumber,
       "amount": amount,
@@ -440,6 +468,7 @@ class VtuProvider extends BaseViewModel {
         if (request["status"] == true) {
           NavigateClass().pushNamed(
             context: ctx,
+            args: amount,
             routName: Routes.success,
           );
         } else {
@@ -529,19 +558,25 @@ class VtuProvider extends BaseViewModel {
       } else {
         MekNotification().showMessage(
           ctx,
-          message: request['message'].toString(),
+          message:
+              "An error occurred, Please check your internet connection !!!",
         );
       }
     } catch (e) {
       MekNotification().showMessage(
         ctx,
-        message: e.toString(),
+        message: "An error occurred, Please try again later !!!",
       );
     }
   }
 
   void setSelectedCountry(CountryModel country) {
     selectedCountry = country;
+    notifyListeners();
+  }
+
+  void setSelectedLoanCountry(CountryModel country) {
+    selectedLoanCountry = country;
     notifyListeners();
   }
 
@@ -562,6 +597,7 @@ class VtuProvider extends BaseViewModel {
       if (shouldCallInit) {
         changeCallInitState(false);
         await getData();
+        await getLoanCountry();
       }
     }
   }

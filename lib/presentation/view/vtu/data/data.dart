@@ -420,7 +420,18 @@ class DataPage extends StatelessWidget {
                       ),
                     ],
                   )
-                : Container(),
+                : Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+                    decoration: BoxDecoration(
+                      color: ColorManager.greyColor.withOpacity(.4),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Text(
+                      "Loading .....",
+                      style: getBoldStyle(color: ColorManager.deepGreyColor),
+                    ),
+                  ),
           ),
           UIHelper.verticalSpaceMedium,
           //! operator and number field
@@ -570,7 +581,7 @@ class DataPage extends StatelessWidget {
                           keyboardType: const TextInputType.numberWithOptions(),
                           inputFormatters: [
                             FilteringTextInputFormatter.digitsOnly,
-                            LengthLimitingTextInputFormatter(10),
+                            LengthLimitingTextInputFormatter(14),
                           ],
                           controller: vtuProvider.numberController,
                           style: TextStyle(
@@ -581,16 +592,17 @@ class DataPage extends StatelessWidget {
                               color: ColorManager.blackColor),
                           decoration: const InputDecoration(
                             border: InputBorder.none,
-                            hintText: 'Enter 10 digits',
+                            hintText: 'Enter number',
                           ),
                           validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter a value';
+                             if (value == null || value.isEmpty) {
+                              return 'Please enter a phone number';
                             }
-                            if (value.length != 10) {
-                              return 'Please enter exactly 10 digits';
+                            final regex = RegExp(r'^[1-9]\d{6,14}$');
+                            if (!regex.hasMatch(value)) {
+                              return 'Invalid phone number format';
                             }
-                            return null;
+                            return null; 
                           },
                         ),
                       )
@@ -625,14 +637,24 @@ class DataPage extends StatelessWidget {
                   buttonText: "Submit",
                   onPressed: () {
                     if (formKey.currentState!.validate()) {
-                      _confirmationBottomSheetMenu(
-                        plan: vtuProvider.selectedDataPlan!,
-                        amount:
-                            "${vtuProvider.selectedDataPlan!.costPrice.toInt()}",
-                        number: vtuProvider.numberController.text,
-                        provider: vtuProvider,
-                        ctx: context,
-                      );
+                        if (AppConstants.homeModel != null) {
+                         _confirmationBottomSheetMenu(
+                          plan: vtuProvider.selectedDataPlan!,
+                          amount:
+                              "${vtuProvider.selectedDataPlan!.costPrice.toInt()}",
+                          number: vtuProvider.numberController.text,
+                          provider: vtuProvider,
+                          ctx: context,
+                        );
+                      } else {
+                        MekNotification().showMessage(
+                          context,
+                          message:
+                              "Please refresh your home screen, your data is missing!!!",
+                        );
+                      }
+                     
+                     
                     } else {
                       MekNotification().showMessage(
                         context,
@@ -682,13 +704,13 @@ class DataPage extends StatelessWidget {
               color: ColorManager.greyColor.withOpacity(.4),
               borderRadius: BorderRadius.circular(10),
             ),
-            child: AppConstants.countryModel != null &&
-                    AppConstants.countryModel!.isNotEmpty
+            child: AppConstants.countryLoanModel != null &&
+                    AppConstants.countryLoanModel!.isNotEmpty
                 ? Row(
                     children: [
                       Text(
-                        vtuProvider.countryCode != null
-                            ? vtuProvider.countryCode!.toUpperCase()
+                        vtuProvider.loanCountryCode != null
+                            ? vtuProvider.loanCountryCode!.toUpperCase()
                             : "",
                         style: getBoldStyle(
                           color: ColorManager.blackColor,
@@ -702,10 +724,10 @@ class DataPage extends StatelessWidget {
                             border: InputBorder.none,
                             enabledBorder: InputBorder.none,
                           ),
-                          value: vtuProvider.selectedCountry,
+                          value: vtuProvider.selectedLoanCountry,
                           onChanged: (CountryModel? newValue) async {
-                            vtuProvider.setSelectedCountry(newValue!);
-                            vtuProvider.setCountryCode(
+                            vtuProvider.setSelectedLoanCountry(newValue!);
+                            vtuProvider.setLoanCountryCode(
                               newValue.countryCode,
                               newValue.phoneCode,
                             );
@@ -722,12 +744,23 @@ class DataPage extends StatelessWidget {
                             vtuProvider.isOpSet();
                           },
                           items: vtuProvider
-                              .countryList(AppConstants.countryModel!),
+                              .countryList(AppConstants.countryLoanModel!),
                         ),
                       ),
                     ],
                   )
-                : Container(),
+                : Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+                    decoration: BoxDecoration(
+                      color: ColorManager.greyColor.withOpacity(.4),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Text(
+                      "Loading .....",
+                      style: getBoldStyle(color: ColorManager.deepGreyColor),
+                    ),
+                  ),
           ),
           UIHelper.verticalSpaceMedium,
           //! operator and number field
@@ -744,7 +777,7 @@ class DataPage extends StatelessWidget {
                     ??
                         AppConstants.operatorModel!.first.operatorCode
                             .toUpperCase()
-                    : "",
+                    : "...",
                 style: getBoldStyle(
                   color: ColorManager.blackColor,
                   fontSize: 18,
@@ -863,7 +896,7 @@ class DataPage extends StatelessWidget {
                   child: Row(
                     children: [
                       Text(
-                        "${vtuProvider.phoneCode ?? ""}  |",
+                        "${vtuProvider.loanPhoneCode ?? ""}  |",
                         style: getBoldStyle(
                           color: ColorManager.blackColor,
                           fontSize: 16,
@@ -875,7 +908,7 @@ class DataPage extends StatelessWidget {
                           keyboardType: const TextInputType.numberWithOptions(),
                           inputFormatters: [
                             FilteringTextInputFormatter.digitsOnly,
-                            LengthLimitingTextInputFormatter(10),
+                            LengthLimitingTextInputFormatter(14),
                           ],
                           controller: vtuProvider.numberController,
                           style: TextStyle(
@@ -886,16 +919,17 @@ class DataPage extends StatelessWidget {
                               color: ColorManager.blackColor),
                           decoration: const InputDecoration(
                             border: InputBorder.none,
-                            hintText: 'Enter 10 digits',
+                            hintText: 'Enter number',
                           ),
                           validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter a value';
+                             if (value == null || value.isEmpty) {
+                              return 'Please enter a phone number';
                             }
-                            if (value.length != 10) {
-                              return 'Please enter exactly 10 digits';
+                            final regex = RegExp(r'^[1-9]\d{6,14}$');
+                            if (!regex.hasMatch(value)) {
+                              return 'Invalid phone number format';
                             }
-                            return null;
+                            return null; 
                           },
                         ),
                       )
@@ -967,16 +1001,26 @@ class DataPage extends StatelessWidget {
                   onPressed: () {
                     if (formKey.currentState!.validate()) {
                       if (vtuProvider.loanLimit != null) {
-                        _confirmationBottomSheetMenu(
-                          topUp: 2,
-                          plan: vtuProvider.selectedDataPlan!,
-                          amount: calculateLoanRepayment(
-                              "${vtuProvider.selectedDataPlan!.costPrice.toInt()}",
-                              vtuProvider.loanLimit!.percentage),
-                          number: vtuProvider.numberController.text,
-                          provider: vtuProvider,
-                          ctx: context,
-                        );
+                         if (AppConstants.homeModel != null) {
+                         
+                          _confirmationBottomSheetMenu(
+                            topUp: 2,
+                            plan: vtuProvider.selectedDataPlan!,
+                            amount: calculateLoanRepayment(
+                                "${vtuProvider.selectedDataPlan!.costPrice.toInt()}",
+                                vtuProvider.loanLimit!.percentage),
+                            number: vtuProvider.numberController.text,
+                            provider: vtuProvider,
+                            ctx: context,
+                          );
+                        } else {
+                          MekNotification().showMessage(
+                            context,
+                            message:
+                                "Please refresh your home screen, your data is missing!!!",
+                          );
+                        }
+                     
                       } else {
                         MekNotification().showMessage(
                           context,
@@ -1291,6 +1335,7 @@ class DataPage extends StatelessWidget {
       ],
     );
   }
+
 }
 
 class CheckoutTile extends StatelessWidget {

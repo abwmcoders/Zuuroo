@@ -18,34 +18,38 @@ import 'model/logout_model.dart';
 class Profile extends StatelessWidget {
   Profile({super.key});
 
+  String generatePaystackReferenceWithTimestamp() {
+    DateTime now = DateTime.now();
+    return 'TX_${now.millisecondsSinceEpoch}';
+  }
+
   Future<void> initialize(BuildContext ctx) async {
     try {
       var response = await UserApiServices().initializePayment({});
-      if (response.statusCode == 200) {
-        var data = jsonDecode(response.body);
-        String paymentUrl = data['payment_url'];
-        String reference = data['reference'];
+      if (response["status"] == "success") {
+        String paymentUrl = response['payment_url'];
+        String reference = response['reference'];
 
         // Proceed to open Paystack WebView
         PayWithPayStack().now(
             callbackUrl: paymentUrl,
             context: ctx,
-            secretKey: "sk_test_52fdad00c5f938381b29d16a6e4c516bea328ff5",
-            customerEmail: "popekabu@gmail.com",
-            reference: reference,
+            secretKey: "sk_live_7570700bb6e02b66cb43cc0040b5dcb9fc72985d",//"sk_test_52fdad00c5f938381b29d16a6e4c516bea328ff5",
+            customerEmail: AppConstants.homeModel!.data.user.email,
+            reference: "${reference + generatePaystackReferenceWithTimestamp()}",
             currency: "NGN",
             amount: 50,
             transactionCompleted: () {
               MekNotification().showMessage(
                 ctx,
                 color: ColorManager.activeColor,
-                message: "Payment successful",
+                message: "Bank card added successful",
               );
             },
             transactionNotCompleted: () {
               MekNotification().showMessage(
                 ctx,
-                message: "Payment Failed",
+                message: "Unable to add bank card !!!",
               );
             });
       } else {
@@ -213,7 +217,7 @@ class Profile extends StatelessWidget {
                                 onPressed: () {
                                   NavigateClass().pushNamed(
                                     context: context,
-                                    routName: Routes.changePin,
+                                    routName: Routes.requestPinChange,
                                   );
                                 },
                               ),
@@ -393,42 +397,37 @@ class ProfileTile extends StatelessWidget {
     return Column(
       children: [
         isSignout
-            ? Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20.0, vertical: 15),
-                child: Row(
-                  children: [
-                    Container(
-                      height: screenAwareSize(50, context),
-                      width: screenAwareSize(50, context),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: ColorManager.primaryColor.withOpacity(.4),
+            ? InkWell(
+              onTap: onPressed,
+              child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20.0, vertical: 15),
+                  child: Row(
+                    children: [
+                      Container(
+                        height: screenAwareSize(50, context),
+                        width: screenAwareSize(50, context),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: ColorManager.primaryColor.withOpacity(.4),
+                        ),
+                        child: Icon(
+                          icon,
+                          size: 18,
+                          color: ColorManager.primaryColor,
+                        ),
                       ),
-                      child: Icon(
-                        icon,
-                        size: 18,
-                        color: ColorManager.primaryColor,
+                      UIHelper.horizontalSpaceSmall,
+                      Text(
+                        title,
+                        style: getBoldStyle(color: ColorManager.primaryColor)
+                            .copyWith(fontSize: 14),
                       ),
-                    ),
-                    UIHelper.horizontalSpaceSmall,
-                    Text(
-                      title,
-                      style: getBoldStyle(color: ColorManager.primaryColor)
-                          .copyWith(fontSize: 14),
-                    ),
-                    IconButton(
-                      onPressed: onPressed,
-                      icon: fingerPrint ??
-                          Icon(
-                            Icons.arrow_forward_ios,
-                            size: 15,
-                            color: ColorManager.primaryColor,
-                          ),
-                    )
-                  ],
+                     
+                    ],
+                  ),
                 ),
-              )
+            )
             : ListTile(
                 leading: Container(
                   height: screenAwareSize(50, context),

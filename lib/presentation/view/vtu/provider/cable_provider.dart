@@ -147,7 +147,7 @@ class CableProvider extends BaseViewModel {
     final response = await UserApiServices().getCablePlan(code);
     print("Operator resoonse ---> $response");
     if (response != null) {
-      List<CablePlan> _cablePlanResults = AppConstants.cablePlanModel ?? [];
+      List<CablePlan> _cablePlanResults = [];
       for (dynamic plan in response) {
         final cablePl = CablePlan.fromJson(plan);
         bool exists = _cablePlanResults
@@ -174,6 +174,7 @@ class CableProvider extends BaseViewModel {
     print("bode for verify ---> $body");
     try {
       var request = await UserApiServices().verifyIucNumber(body);
+      
       changeLoaderStatus(false);
       if (request != null) {
         if (request["status"] == "true") {
@@ -189,14 +190,14 @@ class CableProvider extends BaseViewModel {
       } else {
         MekNotification().showMessage(
           ctx,
-          message: request['message'].toString(),
+          message: "An error occurred, Please check your internet connection",
         );
         return null;
       }
     } catch (e) {
       MekNotification().showMessage(
         ctx,
-        message: e.toString(),
+        message: "An error occurred, Please try again later",
       );
       return null;
     }
@@ -211,8 +212,8 @@ class CableProvider extends BaseViewModel {
     dismissKeyboard(context);
     changeLoaderStatus(true);
     var body = {
-      "cableName": cableName,
-      "cablePlan": cablePlan!.plan,
+      "cableName": selectedCable!.providerCode,
+      "cablePlan": cablePlan!.planId,
       "cableNumber": iuc,
       "amount": amount,
       "top_up": topUp,
@@ -224,11 +225,13 @@ class CableProvider extends BaseViewModel {
     print("object for cable purchase ---> $body");
     try {
       var request = await UserApiServices().purchaseCable(body);
+      print("response for data purchase ---> $request");
       changeLoaderStatus(false);
       if (request != null) {
         if (request["status"] == true) {
           NavigateClass().pushNamed(
             context: ctx,
+            args: amount,
             routName: Routes.success,
           );
         } else {

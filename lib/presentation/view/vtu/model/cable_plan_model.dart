@@ -34,6 +34,7 @@ class CablePlanResponse {
 
 class CablePlan {
   int? id;
+  int? planId;
   String? plan;
   String? price;
   String? providerCode;
@@ -42,6 +43,7 @@ class CablePlan {
 
   CablePlan(
       {this.id,
+      this.planId,
       this.plan,
       this.price,
       this.providerCode,
@@ -50,6 +52,7 @@ class CablePlan {
 
   CablePlan.fromJson(Map<String, dynamic> json) {
     id = json['id'];
+    planId = json['plan_id'];
     plan = json['plan'];
     price = json['price'];
     providerCode = json['provider_code'];
@@ -60,6 +63,7 @@ class CablePlan {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['id'] = this.id;
+    data['plan_id'] = this.planId;
     data['plan'] = this.plan;
     data['price'] = this.price;
     data['provider_code'] = this.providerCode;

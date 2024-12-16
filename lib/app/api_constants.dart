@@ -6,6 +6,7 @@ class ApiConstants {
   static const String logoutUrl = "logout";
   static const String home = "home";
   static const String country = "country/country-by-status";
+  static const String countryLoan = "country/isloan";
   static const String ct = "countries";
   static const String biller = "bill/electricity-billers/status/1";
   static const String cable = "cable-subscriptions/status/active";
@@ -17,6 +18,8 @@ class ApiConstants {
   static const String cablePayment = "cable/payment";
   static const String bill = "bill/payment";
   static const String pin = "user/verify-pin";
+  static const String otpVerify = "user/verify-otp";
+  static const String requestPinChange = "user/request-pin-change";
   static const String verifyMeter = "bill/verify-meter";
   static const String verifyIuc = "cable/verify-iuc";
   static const String changePassword = "user/update-password";

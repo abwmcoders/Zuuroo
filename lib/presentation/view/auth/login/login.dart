@@ -75,7 +75,7 @@ class Login extends StatelessWidget {
                           fieldController: loginProvider.mekMail,
                           keyboardType: TextInputType.name,
                           validator: (String? val) =>
-                              FieldValidator().validateEmail(val!),
+                              FieldValidator().validate(val!),
                         ),
                         UIHelper.verticalSpaceSmall,
                         AppFormField(

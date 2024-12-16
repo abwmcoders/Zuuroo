@@ -20,42 +20,49 @@ class CardFunding extends StatelessWidget {
   final TextEditingController amount = TextEditingController();
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
+   String generatePaystackReferenceWithTimestamp() {
+    DateTime now = DateTime.now();
+    return 'TX_${now.millisecondsSinceEpoch}';
+  }
+
+
   Future<void> initialize(BuildContext ctx) async {
     try {
       var response = await UserApiServices().initializePayment({
         "amount": amount.text.trim(),
       });
-      if (response.statusCode == 200) {
-        var data = jsonDecode(response.body);
-    //final uniqueTransRef = PayWithPayStack().generateUuidV4();
-    String paymentUrl = data['payment_url'];
-    String reference = data['reference'];
+      print("initialize response ---> $response");
+      if (response["status"] == "success") {
+        String paymentUrl = response['payment_url'];
+        String reference = response['reference'];
 
-    PayWithPayStack().now(
-        callbackUrl: paymentUrl,
-        context: ctx,
-        secretKey: "sk_test_52fdad00c5f938381b29d16a6e4c516bea328ff5",
-        customerEmail: "popekabu@gmail.com",
-        reference: reference,
-        currency: "NGN",
-        amount: double.parse(amount.text.trim()),
-        transactionCompleted: () {
-          NavigateClass().pushReplacementNamed(
+        PayWithPayStack().now(
+            callbackUrl: paymentUrl,
             context: ctx,
-            routName: Routes.mainRoute,
-          );
-          MekNotification().showMessage(
-            ctx,
-            color: ColorManager.activeColor,
-            message: "Payment successful",
-          );
-        },
-        transactionNotCompleted: () {
-          MekNotification().showMessage(
-            ctx,
-            message: "Payment Failed",
-          );
-        });
+            secretKey:
+                "sk_live_7570700bb6e02b66cb43cc0040b5dcb9fc72985d", // "sk_test_52fdad00c5f938381b29d16a6e4c516bea328ff5",
+            customerEmail: AppConstants.homeModel!.data.user.email,
+            reference: "${reference + generatePaystackReferenceWithTimestamp()}",
+            currency: "NGN",
+            amount: double.parse(amount.text.trim()),
+            transactionCompleted: () {
+              amount.clear();
+              NavigateClass().pushReplacementNamed(
+                context: ctx,
+                routName: Routes.mainRoute,
+              );
+              MekNotification().showMessage(
+                ctx,
+                color: ColorManager.activeColor,
+                message: "Payment successful",
+              );
+            },
+            transactionNotCompleted: () {
+              MekNotification().showMessage(
+                ctx,
+                message: "Payment Failed",
+              );
+            });
       } else {
         MekNotification().showMessage(
           ctx,
@@ -105,7 +112,7 @@ class CardFunding extends StatelessWidget {
                       inputFormatters: [
                         FilteringTextInputFormatter.digitsOnly,
                       ],
-                       style: TextStyle(
+                      style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                         letterSpacing: 1.5,
@@ -122,17 +129,17 @@ class CardFunding extends StatelessWidget {
                           fontFamily: "NT",
                           color: ColorManager.greyColor,
                         ),
-                        
+
                         prefix: Text(
-                                AppConstants.currencySymbol,
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  letterSpacing: 1.5,
-                                  fontFamily: "NT",
-                                  color: ColorManager.blackColor,
-                                ),
-                              ),
+                          AppConstants.currencySymbol,
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 1.5,
+                            fontFamily: "NT",
+                            color: ColorManager.blackColor,
+                          ),
+                        ),
                       ),
                     ),
                   ],
@@ -267,7 +274,6 @@ class CardFunding extends StatelessWidget {
                       message: "Please enter amount to deposit!!!",
                     );
                   }
-                  
                 },
               ),
             ],
