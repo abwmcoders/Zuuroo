@@ -45,7 +45,7 @@ class CardFunding extends StatelessWidget {
             reference: "${reference + generatePaystackReferenceWithTimestamp()}",
             currency: "NGN",
             amount: double.parse(amount.text.trim()),
-            transactionCompleted: () {
+            transactionCompleted: (_) {
               amount.clear();
               NavigateClass().pushReplacementNamed(
                 context: ctx,
@@ -57,7 +57,7 @@ class CardFunding extends StatelessWidget {
                 message: "Payment successful",
               );
             },
-            transactionNotCompleted: () {
+            transactionNotCompleted: (_) {
               MekNotification().showMessage(
                 ctx,
                 message: "Payment Failed",

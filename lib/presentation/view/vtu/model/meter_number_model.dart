@@ -54,3 +54,32 @@ class MeterData {
     };
   }
 }
+
+class MeterModel {
+  String? provider;
+  String? customerName;
+  String? number;
+  String? address;
+  String? type;
+
+  MeterModel(
+      {this.provider, this.customerName, this.number, this.address, this.type});
+
+  MeterModel.fromJson(Map<String, dynamic> json) {
+    provider = json['provider'];
+    customerName = json['Customer_Name'];
+    number = json['number'];
+    address = json['Address'];
+    type = json['type'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['provider'] = this.provider;
+    data['Customer_Name'] = this.customerName;
+    data['number'] = this.number;
+    data['Address'] = this.address;
+    data['type'] = this.type;
+    return data;
+  }
+}

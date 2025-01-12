@@ -104,6 +104,21 @@ class UserApiServices extends BaseServices {
     }
   }
 
+  Future getBettingList() async {
+    var rm;
+    String token = await getUserToken();
+    try {
+      await getUserToken().then(
+        (value) {
+          rm = tokenizedGetRequest(token: value, url: ApiConstants.bet);
+        },
+      );
+      return rm;
+    } catch (e) {
+      return null;
+    }
+  }
+
   Future getHistories({String? params, bool isStatus = false}) async {
     var rm;
     String token = await getUserToken();
@@ -277,6 +292,19 @@ class UserApiServices extends BaseServices {
     }
   }
 
+  Future purchaseBet(dynamic data) async {
+    var rm;
+    try {
+      await getUserToken().then((token) {
+        rm = tokenizedPostRequest(
+            token: token, url: ApiConstants.betPurchase, data: data);
+      });
+      return rm;
+    } catch (e) {
+      return null;
+    }
+  }
+
   Future changePassword(dynamic data) async {
     var rm;
     try {
@@ -374,6 +402,19 @@ class UserApiServices extends BaseServices {
       await getUserToken().then((token) {
         rm = tokenizedPostRequest(
             token: token, url: ApiConstants.verifyMeter, data: data);
+      });
+      return rm;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Future verifyBettingNumber(dynamic data) async {
+    var rm;
+    try {
+      await getUserToken().then((token) {
+        rm = tokenizedPostRequest(
+            token: token, url: ApiConstants.betVerify, data: data);
       });
       return rm;
     } catch (e) {

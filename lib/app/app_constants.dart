@@ -8,6 +8,7 @@ import '../presentation/view/vtu/model/cable_plan_model.dart';
 import '../presentation/view/vtu/model/country_model.dart';
 import '../presentation/view/vtu/model/data_cat_model.dart';
 import '../presentation/view/vtu/model/data_plan_model.dart';
+import '../presentation/view/vtu/model/power_model.dart';
 
 class AppConstants {
   static HomeModel? homeModel;
@@ -15,7 +16,8 @@ class AppConstants {
   static List<CountryModel>? countryLoanModel = [];
   static List<LoanLimit>? loanModel = [];
   static List<CableData>? cableModel = [];
-  static List<BillerData>? billerModel = [];
+  static List<PowerModel>? billerModel = [];
+  static List<BillerData>? billerModel2 = [];
   static List<DataCategory>? dataCategoryModel = [];
   static List<DataPlan>? dataPlanModel = [];
   static List<OperatorModel>? operatorModel = [];

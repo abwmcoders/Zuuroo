@@ -15,6 +15,7 @@ import 'package:zuuro/presentation/view/vtu/model/biller_model.dart';
 import '../../../../app/animation/navigator.dart';
 import '../../../../app/functions.dart';
 import '../../../../app/services/api_rep/user_services.dart';
+import '../model/bet_biller_model.dart';
 import '../model/country_model.dart';
 import '../model/data_cat_model.dart';
 import '../model/data_plan_model.dart';
@@ -22,17 +23,17 @@ import '../model/meter_number_model.dart';
 import '../model/operator_model.dart';
 import '../model/power_model.dart';
 
-class VtuProvider extends BaseViewModel {
+class BetProvider extends BaseViewModel {
   BuildContext? context;
   List<CountryModel>? countries;
   dynamic operators;
   CountryModel? selectedCountry;
   CountryModel? selectedLoanCountry;
-  PowerModel? selectedBiller;
+  BetModel? selectedBiller;
   bool shouldCallInit = false;
   bool callBiller = false;
 
-  VtuProvider({
+  BetProvider({
     this.context,
     this.countries,
     this.operators,
@@ -63,7 +64,7 @@ class VtuProvider extends BaseViewModel {
   final otpField = TextEditingController();
   TextEditingController amountController = TextEditingController(text: "");
   TextEditingController numberController = TextEditingController(text: "");
-  TextEditingController meterNumber = TextEditingController();
+  TextEditingController betNumber = TextEditingController();
   LoanLimit? loanLimit;
   DataCategory? selectedDataCat;
   DataPlan? selectedDataPlan;
@@ -468,7 +469,7 @@ class VtuProvider extends BaseViewModel {
       changeLoaderStatus(false);
       print("body for res bill purchase ---> $request");
       if (request != null) {
-        if (request["success"] == true) {
+        if (request["status"] == true) {
           NavigateClass().pushNamed(
             context: ctx,
             args: amount,

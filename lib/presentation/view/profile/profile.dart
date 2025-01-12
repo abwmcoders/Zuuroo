@@ -39,14 +39,14 @@ class Profile extends StatelessWidget {
             reference: "${reference + generatePaystackReferenceWithTimestamp()}",
             currency: "NGN",
             amount: 50,
-            transactionCompleted: () {
+            transactionCompleted: (_) {
               MekNotification().showMessage(
                 ctx,
                 color: ColorManager.activeColor,
                 message: "Bank card added successful",
               );
             },
-            transactionNotCompleted: () {
+            transactionNotCompleted: (_) {
               MekNotification().showMessage(
                 ctx,
                 message: "Unable to add bank card !!!",

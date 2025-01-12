@@ -656,8 +656,8 @@ class Airtime extends StatelessWidget {
                   buttonText: "Submit",
                   onPressed: () {
                     if (formKey.currentState!.validate()) {
-                      if(AppConstants.homeModel != null) {
-                         _confirmationBottomSheetMenu(
+                      if (AppConstants.homeModel != null) {
+                        _confirmationBottomSheetMenu(
                             amount: vtuProvider.amountController.text,
                             number: vtuProvider.numberController.text,
                             provider: vtuProvider,
@@ -669,7 +669,6 @@ class Airtime extends StatelessWidget {
                               "Please refresh your home screen, your data is missing!!!",
                         );
                       }
-                     
                     } else {
                       MekNotification().showMessage(
                         context,
@@ -1012,7 +1011,6 @@ class Airtime extends StatelessWidget {
                               "Please refresh your home screen, your data is missing!!!",
                         );
                       }
-                     
                     } else {
                       //Navigator.pop(context);
                       MekNotification().showMessage(
@@ -1145,6 +1143,7 @@ class AmountReUseWidget extends StatelessWidget {
 }
 
 String calculateLoanRepayment(String amount, String perc) {
+  print("Amount -> $amount, Perc ---> $perc");
   double result = (int.parse(perc) / 100) * int.parse(amount);
   result += int.parse(amount);
   return "${result.toInt()}";
