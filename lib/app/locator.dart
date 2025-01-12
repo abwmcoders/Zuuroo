@@ -10,6 +10,7 @@ import '../presentation/view/auth/login/provider/login_provider.dart';
 import '../presentation/view/auth/register/provider/reg_provider.dart';
 import '../presentation/view/auth/verify/provider/verify_provider.dart';
 import '../presentation/view/settings/kyc/provider/kyc_provider.dart';
+import '../presentation/view/vtu/provider/bet_provider.dart';
 import '../presentation/view/vtu/provider/vtu_provider.dart';
 import 'services/base_services.dart';
 
@@ -32,5 +33,6 @@ final allProviders = <SingleChildWidget>[
   ChangeNotifierProvider(create: (_) => ForgetPasswordProvider()),
   ChangeNotifierProvider(create: (_) => HomeProvider()),
   ChangeNotifierProvider(create: (_) => VtuProvider()),
+  ChangeNotifierProvider(create: (_) => BetProvider()),
   // ChangeNotifierProvider(create: (_) => ForgetPasswordProvider()),
 ];

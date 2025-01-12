@@ -22,6 +22,7 @@ import '../model/data_plan_model.dart';
 import '../model/meter_number_model.dart';
 import '../model/operator_model.dart';
 import '../model/power_model.dart';
+import '../model/verify_bet.dart';
 
 class BetProvider extends BaseViewModel {
   BuildContext? context;
@@ -69,7 +70,7 @@ class BetProvider extends BaseViewModel {
   DataCategory? selectedDataCat;
   DataPlan? selectedDataPlan;
   bool checkNumber = false;
-  MeterModel? selectedMeterData;
+  VerifyBet? selectedMeterData;
 
   setIndex(int ind) {
     currentPage = ind;
@@ -86,7 +87,7 @@ class BetProvider extends BaseViewModel {
     notifyListeners();
   }
 
-  setMeterData(MeterModel data) {
+  setMeterData(VerifyBet data) {
     selectedMeterData = data;
     notifyListeners();
   }
@@ -270,17 +271,18 @@ class BetProvider extends BaseViewModel {
   }
 
   getBiller() async {
-    final response = await UserApiServices().getBillerList();
+    final response = await UserApiServices().getBettingList();
     if (response != null && response['data'] != null) {
-      List<PowerModel> _billerResult = AppConstants.billerModel ?? [];
+      print("bet list not null: ${response['data']}");
+      List<BetModel> _billerResult = AppConstants.betBillerModel ?? [];
       for (dynamic biller in response['data']) {
-        final billerModel = PowerModel.fromJson(biller);
+        final billerModel = BetModel.fromJson(biller);
         bool exists = _billerResult.any((existingBiller) =>
             existingBiller.provider == billerModel.provider);
         if (!exists) {
           _billerResult.add(billerModel);
         }
-        AppConstants.billerModel = _billerResult;
+        AppConstants.betBillerModel = _billerResult;
         notifyListeners();
       }
     }
@@ -442,34 +444,30 @@ class BetProvider extends BaseViewModel {
     }
   }
 
-  void purchaseBill(
+  void purchaseBet(
       {required BuildContext ctx,
-      required String meterNumber,
+      required String betNumber,
       required String pin,
       int topUp = 1,
       required String amount}) async {
-    print("called purchase bill");
+    print("called purchase bet");
     dismissKeyboard(context);
     changeLoaderStatus(true);
     var body = {
-      "provider": selectedBiller!.provider.toString(),
-      "meterType": metr!.toLowerCase(),
-      "top_up": topUp,
-      "meterNumber": meterNumber,
-      "reference": generateRandomReference(),
       "amount": amount,
-      "customerName": selectedMeterData!.customerName,
-      "customerPhoneNumber": numberController.text.trim(),
+      "customerId": betNumber,
+      "provider": selectedBiller!.provider.toString(),
+      "reference": generateRandomReference(),
       "pin": pin,
+      "top_up": topUp,
     };
-
     print("body for bill purchase ---> $body");
     try {
-      var request = await UserApiServices().purchaseBill(body);
+      var request = await UserApiServices().purchaseBet(body);
       changeLoaderStatus(false);
-      print("body for res bill purchase ---> $request");
+      print("body for res bet purchase ---> $request");
       if (request != null) {
-        if (request["status"] == true) {
+        if (request["success"] == true) {
           NavigateClass().pushNamed(
             context: ctx,
             args: amount,
@@ -530,28 +528,26 @@ class BetProvider extends BaseViewModel {
     }
   }
 
-  verifyMeterNumber({
+  verifyBetNumber({
     required BuildContext ctx,
     required String ctr,
     required String billerCode,
-    String meterType = "prepaid",
   }) async {
     dismissKeyboard(context);
     changeLoaderStatus(true);
     var body = {
-      "number": ctr,
-      "provider": billerCode,
-      "type": meterType,
+      "provider": selectedBiller!.provider!,
+      "customerId": betNumber.text.trim(),
     };
     print("verify meter body ---> $body");
 
     try {
-      var request = await UserApiServices().verifyMeterNumber(body);
+      var request = await UserApiServices().verifyBettingNumber(body);
       changeLoaderStatus(false);
       print("verify meter response ---> $request");
       if (request != null) {
         if (request["success"] == true) {
-          var verifyMeterResponse = MeterModel.fromJson(request['data']);
+          var verifyMeterResponse = VerifyBet.fromJson(request['data']);
           setMeterData(verifyMeterResponse);
         } else {
           MekNotification().showMessage(
@@ -584,7 +580,7 @@ class BetProvider extends BaseViewModel {
     notifyListeners();
   }
 
-  void setSelectedBiller(PowerModel biller) {
+  void setSelectedBiller(BetModel biller) {
     selectedBiller = biller;
     notifyListeners();
   }
@@ -612,11 +608,9 @@ class BetProvider extends BaseViewModel {
   }
 }
 
-
 String generateRandomReference() {
   const int length = 18;
-  const String chars =
-      'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#\$%^&*()+{}~';
+  const String chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#\$%^&*()+{}~';
   final Random random = Random();
 
   return List.generate(length, (index) => chars[random.nextInt(chars.length)])

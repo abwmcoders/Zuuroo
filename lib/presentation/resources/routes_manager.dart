@@ -96,7 +96,7 @@ class RouteGenerator {
       case Routes.dataRoute:
         return MaterialPageRoute(builder: (_) => DataPage());
       case Routes.betRoute:
-        return MaterialPageRoute(builder: (_) => const Bet());
+        return MaterialPageRoute(builder: (_) => Bet());
       case Routes.electRoute:
         return MaterialPageRoute(builder: (_) => Bill());
       case Routes.cableRoute:

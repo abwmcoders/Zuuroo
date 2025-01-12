@@ -3,6 +3,7 @@ import 'package:zuuro/presentation/view/vtu/model/operator_model.dart';
 
 import '../presentation/view/home/model/home_model.dart';
 import '../presentation/view/home/model/loan_model.dart';
+import '../presentation/view/vtu/model/bet_biller_model.dart';
 import '../presentation/view/vtu/model/cable_model.dart';
 import '../presentation/view/vtu/model/cable_plan_model.dart';
 import '../presentation/view/vtu/model/country_model.dart';
@@ -17,6 +18,7 @@ class AppConstants {
   static List<LoanLimit>? loanModel = [];
   static List<CableData>? cableModel = [];
   static List<PowerModel>? billerModel = [];
+  static List<BetModel>? betBillerModel = [];
   static List<BillerData>? billerModel2 = [];
   static List<DataCategory>? dataCategoryModel = [];
   static List<DataPlan>? dataPlanModel = [];
