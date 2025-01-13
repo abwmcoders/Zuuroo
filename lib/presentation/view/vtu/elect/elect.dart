@@ -241,19 +241,12 @@ class Bill extends StatelessWidget {
                           fontSize: 12,
                         ),
                       ),
-                      Row(
-                        children: [
-                          SvgPicture.asset(
-                            ImageAssets.mtn,
-                          ),
-                          Text(
-                            type!,
-                            style: getBoldStyle(
-                              color: ColorManager.blackColor,
-                              fontSize: 12,
-                            ),
-                          ),
-                        ],
+                      Text(
+                        type!,
+                        style: getBoldStyle(
+                          color: ColorManager.blackColor,
+                          fontSize: 12,
+                        ),
                       ),
                     ],
                   ),
@@ -309,8 +302,9 @@ class Bill extends StatelessWidget {
                               Icons.check,
                               color: ColorManager.activeColor,
                             )
-                          : int.parse(AppConstants
-                                      .homeModel!.data.wallet.balance) >=
+                          : double.parse(AppConstants
+                                          .homeModel!.data.wallet.balance)
+                                      .toInt() >=
                                   int.parse(amount)
                               ? Icon(
                                   Icons.check,
@@ -319,7 +313,7 @@ class Bill extends StatelessWidget {
                               : Icon(
                                   Icons.close,
                                   color: ColorManager.primaryColor,
-                                ),
+                                )
                     ],
                   ),
                 ),

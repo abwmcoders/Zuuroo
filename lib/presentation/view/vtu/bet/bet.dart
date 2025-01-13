@@ -289,8 +289,9 @@ class Bet extends StatelessWidget {
                               Icons.check,
                               color: ColorManager.activeColor,
                             )
-                          : int.parse(AppConstants
-                                      .homeModel!.data.wallet.balance) >=
+                          : double.parse(AppConstants
+                                          .homeModel!.data.wallet.balance)
+                                      .toInt() >=
                                   int.parse(amount)
                               ? Icon(
                                   Icons.check,
@@ -299,7 +300,23 @@ class Bet extends StatelessWidget {
                               : Icon(
                                   Icons.close,
                                   color: ColorManager.primaryColor,
-                                ),
+                                )
+                      // topUp == 2
+                      //     ? Icon(
+                      //         Icons.check,
+                      //         color: ColorManager.activeColor,
+                      //       )
+                      //     : int.parse(AppConstants
+                      //                 .homeModel!.data.wallet.balance) >=
+                      //             int.parse(amount)
+                      //         ? Icon(
+                      //             Icons.check,
+                      //             color: ColorManager.activeColor,
+                      //           )
+                      //         : Icon(
+                      //             Icons.close,
+                      //             color: ColorManager.primaryColor,
+                      //           ),
                     ],
                   ),
                 ),
@@ -625,7 +642,7 @@ class Bet extends StatelessWidget {
                         } else {
                           MekNotification().showMessage(
                             context,
-                            message: "Unverified Meter number !!!",
+                            message: "Unverified Betting Number !!!",
                           );
                         }
                       } else {

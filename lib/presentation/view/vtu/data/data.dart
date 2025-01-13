@@ -240,19 +240,12 @@ class DataPage extends StatelessWidget {
                           fontSize: 12,
                         ),
                       ),
-                      Row(
-                        children: [
-                          // SvgPicture.asset(
-                          //   ImageAssets.mtn,
-                          // ),
-                          Text(
-                            type!,
-                            style: getBoldStyle(
-                              color: ColorManager.blackColor,
-                              fontSize: 12,
-                            ),
-                          ),
-                        ],
+                      Text(
+                        type!,
+                        style: getBoldStyle(
+                          color: ColorManager.blackColor,
+                          fontSize: 12,
+                        ),
                       ),
                     ],
                   ),
@@ -303,9 +296,15 @@ class DataPage extends StatelessWidget {
                           ),
                         ],
                       ),
-                      int.parse(AppConstants.homeModel!.data.wallet.balance) >=
-                              int.parse(amount)
-                          ? topUp == 2
+                      topUp == 2
+                          ? Icon(
+                              Icons.check,
+                              color: ColorManager.activeColor,
+                            )
+                          : double.parse(AppConstants
+                                          .homeModel!.data.wallet.balance)
+                                      .toInt() >=
+                                  int.parse(amount)
                               ? Icon(
                                   Icons.check,
                                   color: ColorManager.activeColor,
@@ -314,10 +313,22 @@ class DataPage extends StatelessWidget {
                                   Icons.close,
                                   color: ColorManager.primaryColor,
                                 )
-                          : Icon(
-                              Icons.close,
-                              color: ColorManager.primaryColor,
-                            )
+                      // double.parse(AppConstants.homeModel!.data.wallet.balance)
+                      //             .toInt() >=
+                      //         int.parse(amount)
+                      //     ? topUp == 2
+                      //         ? Icon(
+                      //             Icons.check,
+                      //             color: ColorManager.activeColor,
+                      //           )
+                      //         : Icon(
+                      //             Icons.close,
+                      //             color: ColorManager.primaryColor,
+                      //           )
+                      //     : Icon(
+                      //         Icons.close,
+                      //         color: ColorManager.primaryColor,
+                      //       )
                     ],
                   ),
                 ),

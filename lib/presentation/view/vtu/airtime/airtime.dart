@@ -196,6 +196,7 @@ class Airtime extends StatelessWidget {
       required String number,
       int topUp = 1,
       required VtuProvider provider}) {
+    print("Wallet balance -> ${AppConstants.homeModel!.data.wallet.balance}");
     showModalBottomSheet(
       context: ctx,
       backgroundColor: ColorManager.whiteColor,
@@ -235,19 +236,12 @@ class Airtime extends StatelessWidget {
                           fontSize: 12,
                         ),
                       ),
-                      Row(
-                        children: [
-                          SvgPicture.asset(
-                            ImageAssets.mtn,
-                          ),
-                          Text(
-                            type!,
-                            style: getBoldStyle(
-                              color: ColorManager.blackColor,
-                              fontSize: 12,
-                            ),
-                          ),
-                        ],
+                      Text(
+                        type!,
+                        style: getBoldStyle(
+                          color: ColorManager.blackColor,
+                          fontSize: 12,
+                        ),
                       ),
                     ],
                   ),
@@ -312,8 +306,9 @@ class Airtime extends StatelessWidget {
                               Icons.check,
                               color: ColorManager.activeColor,
                             )
-                          : int.parse(AppConstants
-                                      .homeModel!.data.wallet.balance) >=
+                          : double.parse(AppConstants
+                                          .homeModel!.data.wallet.balance).toInt()
+                           >=
                                   int.parse(amount)
                               ? Icon(
                                   Icons.check,

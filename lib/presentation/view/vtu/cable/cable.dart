@@ -1508,20 +1508,23 @@ class Cable extends StatelessWidget {
                           ),
                         ],
                       ),
-                      topUp == 2 ? Icon(
-                              Icons.check,
-                              color: ColorManager.activeColor,
-                            )
-                          : int.parse(AppConstants.homeModel!.data.wallet.balance) >=
-                              int.parse(amount)
+                     topUp == 2
                           ? Icon(
                               Icons.check,
                               color: ColorManager.activeColor,
                             )
-                          : Icon(
-                              Icons.close,
-                              color: ColorManager.primaryColor,
-                            )
+                          : double.parse(AppConstants
+                                          .homeModel!.data.wallet.balance)
+                                      .toInt() >=
+                                  int.parse(amount)
+                              ? Icon(
+                                  Icons.check,
+                                  color: ColorManager.activeColor,
+                                )
+                              : Icon(
+                                  Icons.close,
+                                  color: ColorManager.primaryColor,
+                                ),
                     ],
                   ),
                 ),
