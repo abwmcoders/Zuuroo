@@ -143,7 +143,7 @@ class Airtime extends StatelessWidget {
                   ),
                 ),
                 const Label(
-                  label: "Enter Your 4 Digits OTP",
+                  label: "Enter Your 4 Digits PIN",
                 ),
               ],
             ),
@@ -197,6 +197,13 @@ class Airtime extends StatelessWidget {
       int topUp = 1,
       required VtuProvider provider}) {
     print("Wallet balance -> ${AppConstants.homeModel!.data.wallet.balance}");
+    int result =
+        double.parse(AppConstants.homeModel!.data.wallet.loanBalance).abs() >
+                0.00
+            ? double.parse(AppConstants.homeModel!.data.wallet.loanBalance)
+                .abs()
+                .toInt()
+            : 0;
     showModalBottomSheet(
       context: ctx,
       backgroundColor: ColorManager.whiteColor,
@@ -302,7 +309,10 @@ class Airtime extends StatelessWidget {
                         ],
                       ),
                       topUp == 2
-                          ? Icon(
+                          ? result > 1 ? Icon(
+                                  Icons.close,
+                                  color: ColorManager.primaryColor,
+                                ) :Icon(
                               Icons.check,
                               color: ColorManager.activeColor,
                             )
@@ -328,8 +338,21 @@ class Airtime extends StatelessWidget {
                         AppConstants.homeModel?.data.wallet.balance ?? '');
                     double? inputAmount = double.tryParse(amount);
                     if (topUp == 2) {
-                      Navigator.pop(ctx);
-                      _otpInput(provider: provider, topUp: topUp, context: ctx);
+                      // int result = double.parse(
+                      //     AppConstants.homeModel!.data.wallet.loanBalance).abs() > 0.00 ? double.parse(
+                      //     AppConstants.homeModel!.data.wallet.loanBalance).abs().toInt() : 0;
+                      if(result > 1){
+                        Navigator.pop(ctx);
+                        MekNotification().showMessage(
+                          ctx,
+                          message: "You have unpaid loan amount, please pay up to continue !!!",
+                        );
+                      }else {
+                        Navigator.pop(ctx);
+                        _otpInput(
+                            provider: provider, topUp: topUp, context: ctx);
+                      }
+                      
                     } else {
                       if (balance != null &&
                           inputAmount != null &&

@@ -1395,7 +1395,7 @@ class Cable extends StatelessWidget {
                   ),
                 ),
                 const Label(
-                  label: "Enter Your 4 Digits OTP",
+                  label: "Enter Your 4 Digits PIN",
                 ),
               ],
             ),
@@ -1448,6 +1448,13 @@ class Cable extends StatelessWidget {
       required String number,
       int topUp = 1,
       required CableProvider provider}) {
+        int result =
+        double.parse(AppConstants.homeModel!.data.wallet.loanBalance).abs() >
+                0.00
+            ? double.parse(AppConstants.homeModel!.data.wallet.loanBalance)
+                .abs()
+                .toInt()
+            : 0;
     showModalBottomSheet(
       context: ctx,
       backgroundColor: ColorManager.whiteColor,
@@ -1509,7 +1516,10 @@ class Cable extends StatelessWidget {
                         ],
                       ),
                      topUp == 2
-                          ? Icon(
+                          ? result > 1 ? Icon(
+                                  Icons.close,
+                                  color: ColorManager.primaryColor,
+                                ) : Icon(
                               Icons.check,
                               color: ColorManager.activeColor,
                             )
@@ -1535,8 +1545,19 @@ class Cable extends StatelessWidget {
                         AppConstants.homeModel?.data.wallet.balance ?? '');
                     double? inputAmount = double.tryParse(amount);
                     if(topUp == 2) {
-                      Navigator.pop(ctx);
-                      _otpInput(provider: provider, topUp: topUp, context: ctx);
+                      if (result > 1) {
+                        Navigator.pop(ctx);
+                        MekNotification().showMessage(
+                          ctx,
+                          message:
+                              "You have unpaid loan amount, please pay up to continue !!!",
+                        );
+                      }else{
+                        Navigator.pop(ctx);
+                        _otpInput(
+                            provider: provider, topUp: topUp, context: ctx);
+                      }
+                      
                     }else {
                       if (balance != null &&
                           inputAmount != null &&
@@ -1670,7 +1691,7 @@ class Cable extends StatelessWidget {
                       } else {
                         MekNotification().showMessage(
                           context,
-                          message: "Unverified iuc number !!!",
+                          message: "Unverified iuc number, please fill all fields and tap anywhere in the app to verify !!!",
                         );
                       }
                       } else {
@@ -1852,7 +1873,7 @@ class Cable extends StatelessWidget {
                         } else {
                           MekNotification().showMessage(
                             context,
-                            message: "Unverified iuc number !!!",
+                            message: "Unverified iuc number, please fill all fields and tap anywhere in the app to verify !!!",
                           );
                         }                      
                       } else {

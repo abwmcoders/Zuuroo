@@ -146,7 +146,7 @@ class DataPage extends StatelessWidget {
                   ),
                 ),
                 const Label(
-                  label: "Enter Your 4 Digits OTP",
+                  label: "Enter Your 4 Digits PIN",
                 ),
               ],
             ),
@@ -201,6 +201,13 @@ class DataPage extends StatelessWidget {
       required String number,
       int topUp = 1,
       required VtuProvider provider}) {
+      int result =
+        double.parse(AppConstants.homeModel!.data.wallet.loanBalance).abs() >
+                0.00
+            ? double.parse(AppConstants.homeModel!.data.wallet.loanBalance)
+                .abs()
+                .toInt()
+            : 0;
     showModalBottomSheet(
       context: ctx,
       backgroundColor: ColorManager.whiteColor,
@@ -297,7 +304,10 @@ class DataPage extends StatelessWidget {
                         ],
                       ),
                       topUp == 2
-                          ? Icon(
+                          ? result > 1 ? Icon(
+                                  Icons.close,
+                                  color: ColorManager.primaryColor,
+                                ) : Icon(
                               Icons.check,
                               color: ColorManager.activeColor,
                             )
@@ -339,8 +349,19 @@ class DataPage extends StatelessWidget {
                         AppConstants.homeModel?.data.wallet.balance ?? '');
                     double? inputAmount = double.tryParse(amount);
                     if (topUp == 2) {
-                      Navigator.pop(ctx);
-                      _otpInput(provider: provider, topUp: topUp, context: ctx);
+                      if(result > 1) {
+                        Navigator.pop(ctx);
+                        MekNotification().showMessage(
+                          ctx,
+                          message:
+                              "You have unpaid loan amount, please pay up to continue !!!",
+                        );
+                      }else{
+                        Navigator.pop(ctx);
+                        _otpInput(
+                            provider: provider, topUp: topUp, context: ctx);
+                      }
+                      
                     } else {
                       if (balance != null &&
                           inputAmount != null &&

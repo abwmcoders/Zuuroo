@@ -318,7 +318,7 @@ class _ChangePinState extends State<ChangePin> {
                   ),
                 ),
                 const Label(
-                  label: "Enter Your 4 Digits OTP",
+                  label: "Enter Your 4 Digits PIN",
                 ),
               ],
             ),
