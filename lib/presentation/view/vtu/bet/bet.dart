@@ -427,6 +427,33 @@ class Bet extends StatelessWidget {
               },
             ),
             UIHelper.verticalSpaceMedium,
+            if (vtuProvider.betNumber.text != '' && vtuProvider.selectedBiller != null)
+            Align(
+              alignment: Alignment.bottomRight,
+              child: InkWell(
+                onTap: (){
+                   vtuProvider.verifyBetNumber(
+                      ctx: context,
+                      ctr: vtuProvider.betNumber.text.trim(),
+                      billerCode: vtuProvider.selectedBiller!.provider!,
+                    );
+                },
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  decoration: BoxDecoration(
+                    gradient: ColorManager.buttonGradient,
+                    //color: ColorManager.primaryColor,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Text("Verify", style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                    color: ColorManager.whiteColor,
+                  ),),
+                ),
+              ),
+            ),
+            UIHelper.verticalSpaceMedium,
             vtuProvider.selectedMeterData != null
                 ? Column(
                     children: [
@@ -568,6 +595,36 @@ class Bet extends StatelessWidget {
                 );
               },
             ),
+            UIHelper.verticalSpaceMedium,
+            if (vtuProvider.betNumber.text != '' && vtuProvider.selectedBiller != null)
+              Align(
+                alignment: Alignment.bottomRight,
+                child: InkWell(
+                  onTap: () {
+                    vtuProvider.verifyBetNumber(
+                      ctx: context,
+                      ctr: vtuProvider.betNumber.text.trim(),
+                      billerCode: vtuProvider.selectedBiller!.provider!,
+                    );
+                  },
+                  child: Container(
+                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                    decoration: BoxDecoration(
+                      gradient: ColorManager.buttonGradient,
+                      //color: ColorManager.primaryColor,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Text(
+                      "Verify",
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                        color: ColorManager.whiteColor,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
             UIHelper.verticalSpaceMedium,
             vtuProvider.selectedMeterData != null
                 ? Column(

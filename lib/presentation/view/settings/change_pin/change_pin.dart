@@ -114,16 +114,14 @@ class _ChangePinState extends State<ChangePin> {
                       end: Alignment.bottomRight,
                     ),
                     "Change Pin",
-                    style: getBoldStyle(color: ColorManager.whiteColor)
-                        .copyWith(fontSize: 22),
+                    style: getBoldStyle(color: ColorManager.whiteColor).copyWith(fontSize: 22),
                   ),
                 ],
               ),
               UIHelper.verticalSpaceSmall,
               Text(
                 "You can create a new pin here.",
-                style: getRegularStyle(
-                    color: ColorManager.greyColor, fontSize: 14),
+                style: getRegularStyle(color: ColorManager.greyColor, fontSize: 14),
               ),
               UIHelper.verticalSpaceMedium,
               Row(
@@ -139,8 +137,7 @@ class _ChangePinState extends State<ChangePin> {
                           color: ColorManager.greyColor.withOpacity(.14),
                           spreadRadius: 8,
                           blurRadius: 9,
-                          offset:
-                              const Offset(8, 5), // changes position of shadow
+                          offset: const Offset(8, 5), // changes position of shadow
                         ),
                       ],
                     ),
@@ -149,10 +146,8 @@ class _ChangePinState extends State<ChangePin> {
                       obscureText: false,
                       controller: newPin1,
                       cursorColor: ColorManager.primaryColor,
-                      validator: (String? val) =>
-                          FieldValidator().validate(val!),
-                      style: const TextStyle(
-                          fontSize: 24, fontWeight: FontWeight.bold),
+                      validator: (String? val) => FieldValidator().validate(val!),
+                      style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                       keyboardType: TextInputType.number,
                       textAlign: TextAlign.center,
                       decoration: InputDecoration(
@@ -175,8 +170,7 @@ class _ChangePinState extends State<ChangePin> {
                           color: ColorManager.greyColor.withOpacity(.14),
                           spreadRadius: 8,
                           blurRadius: 9,
-                          offset:
-                              const Offset(8, 5), // changes position of shadow
+                          offset: const Offset(8, 5), // changes position of shadow
                         ),
                       ],
                     ),
@@ -186,10 +180,8 @@ class _ChangePinState extends State<ChangePin> {
                         obscureText: false,
                         controller: newPin2,
                         cursorColor: ColorManager.primaryColor,
-                        validator: (String? val) =>
-                            FieldValidator().validate(val!),
-                        style: const TextStyle(
-                            fontSize: 24, fontWeight: FontWeight.bold),
+                        validator: (String? val) => FieldValidator().validate(val!),
+                        style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                         keyboardType: TextInputType.number,
                         textAlign: TextAlign.center,
                         decoration: InputDecoration(
@@ -210,8 +202,7 @@ class _ChangePinState extends State<ChangePin> {
                           color: ColorManager.greyColor.withOpacity(.14),
                           spreadRadius: 8,
                           blurRadius: 9,
-                          offset:
-                              const Offset(8, 5), // changes position of shadow
+                          offset: const Offset(8, 5), // changes position of shadow
                         ),
                       ],
                     ),
@@ -221,10 +212,8 @@ class _ChangePinState extends State<ChangePin> {
                         obscureText: false,
                         controller: newPin3,
                         cursorColor: ColorManager.primaryColor,
-                        validator: (String? val) =>
-                            FieldValidator().validate(val!),
-                        style: const TextStyle(
-                            fontSize: 24, fontWeight: FontWeight.bold),
+                        validator: (String? val) => FieldValidator().validate(val!),
+                        style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                         keyboardType: TextInputType.number,
                         textAlign: TextAlign.center,
                         decoration: InputDecoration(
@@ -245,8 +234,7 @@ class _ChangePinState extends State<ChangePin> {
                           color: ColorManager.greyColor.withOpacity(.14),
                           spreadRadius: 8,
                           blurRadius: 9,
-                          offset:
-                              const Offset(8, 5), // changes position of shadow
+                          offset: const Offset(8, 5), // changes position of shadow
                         ),
                       ],
                     ),
@@ -256,10 +244,8 @@ class _ChangePinState extends State<ChangePin> {
                         obscureText: false,
                         controller: newPin4,
                         cursorColor: ColorManager.primaryColor,
-                        validator: (String? val) =>
-                            FieldValidator().validate(val!),
-                        style: const TextStyle(
-                            fontSize: 24, fontWeight: FontWeight.bold),
+                        validator: (String? val) => FieldValidator().validate(val!),
+                        style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                         keyboardType: TextInputType.number,
                         textAlign: TextAlign.center,
                         decoration: InputDecoration(
@@ -339,8 +325,7 @@ class _ChangePinState extends State<ChangePin> {
                             color: ColorManager.greyColor.withOpacity(.14),
                             spreadRadius: 8,
                             blurRadius: 9,
-                            offset: const Offset(
-                                8, 5), // changes position of shadow
+                            offset: const Offset(8, 5), // changes position of shadow
                           ),
                         ],
                       ),
@@ -349,10 +334,8 @@ class _ChangePinState extends State<ChangePin> {
                         obscureText: false,
                         controller: pin1,
                         cursorColor: ColorManager.primaryColor,
-                        validator: (String? val) =>
-                            FieldValidator().validate(val!),
-                        style: const TextStyle(
-                            fontSize: 24, fontWeight: FontWeight.bold),
+                        validator: (String? val) => FieldValidator().validate(val!),
+                        style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                         keyboardType: TextInputType.number,
                         textAlign: TextAlign.center,
                         decoration: InputDecoration(
@@ -375,8 +358,7 @@ class _ChangePinState extends State<ChangePin> {
                             color: ColorManager.greyColor.withOpacity(.14),
                             spreadRadius: 8,
                             blurRadius: 9,
-                            offset: const Offset(
-                                8, 5), // changes position of shadow
+                            offset: const Offset(8, 5), // changes position of shadow
                           ),
                         ],
                       ),
@@ -386,10 +368,8 @@ class _ChangePinState extends State<ChangePin> {
                           obscureText: false,
                           controller: pin2,
                           cursorColor: ColorManager.primaryColor,
-                          validator: (String? val) =>
-                              FieldValidator().validate(val!),
-                          style: const TextStyle(
-                              fontSize: 24, fontWeight: FontWeight.bold),
+                          validator: (String? val) => FieldValidator().validate(val!),
+                          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                           keyboardType: TextInputType.number,
                           textAlign: TextAlign.center,
                           decoration: InputDecoration(
@@ -410,8 +390,7 @@ class _ChangePinState extends State<ChangePin> {
                             color: ColorManager.greyColor.withOpacity(.14),
                             spreadRadius: 8,
                             blurRadius: 9,
-                            offset: const Offset(
-                                8, 5), // changes position of shadow
+                            offset: const Offset(8, 5), // changes position of shadow
                           ),
                         ],
                       ),
@@ -421,10 +400,8 @@ class _ChangePinState extends State<ChangePin> {
                           obscureText: false,
                           controller: pin3,
                           cursorColor: ColorManager.primaryColor,
-                          validator: (String? val) =>
-                              FieldValidator().validate(val!),
-                          style: const TextStyle(
-                              fontSize: 24, fontWeight: FontWeight.bold),
+                          validator: (String? val) => FieldValidator().validate(val!),
+                          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                           keyboardType: TextInputType.number,
                           textAlign: TextAlign.center,
                           decoration: InputDecoration(
@@ -445,8 +422,7 @@ class _ChangePinState extends State<ChangePin> {
                             color: ColorManager.greyColor.withOpacity(.14),
                             spreadRadius: 8,
                             blurRadius: 9,
-                            offset: const Offset(
-                                8, 5), // changes position of shadow
+                            offset: const Offset(8, 5), // changes position of shadow
                           ),
                         ],
                       ),
@@ -456,10 +432,8 @@ class _ChangePinState extends State<ChangePin> {
                           obscureText: false,
                           controller: pin4,
                           cursorColor: ColorManager.primaryColor,
-                          validator: (String? val) =>
-                              FieldValidator().validate(val!),
-                          style: const TextStyle(
-                              fontSize: 24, fontWeight: FontWeight.bold),
+                          validator: (String? val) => FieldValidator().validate(val!),
+                          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                           keyboardType: TextInputType.number,
                           textAlign: TextAlign.center,
                           decoration: InputDecoration(
@@ -467,8 +441,7 @@ class _ChangePinState extends State<ChangePin> {
                           ),
                           onChanged: (value) {
                             if (value.length == 1) {
-                              oldPin =
-                                  "${pin1.text.trim() + pin2.text.trim() + pin3.text.trim() + pin4.text.trim()}";
+                              oldPin = "${pin1.text.trim() + pin2.text.trim() + pin3.text.trim() + pin4.text.trim()}";
                               provider.setBoolStatus(true);
                               provider.setPin(oldPin!);
                               pin4FocusNode!.unfocus();
@@ -486,6 +459,10 @@ class _ChangePinState extends State<ChangePin> {
                       provider.verifyPin(
                         ctx: context,
                       );
+                      pin1.clear();
+                      pin2.clear();
+                      pin3.clear();
+                      pin4.clear();
                     } else {
                       Navigator.pop(context);
                       MekNotification().showMessage(
@@ -505,7 +482,6 @@ class _ChangePinState extends State<ChangePin> {
     );
   }
 }
-
 
 class ChangePinEmail extends StatelessWidget {
   ChangePinEmail({
@@ -530,7 +506,7 @@ class ChangePinEmail extends StatelessWidget {
     return Form(
       key: _formKey,
       child: ContainerWidget(
-       // color: ColorManager.whiteColor.withOpacity(.5),
+        // color: ColorManager.whiteColor.withOpacity(.5),
         content: Column(
           children: [
             UIHelper.verticalSpaceMedium,
@@ -545,8 +521,7 @@ class ChangePinEmail extends StatelessWidget {
                     UIHelper.verticalSpaceSmall,
                     Text(
                       "Confirm your email and a 6 digit code will be sent.",
-                      style: getRegularStyle(
-                          color: ColorManager.deepGreyColor, fontSize: 14),
+                      style: getRegularStyle(color: ColorManager.deepGreyColor, fontSize: 14),
                     ),
                     UIHelper.verticalSpaceMedium,
                     AppFormField(
@@ -554,28 +529,25 @@ class ChangePinEmail extends StatelessWidget {
                       hintText: "Email",
                       fieldController: provider.requestPinChange,
                       keyboardType: TextInputType.emailAddress,
-                      validator: (String? val) =>
-                          FieldValidator().validateEmail(val!),
+                      validator: (String? val) => FieldValidator().validateEmail(val!),
                     ),
                   ],
                 ),
               ),
             ),
-             
             Expanded(
               flex: 1,
               child: Center(
                 child: AppButton(
                   onPressed: () {
                     if (_formKey.currentState!.validate()) {
-                        provider.requestOtp();
+                      provider.requestOtp();
                     }
                   },
                   buttonText: "Next",
                 ),
               ),
             ),
-               
           ],
         ),
       ),
@@ -591,7 +563,9 @@ class VerifyChangePinOtp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BaseView(
-      vmBuilder: (context) => SettingsProvider(context: context,),
+      vmBuilder: (context) => SettingsProvider(
+        context: context,
+      ),
       builder: _buildScreen,
     );
   }
@@ -619,14 +593,16 @@ class VerifyChangePinOtp extends StatelessWidget {
                   UIHelper.verticalSpaceSmall,
                   Text.rich(
                     TextSpan(
-                        text: 'Enter the OTP code sent to ',
-                        style: getBoldStyle(color: ColorManager.blackColor),
-                        children: [
-                          TextSpan(
-                            text: provider.requestPinChange.text.isNotEmpty ? provider.requestPinChange.text : "Your email",
-                            style: const TextStyle(fontWeight: FontWeight.w600),
-                          ),
-                        ],),
+                      text: 'Enter the OTP code sent to ',
+                      style: getBoldStyle(color: ColorManager.blackColor),
+                      children: [
+                        TextSpan(
+                          text:
+                              provider.requestPinChange.text.isNotEmpty ? provider.requestPinChange.text : "Your email",
+                          style: const TextStyle(fontWeight: FontWeight.w600),
+                        ),
+                      ],
+                    ),
                     textAlign: TextAlign.center,
                   ),
                   UIHelper.verticalSpaceLarge,
@@ -657,4 +633,3 @@ class VerifyChangePinOtp extends StatelessWidget {
     );
   }
 }
-

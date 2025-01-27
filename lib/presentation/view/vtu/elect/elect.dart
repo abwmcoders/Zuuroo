@@ -448,6 +448,37 @@ class Bill extends StatelessWidget {
               },
             ),
             UIHelper.verticalSpaceMedium,
+             if (vtuProvider.meterNumber.text != '' && vtuProvider.selectedBiller != null && vtuProvider.metr != null)
+              Align(
+                alignment: Alignment.bottomRight,
+                child: InkWell(
+                  onTap: () {
+                    vtuProvider.verifyMeterNumber(
+                      ctx: context,
+                      ctr: vtuProvider.meterNumber.text.trim(),
+                      billerCode: vtuProvider.selectedBiller!.provider!,
+                      meterType: vtuProvider.metr!,
+                    );
+                  },
+                  child: Container(
+                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                    decoration: BoxDecoration(
+                      gradient: ColorManager.buttonGradient,
+                      //color: ColorManager.primaryColor,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Text(
+                      "Verify",
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                        color: ColorManager.whiteColor,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            UIHelper.verticalSpaceMedium,
             vtuProvider.selectedMeterData != null
                 ? Column(
                     children: [
@@ -615,6 +646,37 @@ class Bill extends StatelessWidget {
                 );
               },
             ),
+            UIHelper.verticalSpaceMedium,
+            if (vtuProvider.meterNumber.text != '' && vtuProvider.selectedBiller != null && vtuProvider.metr != null)
+              Align(
+                alignment: Alignment.bottomRight,
+                child: InkWell(
+                  onTap: () {
+                    vtuProvider.verifyMeterNumber(
+                      ctx: context,
+                      ctr: vtuProvider.meterNumber.text.trim(),
+                      billerCode: vtuProvider.selectedBiller!.provider!,
+                      meterType: vtuProvider.metr!,
+                    );
+                  },
+                  child: Container(
+                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                    decoration: BoxDecoration(
+                      gradient: ColorManager.buttonGradient,
+                      //color: ColorManager.primaryColor,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Text(
+                      "Verify",
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                        color: ColorManager.whiteColor,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
             UIHelper.verticalSpaceMedium,
             vtuProvider.selectedMeterData != null
                 ? Column(

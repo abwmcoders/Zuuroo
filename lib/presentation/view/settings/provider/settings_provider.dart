@@ -149,19 +149,31 @@ class SettingsProvider extends BaseViewModel {
 
     try {
       var request = await UserApiServices().verifyPin(body);
+      print("Verify pin pin response: $request");
       changeLoaderStatus(false);
+      otp = "";
       if (request != null) {
         if (request["status"] == true) {
           changePin(
             ctx: ctx,
           );
         } else {
+          NavigateClass().pushNamed(
+            context: ctx,
+            routName: Routes.mainRoute,
+          );
+          
           MekNotification().showMessage(
             ctx,
             message: request['message'].toString(),
           );
         }
       } else {
+        NavigateClass().pushNamed(
+          context: ctx,
+          routName: Routes.mainRoute,
+        );
+          
         MekNotification().showMessage(
           ctx,
           message: request['message'].toString(),
@@ -179,7 +191,7 @@ class SettingsProvider extends BaseViewModel {
     dismissKeyboard(context);
     changeLoaderStatus(true);
     try {
-     var body = {"email": requestPinChange.text, "otp": otpField.text};
+      var body = {"email": requestPinChange.text, "otp": otpField.text};
       var request = await UserApiServices().verifyOtp(body);
       changeLoaderStatus(false);
       if (request != null) {
@@ -212,7 +224,7 @@ class SettingsProvider extends BaseViewModel {
     dismissKeyboard(context);
     changeLoaderStatus(true);
     try {
-     var body = {"email": requestPinChange.text};
+      var body = {"email": requestPinChange.text};
       var request = await UserApiServices().requestChangePin(body);
       changeLoaderStatus(false);
       if (request != null) {
