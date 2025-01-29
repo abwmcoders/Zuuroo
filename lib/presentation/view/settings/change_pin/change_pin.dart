@@ -267,7 +267,10 @@ class _ChangePinState extends State<ChangePin> {
               AppButton(
                 onPressed: () {
                   if (_formKey.currentState!.validate()) {
-                    _otpInput(provider);
+                    provider.changePin(
+                        ctx: context,
+                      );
+                    //_otpInput(provider);
                   }
                 },
                 buttonText: "Save Changes",

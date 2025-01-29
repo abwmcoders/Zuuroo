@@ -70,6 +70,13 @@ class VtuProvider extends BaseViewModel {
   bool checkNumber = false;
   MeterModel? selectedMeterData;
 
+  int toCeil(String number) {
+    print("Inside to ceil ---> amount: $number");
+    int roundedValue = double.parse(number).ceil();
+    print("returning value ---> value: $roundedValue");
+    return roundedValue;
+  }
+
   setIndex(int ind) {
     currentPage = ind;
     notifyListeners();
@@ -235,8 +242,7 @@ class VtuProvider extends BaseViewModel {
       List<CountryModel> _countryResult = AppConstants.countryModel ?? [];
       for (dynamic country in response['data']) {
         final countryModel = CountryModel.fromJson(country);
-        bool exists = _countryResult.any((existingCountry) =>
-            existingCountry.countryCode == countryModel.countryCode);
+        bool exists = _countryResult.any((existingCountry) => existingCountry.countryCode == countryModel.countryCode);
 
         if (!exists) {
           _countryResult.add(countryModel);
@@ -255,8 +261,7 @@ class VtuProvider extends BaseViewModel {
       List<CountryModel> _countryResult = AppConstants.countryLoanModel ?? [];
       for (dynamic country in response['data']) {
         final countryModel = CountryModel.fromJson(country);
-        bool exists = _countryResult.any((existingCountry) =>
-            existingCountry.countryCode == countryModel.countryCode);
+        bool exists = _countryResult.any((existingCountry) => existingCountry.countryCode == countryModel.countryCode);
 
         if (!exists) {
           _countryResult.add(countryModel);
@@ -274,8 +279,7 @@ class VtuProvider extends BaseViewModel {
       List<PowerModel> _billerResult = AppConstants.billerModel ?? [];
       for (dynamic biller in response['data']) {
         final billerModel = PowerModel.fromJson(biller);
-        bool exists = _billerResult.any((existingBiller) =>
-            existingBiller.provider == billerModel.provider);
+        bool exists = _billerResult.any((existingBiller) => existingBiller.provider == billerModel.provider);
         if (!exists) {
           _billerResult.add(billerModel);
         }
@@ -292,8 +296,8 @@ class VtuProvider extends BaseViewModel {
       List<OperatorModel> _operatorsResults = [];
       for (dynamic operator in response['data']) {
         final operators = OperatorModel.fromJson(operator);
-        bool exists = _operatorsResults.any((existingOperator) =>
-            existingOperator.operatorCode == operators.operatorCode);
+        bool exists =
+            _operatorsResults.any((existingOperator) => existingOperator.operatorCode == operators.operatorCode);
         if (!exists) {
           _operatorsResults.add(
             OperatorModel.fromJson(operator),
@@ -349,10 +353,7 @@ class VtuProvider extends BaseViewModel {
     }
   }
 
-  void purchaseAirtime(
-      {required BuildContext ctx,
-      int topUp = 1,
-      required String amount}) async {
+  void purchaseAirtime({required BuildContext ctx, int topUp = 1, required String amount}) async {
     dismissKeyboard(context);
     changeLoaderStatus(true);
     var body = {
@@ -360,8 +361,7 @@ class VtuProvider extends BaseViewModel {
       "top_up": topUp,
       "country": topUp == 2 ? loanCountryCode : countryCode,
       "phoneNumber": numberController.text.trim(),
-      "network_operator":
-          operatorCode ?? AppConstants.operatorModel![0].operatorCode,
+      "network_operator": operatorCode ?? AppConstants.operatorModel![0].operatorCode,
       "amount": amount,
     };
 
@@ -409,8 +409,7 @@ class VtuProvider extends BaseViewModel {
       "top_up": topUp,
       "country": topUp == 2 ? loanCountryCode : countryCode,
       "phoneNumber": numberController.text.trim(),
-      "network_operator":
-          operatorCode ?? AppConstants.operatorModel![0].operatorCode,
+      "network_operator": operatorCode ?? AppConstants.operatorModel![0].operatorCode,
       "data_plan": selectedDataPlan!.productCode,
     };
 
@@ -422,9 +421,7 @@ class VtuProvider extends BaseViewModel {
       if (request["status"] == true) {
         NavigateClass().pushNamed(
           context: ctx,
-          args: topUp == 1
-              ? selectedDataPlan!.costPrice.toString()
-              : selectedDataPlan!.loanPrice.toString(),
+          args: topUp == 1 ? selectedDataPlan!.costPrice.toString() : selectedDataPlan!.loanPrice.toString(),
           routName: Routes.success,
         );
       } else {
@@ -561,8 +558,7 @@ class VtuProvider extends BaseViewModel {
       } else {
         MekNotification().showMessage(
           ctx,
-          message:
-              "An error occurred, Please check your internet connection !!!",
+          message: "An error occurred, Please check your internet connection !!!",
         );
       }
     } catch (e) {
@@ -611,13 +607,10 @@ class VtuProvider extends BaseViewModel {
   }
 }
 
-
 String generateRandomReference() {
   const int length = 18;
-  const String chars =
-      'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#\$%^&*()+{}~';
+  const String chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#\$%^&*()+{}~';
   final Random random = Random();
 
-  return List.generate(length, (index) => chars[random.nextInt(chars.length)])
-      .join();
+  return List.generate(length, (index) => chars[random.nextInt(chars.length)]).join();
 }

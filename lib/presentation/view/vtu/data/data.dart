@@ -1019,7 +1019,7 @@ class DataPage extends StatelessWidget {
                   isEdit: false,
                   title: "Loan Repayment",
                   label: calculateLoanRepayment(
-                      "${vtuProvider.selectedDataPlan!.productPrice}",
+                    "${vtuProvider.toCeil(vtuProvider.selectedDataPlan!.productPrice)}",
                       vtuProvider.loanLimit!.percentage),
                   //controller: vtuProvider.amountController,
                 )
@@ -1039,7 +1039,7 @@ class DataPage extends StatelessWidget {
                             topUp: 2,
                             plan: vtuProvider.selectedDataPlan!,
                             amount: calculateLoanRepayment(
-                                "${vtuProvider.selectedDataPlan!.costPrice.toInt()}",
+                              "${vtuProvider.toCeil(vtuProvider.selectedDataPlan!.productPrice)}",
                                 vtuProvider.loanLimit!.percentage),
                             number: vtuProvider.numberController.text,
                             provider: vtuProvider,

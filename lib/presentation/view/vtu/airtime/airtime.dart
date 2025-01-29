@@ -30,8 +30,7 @@ class Airtime extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BaseView(
-      vmBuilder: (context) =>
-          VtuProvider(context: context, shouldCallInit: true),
+      vmBuilder: (context) => VtuProvider(context: context, shouldCallInit: true),
       builder: _buildScreen,
     );
   }
@@ -61,19 +60,15 @@ class Airtime extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Padding(
-                            padding:
-                                const EdgeInsets.only(right: 30.0, left: 10.0),
+                            padding: const EdgeInsets.only(right: 30.0, left: 10.0),
                             child: Text(
                               _titles[index],
                               style: TextStyle(
                                 fontSize: 18,
                                 fontFamily: "NT",
-                                fontWeight: vtuProvider.currentPage == index
-                                    ? FontWeight.bold
-                                    : FontWeight.normal,
-                                color: vtuProvider.currentPage == index
-                                    ? ColorManager.blackColor
-                                    : ColorManager.greyColor,
+                                fontWeight: vtuProvider.currentPage == index ? FontWeight.bold : FontWeight.normal,
+                                color:
+                                    vtuProvider.currentPage == index ? ColorManager.blackColor : ColorManager.greyColor,
                               ),
                             ),
                           ),
@@ -102,9 +97,7 @@ class Airtime extends StatelessWidget {
                     vtuProvider.setIndex(index);
                   },
                   itemBuilder: (context, index) {
-                    return index == 0
-                        ? _loanWidget(vtuProvider, context)
-                        : _buyWidget(vtuProvider, context);
+                    return index == 0 ? _loanWidget(vtuProvider, context) : _buyWidget(vtuProvider, context);
                   },
                 ),
               ),
@@ -115,10 +108,7 @@ class Airtime extends StatelessWidget {
     );
   }
 
-  _otpInput(
-      {required VtuProvider provider,
-      required int topUp,
-      required BuildContext context}) {
+  _otpInput({required VtuProvider provider, required int topUp, required BuildContext context}) {
     appBottomSheet(
       context,
       Container(
@@ -155,23 +145,25 @@ class Airtime extends StatelessWidget {
                   padding: const EdgeInsets.all(10.0),
                   child: AppPinField(
                     length: 4,
-                    onCompleted: (_) => provider.verifyPin(
-                        ctx: context,
-                        onSuccess: () {
-                          Navigator.pop(context);
-                          provider.purchaseAirtime(
-                            ctx: context,
-                            topUp: topUp,
-                            amount: topUp == 2
-                                ? calculateLoanRepayment(
-                                    provider.amountController.text.trim(),
-                                    provider.loanLimit!.percentage)
-                                : provider.amountController.text.trim(),
-                          );
-                        },
-                        onError: () {
-                          Navigator.pop(context);
-                        }),
+                    onCompleted: (_) {
+                      int roundedValue = double.parse(provider.amountController.text.trim()).ceil();
+                      provider.verifyPin(
+                          ctx: context,
+                          onSuccess: () {
+                            Navigator.pop(context);
+                            provider.purchaseAirtime(
+                              ctx: context,
+                              topUp: topUp,
+                              amount: topUp == 2
+                                  ? calculateLoanRepayment(
+                                      "$roundedValue", provider.loanLimit!.percentage)
+                                  : provider.amountController.text.trim(),
+                            );
+                          },
+                          onError: () {
+                            Navigator.pop(context);
+                          });
+                    },
                     controller: provider.otpField,
                     obscure: true,
                     validator: (v) => FieldValidator().validateRequiredLength(
@@ -197,13 +189,9 @@ class Airtime extends StatelessWidget {
       int topUp = 1,
       required VtuProvider provider}) {
     print("Wallet balance -> ${AppConstants.homeModel!.data.wallet.balance}");
-    int result =
-        double.parse(AppConstants.homeModel!.data.wallet.loanBalance).abs() >
-                0.00
-            ? double.parse(AppConstants.homeModel!.data.wallet.loanBalance)
-                .abs()
-                .toInt()
-            : 0;
+    int result = double.parse(AppConstants.homeModel!.data.wallet.loanBalance).abs() > 0.00
+        ? double.parse(AppConstants.homeModel!.data.wallet.loanBalance).abs().toInt()
+        : 0;
     showModalBottomSheet(
       context: ctx,
       backgroundColor: ColorManager.whiteColor,
@@ -224,8 +212,7 @@ class Airtime extends StatelessWidget {
               children: [
                 Text(
                   "₦ $amount.00",
-                  style: getBoldStyle(
-                      color: ColorManager.blackColor, fontSize: 16),
+                  style: getBoldStyle(color: ColorManager.blackColor, fontSize: 16),
                 ),
                 UIHelper.verticalSpaceMedium,
                 Padding(
@@ -280,11 +267,9 @@ class Airtime extends StatelessWidget {
                 ),
                 UIHelper.verticalSpaceSmall,
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
                   decoration: BoxDecoration(
-                      color: ColorManager.greyColor.withOpacity(.5),
-                      borderRadius: BorderRadius.circular(10)),
+                      color: ColorManager.greyColor.withOpacity(.5), borderRadius: BorderRadius.circular(10)),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -309,17 +294,16 @@ class Airtime extends StatelessWidget {
                         ],
                       ),
                       topUp == 2
-                          ? result > 1 ? Icon(
+                          ? result > 1
+                              ? Icon(
                                   Icons.close,
                                   color: ColorManager.primaryColor,
-                                ) :Icon(
-                              Icons.check,
-                              color: ColorManager.activeColor,
-                            )
-                          : double.parse(AppConstants
-                                          .homeModel!.data.wallet.balance).toInt()
-                           >=
-                                  int.parse(amount)
+                                )
+                              : Icon(
+                                  Icons.check,
+                                  color: ColorManager.activeColor,
+                                )
+                          : double.parse(AppConstants.homeModel!.data.wallet.balance).toInt() >= int.parse(amount)
                               ? Icon(
                                   Icons.check,
                                   color: ColorManager.activeColor,
@@ -334,32 +318,26 @@ class Airtime extends StatelessWidget {
                 UIHelper.verticalSpaceMediumPlus,
                 AppButton(
                   onPressed: () {
-                    double? balance = double.tryParse(
-                        AppConstants.homeModel?.data.wallet.balance ?? '');
+                    double? balance = double.tryParse(AppConstants.homeModel?.data.wallet.balance ?? '');
                     double? inputAmount = double.tryParse(amount);
                     if (topUp == 2) {
                       // int result = double.parse(
                       //     AppConstants.homeModel!.data.wallet.loanBalance).abs() > 0.00 ? double.parse(
                       //     AppConstants.homeModel!.data.wallet.loanBalance).abs().toInt() : 0;
-                      if(result > 1){
+                      if (result > 1) {
                         Navigator.pop(ctx);
                         MekNotification().showMessage(
                           ctx,
                           message: "You have unpaid loan amount, please pay up to continue !!!",
                         );
-                      }else {
+                      } else {
                         Navigator.pop(ctx);
-                        _otpInput(
-                            provider: provider, topUp: topUp, context: ctx);
+                        _otpInput(provider: provider, topUp: topUp, context: ctx);
                       }
-                      
                     } else {
-                      if (balance != null &&
-                          inputAmount != null &&
-                          balance >= inputAmount) {
+                      if (balance != null && inputAmount != null && balance >= inputAmount) {
                         Navigator.pop(ctx);
-                        _otpInput(
-                            provider: provider, topUp: topUp, context: ctx);
+                        _otpInput(provider: provider, topUp: topUp, context: ctx);
                       } else {
                         Navigator.pop(ctx);
                         MekNotification().showMessage(
@@ -399,14 +377,11 @@ class Airtime extends StatelessWidget {
               color: ColorManager.greyColor.withOpacity(.4),
               borderRadius: BorderRadius.circular(10),
             ),
-            child: AppConstants.countryModel != null &&
-                    AppConstants.countryModel!.isNotEmpty
+            child: AppConstants.countryModel != null && AppConstants.countryModel!.isNotEmpty
                 ? Row(
                     children: [
                       Text(
-                        vtuProvider.countryCode != null
-                            ? vtuProvider.countryCode!.toUpperCase()
-                            : "",
+                        vtuProvider.countryCode != null ? vtuProvider.countryCode!.toUpperCase() : "",
                         style: getBoldStyle(
                           color: ColorManager.blackColor,
                           fontSize: 18,
@@ -433,15 +408,13 @@ class Airtime extends StatelessWidget {
 
                             vtuProvider.isOpSet();
                           },
-                          items: vtuProvider
-                              .countryList(AppConstants.countryModel!),
+                          items: vtuProvider.countryList(AppConstants.countryModel!),
                         ),
                       ),
                     ],
                   )
                 : Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
                     decoration: BoxDecoration(
                       color: ColorManager.greyColor.withOpacity(.4),
                       borderRadius: BorderRadius.circular(10),
@@ -463,9 +436,7 @@ class Airtime extends StatelessWidget {
               // ),
               Text(
                 vtuProvider.operatorSet == true
-                    ? vtuProvider.operatorCode ??
-                        AppConstants.operatorModel!.first.operatorCode
-                            .toUpperCase()
+                    ? vtuProvider.operatorCode ?? AppConstants.operatorModel!.first.operatorCode.toUpperCase()
                     : "",
                 style: getBoldStyle(
                   color: ColorManager.blackColor,
@@ -510,14 +481,10 @@ class Airtime extends StatelessWidget {
                                 padding: const EdgeInsets.all(12.0),
                                 child: Column(
                                   children: [
-                                    ...List.generate(
-                                        AppConstants.operatorModel!.length,
-                                        (index) {
+                                    ...List.generate(AppConstants.operatorModel!.length, (index) {
                                       return InkWell(
                                         onTap: () {
-                                          vtuProvider.setOperatorCode(
-                                              AppConstants.operatorModel![index]
-                                                  .operatorCode);
+                                          vtuProvider.setOperatorCode(AppConstants.operatorModel![index].operatorCode);
                                           Navigator.pop(context);
                                         },
                                         child: Padding(
@@ -526,17 +493,13 @@ class Airtime extends StatelessWidget {
                                             vertical: 8,
                                           ),
                                           child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
+                                            crossAxisAlignment: CrossAxisAlignment.start,
                                             children: [
                                               Text(
-                                                AppConstants
-                                                    .operatorModel![index]
-                                                    .operatorCode,
+                                                AppConstants.operatorModel![index].operatorCode,
                                                 style: TextStyle(
                                                   color: Colors.black,
-                                                  fontSize: screenAwareSize(
-                                                      19, context),
+                                                  fontSize: screenAwareSize(19, context),
                                                   fontWeight: FontWeight.w500,
                                                   letterSpacing: 1.5,
                                                 ),
@@ -683,8 +646,7 @@ class Airtime extends StatelessWidget {
                       } else {
                         MekNotification().showMessage(
                           context,
-                          message:
-                              "Please refresh your home screen, your data is missing!!!",
+                          message: "Please refresh your home screen, your data is missing!!!",
                         );
                       }
                     } else {
@@ -736,14 +698,11 @@ class Airtime extends StatelessWidget {
               color: ColorManager.greyColor.withOpacity(.4),
               borderRadius: BorderRadius.circular(10),
             ),
-            child: AppConstants.countryLoanModel != null &&
-                    AppConstants.countryLoanModel!.isNotEmpty
+            child: AppConstants.countryLoanModel != null && AppConstants.countryLoanModel!.isNotEmpty
                 ? Row(
                     children: [
                       Text(
-                        vtuProvider.loanCountryCode != null
-                            ? vtuProvider.loanCountryCode!.toUpperCase()
-                            : "",
+                        vtuProvider.loanCountryCode != null ? vtuProvider.loanCountryCode!.toUpperCase() : "",
                         style: getBoldStyle(
                           color: ColorManager.blackColor,
                           fontSize: 18,
@@ -770,15 +729,13 @@ class Airtime extends StatelessWidget {
 
                             vtuProvider.isOpSet();
                           },
-                          items: vtuProvider
-                              .countryList(AppConstants.countryLoanModel!),
+                          items: vtuProvider.countryList(AppConstants.countryLoanModel!),
                         ),
                       ),
                     ],
                   )
                 : Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
                     decoration: BoxDecoration(
                       color: ColorManager.greyColor.withOpacity(.4),
                       borderRadius: BorderRadius.circular(10),
@@ -802,8 +759,7 @@ class Airtime extends StatelessWidget {
                 vtuProvider.operatorSet == true
                     ? vtuProvider.operatorCode != null
                         ? vtuProvider.operatorCode!.toUpperCase()
-                        : AppConstants.operatorModel!.first.operatorCode
-                            .toUpperCase()
+                        : AppConstants.operatorModel!.first.operatorCode.toUpperCase()
                     : "",
                 style: getBoldStyle(
                   color: ColorManager.blackColor,
@@ -815,8 +771,7 @@ class Airtime extends StatelessWidget {
                   appBottomSheet(
                     context,
                     Container(
-                      padding: EdgeInsets.only(
-                          bottom: MediaQuery.of(context).viewInsets.bottom),
+                      padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
                       decoration: BoxDecoration(
                         color: ColorManager.whiteColor,
                         borderRadius: const BorderRadius.only(
@@ -850,14 +805,10 @@ class Airtime extends StatelessWidget {
                                 padding: const EdgeInsets.all(12.0),
                                 child: Column(
                                   children: [
-                                    ...List.generate(
-                                        AppConstants.operatorModel!.length,
-                                        (index) {
+                                    ...List.generate(AppConstants.operatorModel!.length, (index) {
                                       return InkWell(
                                         onTap: () {
-                                          vtuProvider.setOperatorCode(
-                                              AppConstants.operatorModel![index]
-                                                  .operatorCode);
+                                          vtuProvider.setOperatorCode(AppConstants.operatorModel![index].operatorCode);
                                           Navigator.pop(context);
                                         },
                                         child: Padding(
@@ -866,17 +817,13 @@ class Airtime extends StatelessWidget {
                                             vertical: 8,
                                           ),
                                           child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
+                                            crossAxisAlignment: CrossAxisAlignment.start,
                                             children: [
                                               Text(
-                                                AppConstants
-                                                    .operatorModel![index]
-                                                    .operatorCode,
+                                                AppConstants.operatorModel![index].operatorCode,
                                                 style: TextStyle(
                                                   color: Colors.black,
-                                                  fontSize: screenAwareSize(
-                                                      19, context),
+                                                  fontSize: screenAwareSize(19, context),
                                                   fontWeight: FontWeight.w500,
                                                   letterSpacing: 1.5,
                                                 ),
@@ -980,8 +927,7 @@ class Airtime extends StatelessWidget {
               AppConstants.loanModel!.length,
               (index) => Expanded(
                 child: SelectLoanPeriod(
-                  accountType:
-                      "${AppConstants.loanModel![index].labelName} Days",
+                  accountType: "${AppConstants.loanModel![index].labelName} Days",
                   active: vtuProvider.selectedLoanIndex == index ? true : false,
                   onPressed: () {
                     vtuProvider.setLoanIndex(index);
@@ -992,15 +938,13 @@ class Airtime extends StatelessWidget {
             ),
           ),
           UIHelper.verticalSpaceMedium,
-          vtuProvider.loanLimit != null &&
-                  vtuProvider.amountController.text != ''
+          vtuProvider.loanLimit != null && vtuProvider.amountController.text != ''
               ? AmountReUseWidget(
                   isEdit: false,
                   showCurrency: true,
                   title: "Loan Repayment",
                   label: calculateLoanRepayment(
-                      vtuProvider.amountController.text.trim(),
-                      vtuProvider.loanLimit!.percentage),
+                      "${vtuProvider.toCeil(vtuProvider.amountController.text.trim())}", vtuProvider.loanLimit!.percentage),
                   //controller: vtuProvider.amountController,
                 )
               : Container(),
@@ -1016,8 +960,8 @@ class Airtime extends StatelessWidget {
                         _confirmationBottomSheetMenu(
                           topUp: 2,
                           amount: calculateLoanRepayment(
-                              vtuProvider.amountController.text.trim(),
-                              vtuProvider.loanLimit!.percentage),
+                            "${vtuProvider.toCeil(vtuProvider.amountController.text.trim())}"
+                              , vtuProvider.loanLimit!.percentage),
                           number: vtuProvider.numberController.text,
                           provider: vtuProvider,
                           ctx: context,
@@ -1025,8 +969,7 @@ class Airtime extends StatelessWidget {
                       } else {
                         MekNotification().showMessage(
                           context,
-                          message:
-                              "Please refresh your home screen, your data is missing!!!",
+                          message: "Please refresh your home screen, your data is missing!!!",
                         );
                       }
                     } else {
