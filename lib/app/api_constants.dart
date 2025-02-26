@@ -30,7 +30,7 @@ class ApiConstants {
   static const String verifyIuc = "cable/verify-iuc";
   static const String changePassword = "user/update-password";
   static const String changePin = "user/update-pin";
-  static const String history = "histories";
+  static const String history = "user/histories";
   static const String about = "about-us";
   static const String terms = "term-conditions";
   static const String faqs = "faqs";

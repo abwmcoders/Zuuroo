@@ -74,30 +74,30 @@ class PersonalInfo extends StatelessWidget {
             ),
            
             UIHelper.verticalSpaceSmall,
-            Align(
-              alignment: Alignment.bottomRight,
-              child: InkWell(
-                onTap: (){
-                  // NavigateClass().pushNamed(
-                  //   context: context,
-                  //   args: user,
-                  //   routName: Routes.editProfile,
-                  // );
-                },
-                child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                    decoration: BoxDecoration(
-                        gradient: ColorManager.buttonGradient,
-                        borderRadius: BorderRadius.circular(30)),
-                    child: Text(
-                      "Edit Profile",
-                      style: getBoldStyle(
-                        color: ColorManager.whiteColor,
-                        fontSize: 12,
-                      ),
-                    )),
-              ),
-            ),
+            // Align(
+            //   alignment: Alignment.bottomRight,
+            //   child: InkWell(
+            //     onTap: (){
+            //       // NavigateClass().pushNamed(
+            //       //   context: context,
+            //       //   args: user,
+            //       //   routName: Routes.editProfile,
+            //       // );
+            //     },
+            //     child: Container(
+            //         padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+            //         decoration: BoxDecoration(
+            //             gradient: ColorManager.buttonGradient,
+            //             borderRadius: BorderRadius.circular(30)),
+            //         child: Text(
+            //           "Edit Profile",
+            //           style: getBoldStyle(
+            //             color: ColorManager.whiteColor,
+            //             fontSize: 12,
+            //           ),
+            //         )),
+            //   ),
+            // ),
           ],
         ),
       ),

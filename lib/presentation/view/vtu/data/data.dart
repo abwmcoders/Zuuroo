@@ -412,7 +412,7 @@ class DataPage extends StatelessWidget {
                 ? Row(
                     children: [
                       Text(
-                        vtuProvider.countryCode != null
+                         vtuProvider.countryCode != null
                             ? vtuProvider.countryCode!.toUpperCase()
                             : "",
                         style: getBoldStyle(
@@ -446,12 +446,13 @@ class DataPage extends StatelessWidget {
 
                             vtuProvider.isOpSet();
                           },
-                          items: vtuProvider
-                              .countryList(AppConstants.countryModel!),
+                          items: vtuProvider.countryList(AppConstants.countryModel!),
+                         
                         ),
                       ),
                     ],
                   )
+                
                 : Container(
                     padding:
                         const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
@@ -673,7 +674,7 @@ class DataPage extends StatelessWidget {
                          _confirmationBottomSheetMenu(
                           plan: vtuProvider.selectedDataPlan!,
                           amount:
-                              "${vtuProvider.selectedDataPlan!.costPrice.toInt()}",
+                              vtuProvider.selectedDataPlan!.productPrice,
                           number: vtuProvider.numberController.text,
                           provider: vtuProvider,
                           ctx: context,
@@ -1324,7 +1325,7 @@ class DataPage extends StatelessWidget {
                                                 CrossAxisAlignment.start,
                                             children: [
                                               Text(
-                                                "${AppConstants.dataPlanModel![index].operatorCode} ${AppConstants.dataPlanModel![index].productName} - ${AppConstants.dataPlanModel![index].costPrice} | ${AppConstants.dataPlanModel![index].validity}",
+                                                "${AppConstants.dataPlanModel![index].operatorCode} ${AppConstants.dataPlanModel![index].productName} - ${AppConstants.dataPlanModel![index].productPrice} | ${AppConstants.dataPlanModel![index].validity}",
                                                 // AppConstants
                                                 //     .dataCategoryModel![index]
                                                 //     .categoryName

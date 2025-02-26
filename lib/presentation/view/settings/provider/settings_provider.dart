@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:zuuro/app/app_constants.dart';
@@ -106,6 +107,7 @@ class SettingsProvider extends BaseViewModel {
     print("object for airtime purchase ---> $body");
     try {
       var request = await UserApiServices().changePin(body);
+      log("change pin request reponse ---> $request");
       changeLoaderStatus(false);
       if (request != null) {
         if (request["status"] == true) {
@@ -162,7 +164,7 @@ class SettingsProvider extends BaseViewModel {
             context: ctx,
             routName: Routes.mainRoute,
           );
-          
+
           MekNotification().showMessage(
             ctx,
             message: request['message'].toString(),
@@ -173,7 +175,7 @@ class SettingsProvider extends BaseViewModel {
           context: ctx,
           routName: Routes.mainRoute,
         );
-          
+
         MekNotification().showMessage(
           ctx,
           message: request['message'].toString(),
@@ -193,6 +195,7 @@ class SettingsProvider extends BaseViewModel {
     try {
       var body = {"email": requestPinChange.text, "otp": otpField.text};
       var request = await UserApiServices().verifyOtp(body);
+      log("pin request otp response ---> $request");
       changeLoaderStatus(false);
       if (request != null) {
         if (request["status"] == true) {
@@ -226,6 +229,7 @@ class SettingsProvider extends BaseViewModel {
     try {
       var body = {"email": requestPinChange.text};
       var request = await UserApiServices().requestChangePin(body);
+      log("pin request reponse ---> $request");
       changeLoaderStatus(false);
       if (request != null) {
         if (request["status"] == true) {

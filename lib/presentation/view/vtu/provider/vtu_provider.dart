@@ -421,7 +421,7 @@ class VtuProvider extends BaseViewModel {
       if (request["status"] == true) {
         NavigateClass().pushNamed(
           context: ctx,
-          args: topUp == 1 ? selectedDataPlan!.costPrice.toString() : selectedDataPlan!.loanPrice.toString(),
+          args: topUp == 1 ? selectedDataPlan!.productPrice.toString() : selectedDataPlan!.loanPrice.toString(),
           routName: Routes.success,
         );
       } else {

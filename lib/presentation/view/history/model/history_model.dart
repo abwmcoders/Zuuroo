@@ -134,29 +134,32 @@
 import 'dart:convert';
 
 class HistoryResponse {
-  final bool status;
-  final int statusCode;
-  final String message;
-  final Map<String, HistoryData> data;
+  final bool? status;
+  final int? statusCode;
+  final String? message;
+  final List<HistoryData> data;
 
   HistoryResponse({
-    required this.status,
-    required this.statusCode,
-    required this.message,
+    this.status,
+    this.statusCode,
+    this.message,
     required this.data,
   });
 
   factory HistoryResponse.fromJson(Map<String, dynamic> json) {
-    var dataMap = json['data'] as Map<String, dynamic>;
-    Map<String, HistoryData> historyDataMap = {};
-    dataMap.forEach((key, value) {
-      historyDataMap[key] = HistoryData.fromJson(value);
+    var dataMap = json['data'] as List<dynamic>;
+    List<HistoryData> historyDataMap = [];
+    dataMap.forEach((value) {
+      historyDataMap.add(HistoryData.fromJson(value));
     });
+    // dataMap.forEach((key, value) {
+    //   historyDataMap[key] = HistoryData.fromJson(value);
+    // });
 
     return HistoryResponse(
-      status: json['status'],
-      statusCode: json['statusCode'],
-      message: json['message'],
+      status: json['status'] ?? true,
+      statusCode: json['statusCode'] ?? 200,
+      message: json['message'] ?? "",
       data: historyDataMap,
     );
   }

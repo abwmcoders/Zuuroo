@@ -1,6 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:zuuro/presentation/resources/resources.dart';
@@ -44,6 +45,7 @@ class LoginProvider extends BaseViewModel {
         email: mekMail!.text.toString(),
         password: password.text.toString(),
       );
+      log("login request reponse ---> $request");
       changeLoaderStatus(false);
       if (request != null) {
         if (request["status"] == true) {

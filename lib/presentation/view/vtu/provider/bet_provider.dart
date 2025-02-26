@@ -426,7 +426,7 @@ class BetProvider extends BaseViewModel {
         NavigateClass().pushNamed(
           context: ctx,
           args: topUp == 1
-              ? selectedDataPlan!.costPrice.toString()
+              ? selectedDataPlan!.productPrice.toString()
               : selectedDataPlan!.loanPrice.toString(),
           routName: Routes.success,
         );

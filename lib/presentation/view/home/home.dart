@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
@@ -39,8 +41,7 @@ class _HomeXState extends State<HomeX> {
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 15.0, vertical: 20.0),
+            padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 20.0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -64,15 +65,11 @@ class _HomeXState extends State<HomeX> {
                           children: [
                             Text(
                               "Hello TheMade!",
-                              style:
-                                  getBoldStyle(color: ColorManager.blackColor)
-                                      .copyWith(fontSize: 16),
+                              style: getBoldStyle(color: ColorManager.blackColor).copyWith(fontSize: 16),
                             ),
                             Text(
                               "Welcome!",
-                              style:
-                                  getBoldStyle(color: ColorManager.blackColor)
-                                      .copyWith(fontSize: 12),
+                              style: getBoldStyle(color: ColorManager.blackColor).copyWith(fontSize: 12),
                             ),
                           ],
                         ),
@@ -83,8 +80,7 @@ class _HomeXState extends State<HomeX> {
                 ),
                 UIHelper.verticalSpaceSmall,
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                   decoration: BoxDecoration(
                     color: ColorManager.whiteColor,
                     borderRadius: BorderRadius.circular(15),
@@ -113,16 +109,11 @@ class _HomeXState extends State<HomeX> {
                               IconButton(
                                 onPressed: _toggleBalance,
                                 icon: Icon(
-                                  _showBalance
-                                      ? Icons.visibility_off
-                                      : Icons.remove_red_eye,
-                                  color: _showBalance
-                                      ? ColorManager.greyColor
-                                      : ColorManager.blackColor,
+                                  _showBalance ? Icons.visibility_off : Icons.remove_red_eye,
+                                  color: _showBalance ? ColorManager.greyColor : ColorManager.blackColor,
                                   size: 20, // Adjust the icon size
                                 ),
-                                padding: const EdgeInsets.all(
-                                    8), // Adjust padding around the icon
+                                padding: const EdgeInsets.all(8), // Adjust padding around the icon
                                 color: Colors.white, // Adjust the icon color
                               )
                             ],
@@ -132,9 +123,7 @@ class _HomeXState extends State<HomeX> {
                             style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.normal,
-                              color: _showBalance
-                                  ? ColorManager.blackColor
-                                  : ColorManager.greyColor,
+                              color: _showBalance ? ColorManager.blackColor : ColorManager.greyColor,
                             ),
                           ),
                         ],
@@ -152,11 +141,9 @@ class _HomeXState extends State<HomeX> {
                               );
                             },
                             child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 8, vertical: 2),
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                                 decoration: BoxDecoration(
-                                    gradient: ColorManager.buttonGradient,
-                                    borderRadius: BorderRadius.circular(30)),
+                                    gradient: ColorManager.buttonGradient, borderRadius: BorderRadius.circular(30)),
                                 child: Row(
                                   children: [
                                     Icon(
@@ -206,12 +193,10 @@ class _HomeXState extends State<HomeX> {
                                 Container(
                                   padding: const EdgeInsets.all(10),
                                   decoration: BoxDecoration(
-                                    color: ColorManager.primaryColor
-                                        .withOpacity(.1),
+                                    color: ColorManager.primaryColor.withOpacity(.1),
                                     borderRadius: BorderRadius.circular(8),
                                   ),
-                                  child: SvgPicture.asset(
-                                      services[index].imageUrl),
+                                  child: SvgPicture.asset(services[index].imageUrl),
                                 ),
                                 UIHelper.verticalSpaceSmall,
                                 Text(
@@ -231,8 +216,7 @@ class _HomeXState extends State<HomeX> {
                 ),
                 UIHelper.verticalSpaceMedium,
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
                   decoration: BoxDecoration(
                     color: ColorManager.whiteColor,
                     borderRadius: BorderRadius.circular(10),
@@ -251,8 +235,7 @@ class _HomeXState extends State<HomeX> {
                           ),
                           Text(
                             "View all",
-                            style: getRegularStyle(
-                                color: ColorManager.blackColor, fontSize: 14),
+                            style: getRegularStyle(color: ColorManager.blackColor, fontSize: 14),
                           ),
                         ],
                       ),
@@ -271,15 +254,13 @@ class _HomeXState extends State<HomeX> {
                                     padding: const EdgeInsets.all(5),
                                     decoration: BoxDecoration(
                                       shape: BoxShape.circle,
-                                      color: ColorManager.primaryColor
-                                          .withOpacity(.2),
+                                      color: ColorManager.primaryColor.withOpacity(.2),
                                     ),
                                     child: SvgPicture.asset(ImageAssets.airt),
                                   ),
                                   UIHelper.horizontalSpaceSmall,
                                   Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         "Airtime",
@@ -310,11 +291,9 @@ class _HomeXState extends State<HomeX> {
                                     ),
                                   ),
                                   Container(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 5, vertical: 5),
+                                    padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
                                     decoration: BoxDecoration(
-                                      color: ColorManager.activeColor
-                                          .withOpacity(.2),
+                                      color: ColorManager.activeColor.withOpacity(.2),
                                       borderRadius: BorderRadius.circular(10),
                                     ),
                                     child: Text(
@@ -367,8 +346,7 @@ class Home extends StatelessWidget {
       child: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 15.0, vertical: 20.0),
+            padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 20.0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -388,9 +366,7 @@ class Home extends StatelessWidget {
                           child: Center(
                               child: Text(
                             AppConstants.homeModel != null
-                                ? AppConstants.homeModel!.data.user.name
-                                    .substring(0, 2)
-                                    .toUpperCase()
+                                ? AppConstants.homeModel!.data.user.name.substring(0, 2).toUpperCase()
                                 : "",
                             style: getBoldStyle(
                               color: ColorManager.blackColor,
@@ -406,15 +382,11 @@ class Home extends StatelessWidget {
                               AppConstants.homeModel != null
                                   ? "Hello ${AppConstants.homeModel!.data.user.username}!"
                                   : "Hello !",
-                              style:
-                                  getBoldStyle(color: ColorManager.blackColor)
-                                      .copyWith(fontSize: 16),
+                              style: getBoldStyle(color: ColorManager.blackColor).copyWith(fontSize: 16),
                             ),
                             Text(
                               "Welcome!",
-                              style:
-                                  getBoldStyle(color: ColorManager.blackColor)
-                                      .copyWith(fontSize: 12),
+                              style: getBoldStyle(color: ColorManager.blackColor).copyWith(fontSize: 12),
                             ),
                           ],
                         ),
@@ -425,8 +397,7 @@ class Home extends StatelessWidget {
                 ),
                 UIHelper.verticalSpaceSmall,
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                   decoration: BoxDecoration(
                     color: ColorManager.whiteColor,
                     borderRadius: BorderRadius.circular(15),
@@ -455,16 +426,11 @@ class Home extends StatelessWidget {
                               IconButton(
                                 onPressed: homeProvider.toggleBalance,
                                 icon: Icon(
-                                  homeProvider.showBalance
-                                      ? Icons.visibility_off
-                                      : Icons.remove_red_eye,
-                                  color: homeProvider.showBalance
-                                      ? ColorManager.greyColor
-                                      : ColorManager.blackColor,
+                                  homeProvider.showBalance ? Icons.visibility_off : Icons.remove_red_eye,
+                                  color: homeProvider.showBalance ? ColorManager.greyColor : ColorManager.blackColor,
                                   size: 20, // Adjust the icon size
                                 ),
-                                padding: const EdgeInsets.all(
-                                    8), // Adjust padding around the icon
+                                padding: const EdgeInsets.all(8), // Adjust padding around the icon
                                 color: Colors.white, // Adjust the icon color
                               )
                             ],
@@ -473,17 +439,14 @@ class Home extends StatelessWidget {
                             AppConstants.homeModel != null
                                 ? homeProvider.showBalance
                                     ? formatCurrency(
-                                        double.parse(AppConstants
-                                            .homeModel!.data.wallet.balance),
+                                        double.parse(AppConstants.homeModel!.data.wallet.balance),
                                       )
                                     : "********"
                                 : "${AppConstants.currencySymbol} 0.00", //
                             style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.normal,
-                              color: homeProvider.showBalance
-                                  ? ColorManager.blackColor
-                                  : ColorManager.greyColor,
+                              color: homeProvider.showBalance ? ColorManager.blackColor : ColorManager.greyColor,
                             ),
                           ),
                         ],
@@ -501,11 +464,9 @@ class Home extends StatelessWidget {
                               );
                             },
                             child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 8, vertical: 2),
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                                 decoration: BoxDecoration(
-                                    gradient: ColorManager.buttonGradient,
-                                    borderRadius: BorderRadius.circular(30)),
+                                    gradient: ColorManager.buttonGradient, borderRadius: BorderRadius.circular(30)),
                                 child: Row(
                                   children: [
                                     Icon(
@@ -555,12 +516,10 @@ class Home extends StatelessWidget {
                                 Container(
                                   padding: const EdgeInsets.all(10),
                                   decoration: BoxDecoration(
-                                    color: ColorManager.primaryColor
-                                        .withOpacity(.1),
+                                    color: ColorManager.primaryColor.withOpacity(.1),
                                     borderRadius: BorderRadius.circular(8),
                                   ),
-                                  child: SvgPicture.asset(
-                                      services[index].imageUrl),
+                                  child: SvgPicture.asset(services[index].imageUrl),
                                 ),
                                 UIHelper.verticalSpaceSmall,
                                 Text(
@@ -581,8 +540,7 @@ class Home extends StatelessWidget {
                 UIHelper.verticalSpaceMedium,
                 Container(
                   height: screenAwareSize(600, context),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
                   decoration: BoxDecoration(
                     color: ColorManager.whiteColor,
                     borderRadius: BorderRadius.circular(10),
@@ -604,30 +562,33 @@ class Home extends StatelessWidget {
                             future: UserApiServices().getHistories(),
                             builder: (context, snapshot) {
                               if (snapshot.hasData) {
-                                HistoryResponse _history =
-                                    HistoryResponse.fromJson(snapshot.data);
-                                if (_history.data.length == 0) {
+                                log("histories---> ${snapshot.data}");
+                                // Cast snapshot.data to List<dynamic>
+                                // List<dynamic> jsonList = snapshot.data as List<dynamic>;
+                                // // Create a HistoryResponse using the list of history items.
+                                // HistoryResponse _history = HistoryResponse(
+                                //   data: jsonList.map((item) => HistoryData.fromJson(item)).toList(),
+                                // );
+
+                                 HistoryResponse _history = HistoryResponse.fromJson(snapshot.data);
+
+                                // Continue with your UI using _history
+                                if (_history.data.isEmpty) {
                                   return Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
+                                    crossAxisAlignment: CrossAxisAlignment.center,
                                     children: [
                                       Center(
                                         child: Column(
                                           children: [
                                             SizedBox(
-                                              width:
-                                                  screenAwareSize(300, context),
-                                              height:
-                                                  screenAwareSize(300, context),
+                                              width: screenAwareSize(300, context),
+                                              height: screenAwareSize(300, context),
                                               child: Icon(
                                                 Icons.light_mode_sharp,
-                                                color:
-                                                    ColorManager.primaryColor,
+                                                color: ColorManager.primaryColor,
                                                 size: 50,
                                               ),
-                                              // child: Image.asset(
-                                              //     "assets/images/noRTransaction.png"),
                                             ),
                                             Text(
                                               "You have no transaction history",
@@ -641,90 +602,63 @@ class Home extends StatelessWidget {
                                     ],
                                   );
                                 } else {
+                                  // Build your ListView.builder for the non-empty state.
                                   return ListView.builder(
-                                    itemCount: 5,
+                                    itemCount: _history.data.length,
+                                    shrinkWrap: true,
                                     itemBuilder: (context, index) {
-                                      final entry = _history.data.entries
-                                          .elementAt(index);
-                                      HistoryData historyData = entry.value;
+                                      HistoryData historyData = _history.data[index]!;
                                       return Column(
                                         children: [
                                           Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                                vertical: 5.0),
+                                            padding: const EdgeInsets.symmetric(vertical: 5.0),
                                             child: InkWell(
                                               onTap: () {
                                                 NavigateClass().pushNamed(
                                                   context: context,
-                                                  routName:
-                                                      Routes.transactionDetail,
+                                                  routName: Routes.transactionDetail,
                                                   args: historyData,
                                                 );
                                               },
                                               child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                 children: [
                                                   Row(
                                                     children: [
                                                       Container(
-                                                        height: screenAwareSize(
-                                                            60, context),
-                                                        width: screenAwareSize(
-                                                            60, context),
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .all(5),
-                                                        decoration:
-                                                            BoxDecoration(
-                                                          shape:
-                                                              BoxShape.circle,
-                                                          color: ColorManager
-                                                              .primaryColor
-                                                              .withOpacity(.2),
+                                                        height: screenAwareSize(60, context),
+                                                        width: screenAwareSize(60, context),
+                                                        padding: const EdgeInsets.all(5),
+                                                        decoration: BoxDecoration(
+                                                          shape: BoxShape.circle,
+                                                          color: ColorManager.primaryColor.withOpacity(.2),
                                                         ),
                                                         child: Center(
-                                                            child: Text(
-                                                          historyData
-                                                              .operatorCode
-                                                              .substring(0, 2)
-                                                              .toUpperCase(),
-                                                          style: getBoldStyle(
-                                                            color: ColorManager
-                                                                .blackColor,
-                                                            fontSize: 18,
+                                                          child: Text(
+                                                            historyData.operatorCode.substring(0, 2).toUpperCase(),
+                                                            style: getBoldStyle(
+                                                              color: ColorManager.blackColor,
+                                                              fontSize: 18,
+                                                            ),
                                                           ),
-                                                        )),
-                                                        // child: SvgPicture.asset(ImageAssets.airt),
+                                                        ),
                                                       ),
-                                                      UIHelper
-                                                          .horizontalSpaceSmall,
+                                                      UIHelper.horizontalSpaceSmall,
                                                       Column(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
+                                                        crossAxisAlignment: CrossAxisAlignment.start,
                                                         children: [
                                                           Text(
-                                                            historyData
-                                                                .purchase,
+                                                            historyData.purchase,
                                                             style: getBoldStyle(
-                                                              color: ColorManager
-                                                                  .blackColor,
+                                                              color: ColorManager.blackColor,
                                                               fontSize: 14,
                                                             ),
                                                           ),
-                                                          UIHelper
-                                                              .verticalSpaceSmall,
+                                                          UIHelper.verticalSpaceSmall,
                                                           Text(
-                                                            //"July 12th, 11:45:04",
-                                                            historyData
-                                                                .completedUtc
-                                                                .toString(),
-                                                            style:
-                                                                getRegularStyle(
-                                                              color: ColorManager
-                                                                  .blackColor,
+                                                            historyData.completedUtc.toString(),
+                                                            style: getRegularStyle(
+                                                              color: ColorManager.blackColor,
                                                               fontSize: 10,
                                                             ),
                                                           ),
@@ -733,60 +667,30 @@ class Home extends StatelessWidget {
                                                     ],
                                                   ),
                                                   Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
                                                     children: [
                                                       Text(
-                                                        //"₦ 2000.00",
                                                         "₦ ${historyData.sellingPrice}",
                                                         style: getBoldStyle(
-                                                          color: ColorManager
-                                                              .blackColor,
+                                                          color: ColorManager.blackColor,
                                                           fontSize: 12,
                                                         ),
                                                       ),
-                                                      UIHelper
-                                                          .verticalSpaceSmall,
+                                                      UIHelper.verticalSpaceSmall,
                                                       Container(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .symmetric(
-                                                                horizontal: 8,
-                                                                vertical: 5),
-                                                        decoration:
-                                                            BoxDecoration(
-                                                          color: historyData
-                                                                      .processingState
-                                                                      .toLowerCase() ==
-                                                                  "failed"
-                                                              ? ColorManager
-                                                                  .errorColor
-                                                                  .withOpacity(
-                                                                      .1)
-                                                              : ColorManager
-                                                                  .activeColor
-                                                                  .withOpacity(
-                                                                      .1),
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(10),
+                                                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                                                        decoration: BoxDecoration(
+                                                          color: historyData.processingState.toLowerCase() == "failed"
+                                                              ? ColorManager.errorColor.withOpacity(.1)
+                                                              : ColorManager.activeColor.withOpacity(.1),
+                                                          borderRadius: BorderRadius.circular(10),
                                                         ),
                                                         child: Text(
-                                                          //"Successful",
-                                                          historyData
-                                                              .processingState
-                                                              .toString(),
-                                                          style:
-                                                              getRegularStyle(
-                                                            color: historyData
-                                                                        .processingState
-                                                                        .toLowerCase() ==
-                                                                    "failed"
-                                                                ? ColorManager
-                                                                    .errorColor
-                                                                : ColorManager
-                                                                    .activeColor,
+                                                          historyData.processingState.toString(),
+                                                          style: getRegularStyle(
+                                                            color: historyData.processingState.toLowerCase() == "failed"
+                                                                ? ColorManager.errorColor
+                                                                : ColorManager.activeColor,
                                                             fontSize: 10,
                                                           ),
                                                         ),
@@ -803,47 +707,190 @@ class Home extends StatelessWidget {
                                       );
                                     },
                                   );
-                      
                                 }
-                              } else if (snapshot.hasError) {
-                                return Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Center(
-                                      child: Column(
-                                        children: [
-                                          SizedBox(
-                                            width:
-                                                screenAwareSize(300, context),
-                                            height:
-                                                screenAwareSize(300, context),
-                                            child: Icon(
-                                              Icons.light_mode_sharp,
-                                              color: ColorManager.primaryColor,
-                                              size: 50,
-                                            ),
-                                            // child: Image.asset(
-                                            //     "assets/images/noRTransaction.png"),
-                                          ),
-                                          Text(
-                                            "An error occurred trying to get history\nPlease try again later",
-                                            textAlign: TextAlign.center,
-                                            style: getBoldStyle(
-                                              color: ColorManager.blackColor,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    )
-                                  ],
-                                );
-                              } else if (snapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                                return WidgetListLoaderShimmer();
-                              } else {
-                                return WidgetListLoaderShimmer();
                               }
+
+                              return WidgetListLoaderShimmer();
+                              // if (snapshot.hasData) {
+                              //   log("histories---> ${snapshot.data}");
+                              //   HistoryResponse _history = HistoryResponse.fromJson(snapshot.data);
+                              //   if (_history.data.length == 0) {
+                              //     return Column(
+                              //       mainAxisAlignment: MainAxisAlignment.center,
+                              //       crossAxisAlignment: CrossAxisAlignment.center,
+                              //       children: [
+                              //         Center(
+                              //           child: Column(
+                              //             children: [
+                              //               SizedBox(
+                              //                 width: screenAwareSize(300, context),
+                              //                 height: screenAwareSize(300, context),
+                              //                 child: Icon(
+                              //                   Icons.light_mode_sharp,
+                              //                   color: ColorManager.primaryColor,
+                              //                   size: 50,
+                              //                 ),
+                              //                 // child: Image.asset(
+                              //                 //     "assets/images/noRTransaction.png"),
+                              //               ),
+                              //               Text(
+                              //                 "You have no transaction history",
+                              //                 style: getBoldStyle(
+                              //                   color: ColorManager.blackColor,
+                              //                 ),
+                              //               ),
+                              //             ],
+                              //           ),
+                              //         )
+                              //       ],
+                              //     );
+                              //   } else {
+                              //     return ListView.builder(
+                              //       itemCount: 5,
+                              //       shrinkWrap: true,
+                              //       //  physics: NeverScrollableScrollPhysics(),
+                              //       itemBuilder: (context, index) {
+                              //         final entry = _history.data.entries.elementAt(index);
+                              //         HistoryData historyData = entry.value;
+                              //         return Column(
+                              //           children: [
+                              //             Padding(
+                              //               padding: const EdgeInsets.symmetric(vertical: 5.0),
+                              //               child: InkWell(
+                              //                 onTap: () {
+                              //                   NavigateClass().pushNamed(
+                              //                     context: context,
+                              //                     routName: Routes.transactionDetail,
+                              //                     args: historyData,
+                              //                   );
+                              //                 },
+                              //                 child: Row(
+                              //                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              //                   children: [
+                              //                     Row(
+                              //                       children: [
+                              //                         Container(
+                              //                           height: screenAwareSize(60, context),
+                              //                           width: screenAwareSize(60, context),
+                              //                           padding: const EdgeInsets.all(5),
+                              //                           decoration: BoxDecoration(
+                              //                             shape: BoxShape.circle,
+                              //                             color: ColorManager.primaryColor.withOpacity(.2),
+                              //                           ),
+                              //                           child: Center(
+                              //                               child: Text(
+                              //                             historyData.operatorCode.substring(0, 2).toUpperCase(),
+                              //                             style: getBoldStyle(
+                              //                               color: ColorManager.blackColor,
+                              //                               fontSize: 18,
+                              //                             ),
+                              //                           )),
+                              //                           // child: SvgPicture.asset(ImageAssets.airt),
+                              //                         ),
+                              //                         UIHelper.horizontalSpaceSmall,
+                              //                         Column(
+                              //                           crossAxisAlignment: CrossAxisAlignment.start,
+                              //                           children: [
+                              //                             Text(
+                              //                               historyData.purchase,
+                              //                               style: getBoldStyle(
+                              //                                 color: ColorManager.blackColor,
+                              //                                 fontSize: 14,
+                              //                               ),
+                              //                             ),
+                              //                             UIHelper.verticalSpaceSmall,
+                              //                             Text(
+                              //                               //"July 12th, 11:45:04",
+                              //                               historyData.completedUtc.toString(),
+                              //                               style: getRegularStyle(
+                              //                                 color: ColorManager.blackColor,
+                              //                                 fontSize: 10,
+                              //                               ),
+                              //                             ),
+                              //                           ],
+                              //                         )
+                              //                       ],
+                              //                     ),
+                              //                     Column(
+                              //                       crossAxisAlignment: CrossAxisAlignment.start,
+                              //                       children: [
+                              //                         Text(
+                              //                           //"₦ 2000.00",
+                              //                           "₦ ${historyData.sellingPrice}",
+                              //                           style: getBoldStyle(
+                              //                             color: ColorManager.blackColor,
+                              //                             fontSize: 12,
+                              //                           ),
+                              //                         ),
+                              //                         UIHelper.verticalSpaceSmall,
+                              //                         Container(
+                              //                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                              //                           decoration: BoxDecoration(
+                              //                             color: historyData.processingState.toLowerCase() == "failed"
+                              //                                 ? ColorManager.errorColor.withOpacity(.1)
+                              //                                 : ColorManager.activeColor.withOpacity(.1),
+                              //                             borderRadius: BorderRadius.circular(10),
+                              //                           ),
+                              //                           child: Text(
+                              //                             //"Successful",
+                              //                             historyData.processingState.toString(),
+                              //                             style: getRegularStyle(
+                              //                               color: historyData.processingState.toLowerCase() == "failed"
+                              //                                   ? ColorManager.errorColor
+                              //                                   : ColorManager.activeColor,
+                              //                               fontSize: 10,
+                              //                             ),
+                              //                           ),
+                              //                         )
+                              //                       ],
+                              //                     )
+                              //                   ],
+                              //                 ),
+                              //               ),
+                              //             ),
+                              //             UIHelper.verticalSpaceSmall,
+                              //             Divider(),
+                              //           ],
+                              //         );
+                              //       },
+                              //     );
+                              //   }
+                              // } else if (snapshot.hasError) {
+                              //   return Column(
+                              //     mainAxisAlignment: MainAxisAlignment.center,
+                              //     crossAxisAlignment: CrossAxisAlignment.center,
+                              //     children: [
+                              //       Center(
+                              //         child: Column(
+                              //           children: [
+                              //             SizedBox(
+                              //               width: screenAwareSize(300, context),
+                              //               height: screenAwareSize(300, context),
+                              //               child: Icon(
+                              //                 Icons.light_mode_sharp,
+                              //                 color: ColorManager.primaryColor,
+                              //                 size: 50,
+                              //               ),
+                              //               // child: Image.asset(
+                              //               //     "assets/images/noRTransaction.png"),
+                              //             ),
+                              //             Text(
+                              //               "An error occurred trying to get history\nPlease try again later",
+                              //               textAlign: TextAlign.center,
+                              //               style: getBoldStyle(
+                              //                 color: ColorManager.blackColor,
+                              //               ),
+                              //             ),
+                              //           ],
+                              //         ),
+                              //       )
+                              //     ],
+                              //   );
+                              // } else if (snapshot.connectionState == ConnectionState.waiting) {
+                              //   return WidgetListLoaderShimmer();
+                              // } else {
+                              //   return WidgetListLoaderShimmer();
+                              // }
                             }),
                       ),
 
@@ -935,8 +982,7 @@ class Home extends StatelessWidget {
 }
 
 String formatCurrency(double amount) {
-  final format = NumberFormat.currency(
-      locale: 'en_NG', symbol: AppConstants.currencySymbol); // US Dollar
+  final format = NumberFormat.currency(locale: 'en_NG', symbol: AppConstants.currencySymbol); // US Dollar
   return format.format(amount);
 }
 
